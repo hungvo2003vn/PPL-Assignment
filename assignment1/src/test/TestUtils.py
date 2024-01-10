@@ -8,10 +8,10 @@ if os.path.isdir('../target/main/bkool/parser') and not '../target/main/bkool/pa
 from BKOOLLexer import BKOOLLexer
 from BKOOLParser import BKOOLParser
 from lexererr import *
-# from ASTGeneration import ASTGeneration
-# from StaticCheck import StaticChecker
-# from StaticError import *
-# from CodeGenerator import CodeGenerator
+from ASTGeneration import ASTGeneration
+from StaticCheck import StaticChecker
+from StaticError import *
+from CodeGenerator import CodeGenerator
 import subprocess
 
 JASMIN_JAR = "./external/jasmin.jar"

@@ -6,6 +6,7 @@
 *
 '''
 from abc import ABC, abstractmethod, ABCMeta
+from CodeGenError import *
 
 class MachineCode(ABC):
     @abstractmethod
