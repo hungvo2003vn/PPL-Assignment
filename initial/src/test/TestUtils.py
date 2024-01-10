@@ -1,12 +1,12 @@
 import sys,os
 from antlr4 import *
 from antlr4.error.ErrorListener import ConsoleErrorListener,ErrorListener
-if not './main/bkool/parser/' in sys.path:
-    sys.path.append('./main/bkool/parser/')
-if os.path.isdir('../target/main/bkool/parser') and not '../target/main/bkool/parser/' in sys.path:
-    sys.path.append('../target/main/bkool/parser/')
-from BKOOLLexer import BKOOLLexer
-from BKOOLParser import BKOOLParser
+if not './main/zcode/parser/' in sys.path:
+    sys.path.append('./main/zcode/parser/')
+if os.path.isdir('../target/main/zcode/parser') and not '../target/main/zcode/parser/' in sys.path:
+    sys.path.append('../target/main/zcode/parser/')
+from ZCodeLexer import ZCodeLexer
+from ZCodeParser import ZCodeParser
 from lexererr import *
 # from ASTGeneration import ASTGeneration
 # from StaticCheck import StaticChecker
@@ -17,8 +17,8 @@ import subprocess
 JASMIN_JAR = "./external/jasmin.jar"
 TEST_DIR = "./test/testcases/"
 SOL_DIR = "./test/solutions/"
-Lexer = BKOOLLexer
-Parser = BKOOLParser
+Lexer = ZCodeLexer
+Parser = ZCodeParser
 
 class TestUtil:
     @staticmethod
@@ -181,9 +181,9 @@ class TestCodeGen():
         try:
             codeGen.gen(asttree, path)
             
-            subprocess.call("java  -jar "+ JASMIN_JAR + " " + path + "/BKOOLClass.j",shell=True,stderr=subprocess.STDOUT)
+            subprocess.call("java  -jar "+ JASMIN_JAR + " " + path + "/ZCodeClass.j",shell=True,stderr=subprocess.STDOUT)
             
-            subprocess.run("java -cp ./lib:. BKOOLClass",shell=True, stdout = f, timeout=10)
+            subprocess.run("java -cp ./lib:. ZCodeClass",shell=True, stdout = f, timeout=10)
         except StaticError as e:
             f.write(str(e))
         except subprocess.TimeoutExpired:

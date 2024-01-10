@@ -7,11 +7,11 @@ import shutil
 import platform
 from antlr4 import *
 
-for path in ['./test/', './main/bkool/parser/', './main/bkool/utils/', './main/bkool/astgen/', './main/bkool/checker/', './main/bkool/codegen/']:
+for path in ['./test/', './main/zcode/parser/', './main/zcode/utils/', './main/zcode/astgen/', './main/zcode/checker/', './main/zcode/codegen/']:
     sys.path.append(path)
 ANTLR_JAR = os.environ.get('ANTLR_JAR')
 TARGET_DIR = '../target'
-GENERATE_DIR = 'main/bkool/parser'
+GENERATE_DIR = 'main/zcode/parser'
 
 
 def main(argv):
@@ -19,7 +19,7 @@ def main(argv):
         printUsage()
     elif argv[0] == 'gen':
         subprocess.run(["java", "-jar", ANTLR_JAR, "-o", "../target",
-                       "-no-listener", "-visitor", "main/bkool/parser/BKOOL.g4"])
+                       "-no-listener", "-visitor", "main/zcode/parser/ZCode.g4"])
 
     elif argv[0] == 'clean':
         shutil.rmtree(TARGET_DIR)
@@ -36,17 +36,17 @@ def main(argv):
         seperator = ';' if platform.system() == "Windows" else ":"
         process1 = subprocess.Popen(
             ["java", "-jar", ANTLR_JAR,
-             "BKOOL.g4", "-Dlanguage=Java"], cwd="{}/test/gui".format(os.getcwd()))
+             "ZCode.g4", "-Dlanguage=Java"], cwd="{}/test/gui".format(os.getcwd()))
         process1.wait()
 
         process2 = subprocess.Popen(
-            "javac -classpath {} BKOOL*.java".format(ANTLR_JAR), cwd="{}/test/gui".format(os.getcwd()), shell=True)
+            "javac -classpath {} ZCode*.java".format(ANTLR_JAR), cwd="{}/test/gui".format(os.getcwd()), shell=True)
         process2.wait()
 
-        process3 = subprocess.run('java -cp ".{}{}" org.antlr.v4.gui.TestRig BKOOL program -gui code.txt'.format(
+        process3 = subprocess.run('java -cp ".{}{}" org.antlr.v4.gui.TestRig ZCode program -gui code.txt'.format(
             seperator, ANTLR_JAR), cwd="{}/test/gui".format(os.getcwd()), shell=True)
 
-        for filename in glob.glob("./test/gui/BKOOL*"):
+        for filename in glob.glob("./test/gui/ZCode*"):
             _, extname = os.path.splitext(filename)
             if extname == '.g4':
                 continue
@@ -55,7 +55,7 @@ def main(argv):
     elif argv[0] == 'test':
         if not os.path.isdir(TARGET_DIR + "/" + GENERATE_DIR):
             subprocess.run(["java", "-jar", ANTLR_JAR, "-o", GENERATE_DIR,
-                           "-no-listener", "-visitor", "main/bkool/parser/BKOOL.g4"])
+                           "-no-listener", "-visitor", "main/zcode/parser/ZCode.g4"])
         if not (TARGET_DIR + "/" + GENERATE_DIR) in sys.path:
             sys.path.append(TARGET_DIR + "/" + GENERATE_DIR)
         if len(argv) < 2:
