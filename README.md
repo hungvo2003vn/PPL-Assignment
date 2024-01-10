@@ -1,5 +1,16 @@
 # PPL-Assignment-1
 
+## Install Requirements
+
+- MacOS/Linux:
+```
+pip3 install -r requirements.txt
+```
+- Window:
+```
+pip install -r requirements.txt
+```
+
 ## Usage
 
 1.  Set environment variable ANTLR_JAR to the file antlr-4.9.2-complete.jar in your computer
