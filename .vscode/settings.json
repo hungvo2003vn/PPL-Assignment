@@ -1,10 +1,10 @@
 {
     "python.analysis.extraPaths": [
-        "./assignment1/src/test",
-        "./assignment1/src/main/bkool/parser",
-        "./assignment1/src/main/bkool/utils",
-        "./assignment1/src/main/bkool/astgen",
-        "./assignment1/src/main/bkool/checker",
-        "./assignment1/src/main/bkool/codegen"
+        "./initial/src/test",
+        "./initial/src/main/zcode/parser",
+        "./initial/src/main/zcode/utils",
+        "./initial/src/main/zcode/astgen",
+        "./initial/src/main/zcode/checker",
+        "./initial/src/main/zcode/codegen"
     ]
 }
