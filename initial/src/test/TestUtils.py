@@ -37,6 +37,7 @@ class TestLexer:
         TestLexer.check(SOL_DIR,inputfile,num)
         dest = open(SOL_DIR + str(num) + ".txt","r")
         line = dest.read()
+        print(f'Got: {line}, {num}')
         return line == expect
     
     @staticmethod
