@@ -73,7 +73,10 @@ ID: [a-zA-Z_][a-zA-Z0-9_]*;
 
 // TODO Literal 
 // ! STRING_LIT nhớ dùng python bỏ đi " " đầu và cuối và NUMBER_LIT
-STRING_LIT: '"'(~[\r\n\f\\'"] | '\\'[bfrnt'\\] | '\'"')* '"'{self.text = self.text[1:-1];};
+// STRING_LIT: '"'(~[\r\n\f\\'"] | '\\'[bfrnt'\\] | '\'"')* '"'{self.text = self.text[1:-1];};
+STRING_LIT: '"'(~[\r\n\f\\'"] | VALID_SEQUENCE)* '"'{self.text = self.text[1:-1];};
+fragment VALID_SEQUENCE: '\\' [bfrnt'\\] | '\'"';
+
 NUMBER_LIT: DIGIT+ (DECIMAL | DECIMAL? EXPONENT?);
 BOOL_LIT: TRUE | FALSE;
 
@@ -94,8 +97,8 @@ WS : [ \t\r]+ -> skip ; // skip spaces, tabs
 // TODO ERROR
 //! hiện thực  UNCLOSE_STRING và ILLEGAL_ESCAPE code antlr và python tận dụng lại ý tưởng STRING_LIT
 ERROR_CHAR: . {raise ErrorToken(self.text)};
-UNCLOSE_STRING: .;
-ILLEGAL_ESCAPE: .;
+UNCLOSE_STRING: '"'(~[\r\n\f\\'"] | VALID_SEQUENCE)* {raise UncloseString(self.text[1:])};
+ILLEGAL_ESCAPE: '"' ( '\'' ~["] | '\\' ~[bfrnt'\\] | [\r\n\f\\'"])* '"' {raise IllegalEscape(self.text[1:])};
 
 
 

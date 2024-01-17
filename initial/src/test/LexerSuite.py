@@ -79,23 +79,23 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.test(input,expect,114))
         self.assertTrue(TestLexer.test(""" "'"Vo '" Tien '"" ""","'\"Vo '\" Tien '\",<EOF>",115))
         
-    #     ##^ kiểm tra lỗi Unclosed String
-    #     self.assertTrue(TestLexer.test(""" "Vo \n" """, "Unclosed String: Vo ", 116))
-    #     self.assertTrue(TestLexer.test(""" "Vo \n Tien" """, "Unclosed String: Vo ", 117))
-    #     self.assertTrue(TestLexer.test(""" "Vo  """, "Unclosed String: Vo  ", 118))
-    #     self.assertTrue(TestLexer.test(""" "Vo \\n \n """, "Unclosed String: Vo \\n ", 119))
-    #     self.assertTrue(TestLexer.test(""" "Vo \\n \\b """, "Unclosed String: Vo \\n \\b ", 120))
+        ##^ kiểm tra lỗi Unclosed String
+        # self.assertTrue(TestLexer.test(""" "Vo \n" """, "Unclosed String: Vo ", 116))
+        # self.assertTrue(TestLexer.test(""" "Vo \n Tien" """, "Unclosed String: Vo ", 117))
+        # self.assertTrue(TestLexer.test(""" "Vo  """, "Unclosed String: Vo  ", 118))
+        # self.assertTrue(TestLexer.test(""" "Vo \\n \n """, "Unclosed String: Vo \\n ", 119))
+        # self.assertTrue(TestLexer.test(""" "Vo \\n \\b """, "Unclosed String: Vo \\n \\b ", 120))
         
-    #     ##^ kiểm tra lỗi Illegal Escape
-    #     # self.assertTrue(TestLexer.test(""" "Tien \t \n" """, "Illegal Escape In String: Tien 	", 121))
-    #     self.assertTrue(TestLexer.test(""" "Tien \f \n ccc" """, "Illegal Escape In String: Tien \f", 122))
-    #     self.assertTrue(TestLexer.test(""" "Tien \\1  """, "Illegal Escape In String: Tien \\1", 123))
-    #     self.assertTrue(TestLexer.test(""" "Tien \\2 \\n \n """, "Illegal Escape In String: Tien \\2", 124))
-    #     self.assertTrue(TestLexer.test(""" "Tien \\e \\n \\r """, "Illegal Escape In String: Tien \\e", 125))        
-    #     self.assertTrue(TestLexer.test(""" "Tien \\321 \\n \\r """, "Illegal Escape In String: Tien \\3", 126))
-    #     self.assertTrue(TestLexer.test(""" "Tien \\"1 " """, "Illegal Escape In String: Tien \\\"", 127))          
-    #     self.assertTrue(TestLexer.test(""" "Tien ' " " """, "Illegal Escape In String: Tien ' ", 128))
-    #     self.assertTrue(TestLexer.test(""" "Tien \\' ""1 """, "Tien \\' ,Unclosed String: 1 ", 129))  
+        #^ kiểm tra lỗi Illegal Escape
+        self.assertTrue(TestLexer.test(""" "Tien \t \n" """, "Illegal Escape In String: Tien 	", 121))
+        self.assertTrue(TestLexer.test(""" "Tien \f \n ccc" """, "Illegal Escape In String: Tien \f", 122))
+        self.assertTrue(TestLexer.test(""" "Tien \\1  """, "Illegal Escape In String: Tien \\1", 123))
+        self.assertTrue(TestLexer.test(""" "Tien \\2 \\n \n """, "Illegal Escape In String: Tien \\2", 124))
+        self.assertTrue(TestLexer.test(""" "Tien \\e \\n \\r """, "Illegal Escape In String: Tien \\e", 125))        
+        self.assertTrue(TestLexer.test(""" "Tien \\321 \\n \\r """, "Illegal Escape In String: Tien \\3", 126))
+        self.assertTrue(TestLexer.test(""" "Tien \\"1 " """, "Illegal Escape In String: Tien \\\"", 127))          
+        self.assertTrue(TestLexer.test(""" "Tien ' " " """, "Illegal Escape In String: Tien ' ", 128))
+        self.assertTrue(TestLexer.test(""" "Tien \\' ""1 """, "Tien \\' ,Unclosed String: 1 ", 129))  
         
     def test_Comments_newline(self):
         """test Comments và newline""" 
