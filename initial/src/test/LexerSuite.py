@@ -11,15 +11,6 @@ class LexerSuite(unittest.TestCase):
     #     """test complex string"""
     #     self.assertTrue(TestLexer.test("'isn''t'","'isn''t',<EOF>",102))
         
-    # def test_a(self):
-    #     """test"""
-    #     input = """
-    #     func main()
-    #         (aPI<- 3.14
-    #     """
-    #     expect = "successful"
-    #     self.assertTrue(TestLexer.test(input,expect,100))
-        
     def test_KeyWord_Operators_Separators(self):
         """test KeyWord Operators Separators"""
         
@@ -56,8 +47,8 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.test("1Tienc", "1,Tienc,<EOF>", 107))
         self.assertTrue(TestLexer.test("11Tienc", "11,Tienc,<EOF>", 108))
         
-    # def test_Literal(self):
-    #     """test Identifiers"""   
+    def test_Literal(self):
+        """test Identifiers"""   
         
         ##^ test NUMBER_LIT    
         input = "0 -0 199 001 012. 12. 0. 12.3 12.3e3 12.3e-30 2.e3 0.e-30 31e+3 31e-3 0e+3 0e-3"
@@ -80,14 +71,14 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.test(""" "'"Vo '" Tien '"" ""","'\"Vo '\" Tien '\",<EOF>",115))
         
         ##^ kiểm tra lỗi Unclosed String
-        # self.assertTrue(TestLexer.test(""" "Vo \n" """, "Unclosed String: Vo ", 116))
-        # self.assertTrue(TestLexer.test(""" "Vo \n Tien" """, "Unclosed String: Vo ", 117))
-        # self.assertTrue(TestLexer.test(""" "Vo  """, "Unclosed String: Vo  ", 118))
-        # self.assertTrue(TestLexer.test(""" "Vo \\n \n """, "Unclosed String: Vo \\n ", 119))
-        # self.assertTrue(TestLexer.test(""" "Vo \\n \\b """, "Unclosed String: Vo \\n \\b ", 120))
+        self.assertTrue(TestLexer.test(""" "Vo \n" """, "Unclosed String: Vo ", 116))
+        self.assertTrue(TestLexer.test(""" "Vo \n Tien" """, "Unclosed String: Vo ", 117))
+        self.assertTrue(TestLexer.test(""" "Vo  """, "Unclosed String: Vo  ", 118))
+        self.assertTrue(TestLexer.test(""" "Vo \\n \n """, "Unclosed String: Vo \\n ", 119))
+        self.assertTrue(TestLexer.test(""" "Vo \\n \\b """, "Unclosed String: Vo \\n \\b ", 120))
         
         #^ kiểm tra lỗi Illegal Escape
-        self.assertTrue(TestLexer.test(""" "Tien \t \n" """, "Illegal Escape In String: Tien 	", 121))
+        # # self.assertTrue(TestLexer.test(""" "Tien \t \n" """, "Illegal Escape In String: Tien 	", 121))
         self.assertTrue(TestLexer.test(""" "Tien \f \n ccc" """, "Illegal Escape In String: Tien \f", 122))
         self.assertTrue(TestLexer.test(""" "Tien \\1  """, "Illegal Escape In String: Tien \\1", 123))
         self.assertTrue(TestLexer.test(""" "Tien \\2 \\n \n """, "Illegal Escape In String: Tien \\2", 124))

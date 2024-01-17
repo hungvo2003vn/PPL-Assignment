@@ -97,7 +97,10 @@ WS : [ \t\r]+ -> skip ; // skip spaces, tabs
 // TODO ERROR
 ERROR_CHAR: . {raise ErrorToken(self.text)};
 UNCLOSE_STRING: '"' (VALID_SEQUENCE | VALID_ESCAPE)* ('\r\n' | '\n' | EOF) { 
-	raise UncloseString(self.text[1:])
+	tmp = self.text[1:].split("\n")[0]
+	tmp = tmp.split("\r")[0]
+	self.text = tmp
+	raise UncloseString(self.text)
 };
 ILLEGAL_ESCAPE: '"' (VALID_SEQUENCE | VALID_ESCAPE)* INVALID_ESCAPE {raise IllegalEscape(self.text[1:])};
 fragment INVALID_ESCAPE: '\\' ~[bfrnt'\\] | ~'\\' | [']~["];
