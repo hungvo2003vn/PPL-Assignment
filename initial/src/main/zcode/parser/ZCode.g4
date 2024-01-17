@@ -72,33 +72,33 @@ ID: [a-zA-Z_][a-zA-Z0-9_]*;
 
 
 // TODO Literal 
-// ! STRING_LIT nhớ dùng python bỏ đi " " đầu và cuối và NUMBER_LIT
-// STRING_LIT: '"'(~[\r\n\f\\'"] | '\\'[bfrnt'\\] | '\'"')* '"'{self.text = self.text[1:-1];};
-STRING_LIT: '"'(~[\r\n\f\\'"] | VALID_SEQUENCE)* '"'{self.text = self.text[1:-1];};
-fragment VALID_SEQUENCE: '\\' [bfrnt'\\] | '\'"';
+// STRING
+STRING_LIT: '"'(VALID_SEQUENCE | VALID_ESCAPE)* '"'{self.text = self.text[1:-1];};
+fragment VALID_ESCAPE: '\\' [bfrnt'\\] | '\'"';
+fragment VALID_SEQUENCE: ~[\r\n\f\\'"];
 
+//NUMBER
 NUMBER_LIT: DIGIT+ (DECIMAL | DECIMAL? EXPONENT?);
-BOOL_LIT: TRUE | FALSE;
 
 fragment DIGIT: [0-9];
 fragment SIGN: [+-];
 fragment EXPONENT: [eE] SIGN? DIGIT+;
 fragment DECIMAL: '.' DIGIT*;
 
+//BOOLEAN
+BOOL_LIT: TRUE | FALSE;
+
 // NEWLINE COMMENTS WS
-//! vì NEWLINE là kí tự kết thúc giống với ';' trong C nên lấy để xử lí bước sau
-//! vì ngôn ngữ này COMMENTS chỉ 1 hàng không chung với mấng y biểu thức khác nên bắt để xử lí thứ tự các bước sau
-//! COMMENTS lên lớp nghe thử thầy nói gì khônha vì này nén lỗi phần lexer cũng được mà nhưng thứ tự ngữ pháp và ở phần tiếp theo -> này tùy thầy thôi
 NEWLINE: [\n]; // 
 COMMENTS: '##' ~[\n\r\f]*; // Comments
 WS : [ \t\r]+ -> skip ; // skip spaces, tabs
 
 
 // TODO ERROR
-//! hiện thực  UNCLOSE_STRING và ILLEGAL_ESCAPE code antlr và python tận dụng lại ý tưởng STRING_LIT
 ERROR_CHAR: . {raise ErrorToken(self.text)};
-UNCLOSE_STRING: '"'(~[\r\n\f\\'"] | VALID_SEQUENCE)* {raise UncloseString(self.text[1:])};
-ILLEGAL_ESCAPE: '"' ( '\'' ~["] | '\\' ~[bfrnt'\\] | [\r\n\f\\'"])* '"' {raise IllegalEscape(self.text[1:])};
+UNCLOSE_STRING: '"' (VALID_SEQUENCE | VALID_ESCAPE)* ('\r\n' | '\n' | EOF) { raise UncloseString(self.text[1:])};
+ILLEGAL_ESCAPE: '"' ( (VALID_SEQUENCE | VALID_ESCAPE)? INVALID_ESCAPE )* '"' {raise IllegalEscape(self.text[1:])};
+fragment INVALID_ESCAPE: '\\' ~[bfrnt'\\] | ~'\\' | ~[']["];
 
 
 
