@@ -8,7 +8,45 @@ options {
 	language=Python3;
 }
 
-program: EOF;
+// program: EOF;
+
+// declared
+program: list_declared EOF;
+
+list_declared: declared list_declared | declared;
+
+declared:  VAR ID ASSIGN expression NEWLINE | ignore;
+
+/* Variable declaration */
+array_element: ID (LBRACKET expression_list RBRACKET);
+
+/* Statement */
+func_call: ID (LPARENT expression_list? RPARENT);
+
+//TODO hiện thực phần Expression và Value dùng cách viết đệ quy
+//* cuối của expression bao gồm ID, literal, (), gọi hàm   */
+
+//! Expression
+expression_list: expression COMMA expression_list | expression;
+expression: expression1 CONCAT expression1 | expression1;
+expression1: expression2 (EQUAL | STRCMP | NOT_EQUAL | LT | GT | LE | GE) expression2 | expression2;
+expression2: expression2 (AND | OR) expression3 | expression3;	
+expression3: expression3 (ADD | SUB) expression4 | expression4;
+expression4: expression4 (MUL | DIV | MOD) expression5 | expression5;
+expression5: NOT expression5 | expression6;
+expression6: SUB expression6 | expression7;
+expression7: expression7 (LBRACKET expression_list RBRACKET) | expression8;
+expression8: literal | ID | (LPARENT expression RPARENT) | func_call;
+
+
+
+//! Value
+literal: NUMBER_LIT | STRING_LIT | TRUE | FALSE | array_literal;
+array_literal: LBRACKET expression_list? RBRACKET;
+
+
+// kí tự bỏ qua
+ignore: (COMMENTS | NEWLINE)+;
 
 
 //! --------------------------  Lexical structure ----------------------- //

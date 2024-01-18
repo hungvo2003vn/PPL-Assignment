@@ -1,0 +1,6 @@
+ 
+            var VoTien <- a[1] + 1
+            var VoTien <- array[1,1+2][1][2,3]
+            var VoTien <- array[1,(1)...2,array[ar[(1*2) and 1]],array[2]]
+            var VoTien <- 1[1] + fun()[1,fun()] 
+        
