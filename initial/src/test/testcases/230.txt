@@ -1,0 +1,11 @@
+
+        ## comment
+        func main()
+        
+            ## comment
+            aPI <- 3.14
+            ## comment
+            
+        ## comment
+        
+        

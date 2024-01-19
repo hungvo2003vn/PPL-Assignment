@@ -1,1 +1,3 @@
- var VoTien <- "Vo" ... "Tien" 
+ 
+            func main(number a) break ##12
+        

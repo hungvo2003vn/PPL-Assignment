@@ -1,2 +1,17 @@
-func main () return 1
+ 
+            number VoTien
+            
+            ## VO Tien
+            number VoTien <- 0
+            bool a[122,15]
+            bool a[122,15] <- 1
+            string b[3]
+            ## 12 
+            
+            string b[3] <- 2
+            var i <- 0
+            dynamic i
+            dynamic i <- 0
+            ## VO Tien
+             
         

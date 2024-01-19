@@ -1,9 +1,11 @@
  
-            var VoTien <- true > "true" 
-            var VoTien <- true >= "true"
-            var VoTien <- true = "true"
-            var VoTien <- true == "true"
-            var VoTien <- true < "true"
-            var VoTien <- true <= "true"
-            var VoTien <- true >= "true" ... 1 > 2
+            ##12
+            func main(number a) 
+                ##12
+                
+                break
+                ##12
+                ##12
+            func main(number a)
+            ##12        
         
