@@ -21,21 +21,22 @@ implicit_var: VAR ID ASSIGN expression;
 keyword_var: prim_type (ID | array_declared) (ASSIGN expression)?;
 implicit_dynamic: DYNAMIC ID (ASSIGN expression)?;
 prim_type: BOOL | NUMBER | STRING;
+assign_rhs: (expression | call_statement);
 
 /* array */
-array_element: ID (LBRACKET expression_list RBRACKET);
+array_element: ID list_index_operators;
+list_index_operators: expression7 list_index_operators | expression7; 
 array_declared: ID (LBRACKET list_NUMBER_LIT RBRACKET);
 list_NUMBER_LIT: NUMBER_LIT (COMMA list_NUMBER_LIT) | NUMBER_LIT;
 
 /* function declaration */
-function: FUNC ID LPARENT prameters_list? RPARENT NEWLINE (statement | );
+function: FUNC ID LPARENT prameters_list? RPARENT (ignore? statement | ignore);
 prameters_list: prim_type (ID | array_declared) COMMA prameters_list
 				| prim_type (ID | array_declared)
 				| DYNAMIC ID;
 
 /* Statement */
-// func_call: ID (LPARENT expression_list? RPARENT);
-statement_list: ignore? statement statement_list | ignore? statement;
+statement_list: (ignore? statement | ignore) statement_list | (ignore? statement | ignore);
 statement: declaration_statement | assignment_statement 
             | if_statement | for_statement 
             | break_statement | continue_statement 
@@ -44,12 +45,13 @@ statement: declaration_statement | assignment_statement
 declaration_statement: variables ignore;
 assignment_statement: (ID | array_element) ASSIGN expression ignore;
 
-if_statement: (IF LPARENT expression RPARENT ignore? statement) (NEWLINE elif_statement_list)? (NEWLINE else_statement)?;
-elif_statement: ELIF LPARENT expression RPARENT ignore? statement;
-elif_statement_list: elif_statement NEWLINE elif_statement_list | elif_statement;
-else_statement: ELSE  ignore? statement;
+if_statement: (IF condition_block statement_list) (elif_statement_list)? (else_statement)?;
+elif_statement: ELIF condition_block statement_list;
+elif_statement_list: elif_statement elif_statement_list | elif_statement;
+else_statement: ELSE statement_list;
+condition_block: LPARENT expression RPARENT | expression;
 
-for_statement: FOR NUMBER ID UNTIL expression BY expression NEWLINE (ignore? statement | );
+for_statement: FOR ID UNTIL expression BY expression (ignore statement);
 break_statement: BREAK ignore;
 continue_statement: CONTINUE ignore;
 return_statement: RETURN expression ignore;
@@ -89,8 +91,7 @@ array_literal: LBRACKET expression_list? RBRACKET;
 
 
 /* Ignore */
-ignore: (COMMENTS | NEWLINE)+;
-
+ignore: NEWLINE (COMMENTS NEWLINE | NEWLINE)*;
 
 //! --------------------------  Lexical structure ----------------------- //
 
