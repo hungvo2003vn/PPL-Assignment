@@ -21,7 +21,6 @@ implicit_var: VAR ID ASSIGN expression;
 keyword_var: prim_type (ID | array_declared) (ASSIGN expression)?;
 implicit_dynamic: DYNAMIC ID (ASSIGN expression)?;
 prim_type: BOOL | NUMBER | STRING;
-assign_rhs: (expression | call_statement);
 
 /* array */
 array_element: ID list_index_operators;
@@ -57,10 +56,11 @@ continue_statement: CONTINUE ignore;
 return_statement: RETURN expression ignore;
 
 call_statement: (
-	func_call | readNumber | writeNumber
-	readBool | write | readString | writeString
+	ID (LPARENT expression_list? RPARENT) | non_returned_func
 ) ignore;
-func_call: ID (LPARENT expression_list? RPARENT);
+func_call: ID (LPARENT expression_list? RPARENT) | returned_func;
+returned_func: readNumber | readBool | readString;
+non_returned_func: writeNumber | write | writeString;
 readNumber: 'readNumber' LPARENT RPARENT;
 writeNumber: 'writeNumber' LPARENT expression RPARENT;
 readBool: 'readBool' LPARENT RPARENT;
