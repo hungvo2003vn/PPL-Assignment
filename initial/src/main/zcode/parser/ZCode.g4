@@ -8,25 +8,57 @@ options {
 	language=Python3;
 }
 
-// program: EOF;
 
 // declared
-program: list_declared EOF;
+program: (COMMENTS NEWLINE | NEWLINE)* list_declared EOF;
 
 list_declared: declared list_declared | declared;
-
-declared:  VAR ID ASSIGN expression NEWLINE | ignore;
+declared:  function | variables ignore;
 
 /* Variable declaration */
+variables: implicit_var | keyword_var | implicit_dynamic; 
+implicit_var: VAR ID ASSIGN expression;
+keyword_var: prim_type (ID | array_declared) (ASSIGN expression)?;
+implicit_dynamic: DYNAMIC ID (ASSIGN expression)?;
+prim_type: BOOL | NUMBER | STRING;
+
+/* array */
 array_element: ID (LBRACKET expression_list RBRACKET);
+array_declared: ID (LBRACKET list_NUMBER_LIT RBRACKET);
+list_NUMBER_LIT: NUMBER_LIT (COMMA list_NUMBER_LIT) | NUMBER_LIT;
+
+/* function declaration */
+function: FUNC ID LPARENT prameters_list? RPARENT NEWLINE (statement | );
+prameters_list: prim_type (ID | array_declared) COMMA prameters_list
+				| prim_type (ID | array_declared)
+				| DYNAMIC ID;
 
 /* Statement */
+// func_call: ID (LPARENT expression_list? RPARENT);
+statement_list: ignore? statement statement_list | ignore? statement;
+statement: declaration_statement | assignment_statement 
+            | if_statement | for_statement 
+            | break_statement | continue_statement 
+            | return_statement  | call_statement | block_statement;
+
+declaration_statement: variables ignore;
+assignment_statement: (ID | array_element) ASSIGN expression ignore;
+
+if_statement: (IF LPARENT expression RPARENT ignore? statement) (NEWLINE elif_statement_list)? (NEWLINE else_statement)?;
+elif_statement: ELIF LPARENT expression RPARENT ignore? statement;
+elif_statement_list: elif_statement NEWLINE elif_statement_list | elif_statement;
+else_statement: ELSE  ignore? statement;
+
+for_statement: FOR NUMBER ID UNTIL expression BY expression NEWLINE (ignore? statement | );
+break_statement: BREAK ignore;
+continue_statement: CONTINUE ignore;
+return_statement: RETURN expression ignore;
+call_statement: func_call ignore;
 func_call: ID (LPARENT expression_list? RPARENT);
+block_statement: BEGIN statement_list? END ignore;
 
-//TODO hiện thực phần Expression và Value dùng cách viết đệ quy
-//* cuối của expression bao gồm ID, literal, (), gọi hàm   */
 
-//! Expression
+/* Expression */
 expression_list: expression COMMA expression_list | expression;
 expression: expression1 CONCAT expression1 | expression1;
 expression1: expression2 (EQUAL | STRCMP | NOT_EQUAL | LT | GT | LE | GE) expression2 | expression2;
@@ -40,12 +72,12 @@ expression8: literal | ID | (LPARENT expression RPARENT) | func_call;
 
 
 
-//! Value
+/* Value */
 literal: NUMBER_LIT | STRING_LIT | TRUE | FALSE | array_literal;
 array_literal: LBRACKET expression_list? RBRACKET;
 
 
-// kí tự bỏ qua
+/* Ignore */
 ignore: (COMMENTS | NEWLINE)+;
 
 
