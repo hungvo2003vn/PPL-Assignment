@@ -53,8 +53,19 @@ for_statement: FOR NUMBER ID UNTIL expression BY expression NEWLINE (ignore? sta
 break_statement: BREAK ignore;
 continue_statement: CONTINUE ignore;
 return_statement: RETURN expression ignore;
-call_statement: func_call ignore;
+
+call_statement: (
+	func_call | readNumber | writeNumber
+	readBool | write | readString | writeString
+) ignore;
 func_call: ID (LPARENT expression_list? RPARENT);
+readNumber: 'readNumber' LPARENT RPARENT;
+writeNumber: 'writeNumber' LPARENT expression RPARENT;
+readBool: 'readBool' LPARENT RPARENT;
+write: 'write' LPARENT expression RPARENT;
+readString: 'readString' LPARENT RPARENT;
+writeString: 'writeString' LPARENT expression RPARENT;
+
 block_statement: BEGIN statement_list? END ignore;
 
 
