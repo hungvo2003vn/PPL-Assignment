@@ -78,6 +78,21 @@ def main(argv):
             getAndTest(CheckCodeGenSuite)
         else:
             printUsage()
+
+    elif argv[0] == 'genTest':
+
+        testing_generator_path = './test' + '/' +'testGenerator/'
+        if not testing_generator_path in sys.path:
+            sys.path.append(testing_generator_path)
+        if len(argv) < 2:
+            printUsage()
+        elif argv[1] == 'LexerSuite':
+            subprocess.run(f'python {testing_generator_path}genTestCase.py LexerSuite')
+        elif argv[1] == 'ParserSuite':
+            from ParserSuite import ParserSuite
+            subprocess.run(f'python {testing_generator_path}genTestCase.py ParserSuite')
+        else:
+            printUsage()
     else:
         printUsage()
 
@@ -107,6 +122,8 @@ def printUsage():
     print("python3 run.py test ASTGenSuite")
     print("python3 run.py test CheckerSuite")
     print("python3 run.py test CodeGenSuite")
+    print("python3 run.py genTest LexerSuite")
+    print("python3 run.py genTest ParserSuite")
 
 
 if __name__ == "__main__":
