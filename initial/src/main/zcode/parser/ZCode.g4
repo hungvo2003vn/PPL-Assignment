@@ -23,8 +23,8 @@ implicit_dynamic: DYNAMIC ID (ASSIGN expression)?;
 prim_type: BOOL | NUMBER | STRING;
 
 /* array */
-array_element: ID list_index_operators;
-list_index_operators: expression7 list_index_operators | expression7; 
+array_element: (ID | func_call) index_operators;
+index_operators: (LBRACKET expression_list RBRACKET) index_operators | (LBRACKET expression_list RBRACKET); 
 array_declared: ID (LBRACKET list_NUMBER_LIT RBRACKET);
 list_NUMBER_LIT: NUMBER_LIT (COMMA list_NUMBER_LIT) | NUMBER_LIT;
 
@@ -82,7 +82,7 @@ expression4: expression4 (MUL | DIV | MOD) expression5 | expression5;
 expression5: NOT expression5 | expression6;
 expression6: SUB expression6 | expression7;
 expression7: expression7 (LBRACKET expression_list RBRACKET) | expression8;
-expression8: literal | ID | (LPARENT expression RPARENT) | func_call;
+expression8: array_element | literal | ID | (LPARENT expression RPARENT) | func_call;
 
 
 
