@@ -84,22 +84,17 @@ def main(argv):
 
     elif argv[0] == 'genTest':
 
-        python_version = 'python' if platform.system == 'Windows' else 'python3'
+        python_version = 'python' if platform.system() == 'Windows' else 'python3'
         testing_generator_path = './test' + '/' +'testGenerator/'
         if not testing_generator_path in sys.path:
             sys.path.append(testing_generator_path)
         if len(argv) < 2:
             printUsage()
-        elif argv[1] == 'LexerSuite':
-            if platform.system == 'Windows':
-                subprocess.run(f"{python_version} {testing_generator_path}genTestCase.py LexerSuite")
+        elif argv[1] in ['LexerSuite', 'ParserSuite']:
+            if platform.system() == 'Windows':
+                subprocess.run(f"{python_version} {testing_generator_path}genTestCase.py {argv[1]}")
             else:
-                subprocess.run([python_version, os.path.join(testing_generator_path, 'genTestCase.py'), 'LexerSuite'])
-        elif argv[1] == 'ParserSuite':
-            if platform.system == 'Windows':
-                subprocess.run(f"{python_version} {testing_generator_path}genTestCase.py ParserSuite")
-            else:
-                subprocess.run([python_version, os.path.join(testing_generator_path, 'genTestCase.py'), 'ParserSuite'])
+                subprocess.run([python_version, os.path.join(testing_generator_path, 'genTestCase.py'), argv[1]])
         else:
             printUsage()
     else:
