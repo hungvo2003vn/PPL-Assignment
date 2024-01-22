@@ -89,7 +89,6 @@ def main(argv):
         elif argv[1] == 'LexerSuite':
             subprocess.run(f'python {testing_generator_path}genTestCase.py LexerSuite')
         elif argv[1] == 'ParserSuite':
-            from ParserSuite import ParserSuite
             subprocess.run(f'python {testing_generator_path}genTestCase.py ParserSuite')
         else:
             printUsage()
