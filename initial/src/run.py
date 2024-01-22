@@ -55,8 +55,11 @@ def main(argv):
 
     elif argv[0] == 'test':
         if not os.path.isdir(TARGET_DIR + "/" + GENERATE_DIR):
-            subprocess.run(["java", "-jar", ANTLR_JAR, "-o", TARGET_DIR + "/" + GENERATE_DIR,
+
+            creation_path = (TARGET_DIR + "/" + GENERATE_DIR) if platform.system() == "Windows" else TARGET_DIR
+            subprocess.run(["java", "-jar", ANTLR_JAR, "-o", creation_path,
                            "-no-listener", "-visitor", "main/zcode/parser/ZCode.g4"])
+            
         if not (TARGET_DIR + "/" + GENERATE_DIR) in sys.path:
             sys.path.append(TARGET_DIR + "/" + GENERATE_DIR)
         if len(argv) < 2:
@@ -81,15 +84,22 @@ def main(argv):
 
     elif argv[0] == 'genTest':
 
+        python_version = 'python' if platform.system == 'Windows' else 'python3'
         testing_generator_path = './test' + '/' +'testGenerator/'
         if not testing_generator_path in sys.path:
             sys.path.append(testing_generator_path)
         if len(argv) < 2:
             printUsage()
         elif argv[1] == 'LexerSuite':
-            subprocess.run(f'python {testing_generator_path}genTestCase.py LexerSuite')
+            if platform.system == 'Windows':
+                subprocess.run(f"{python_version} {testing_generator_path}genTestCase.py LexerSuite")
+            else:
+                subprocess.run([python_version, os.path.join(testing_generator_path, 'genTestCase.py'), 'LexerSuite'])
         elif argv[1] == 'ParserSuite':
-            subprocess.run(f'python {testing_generator_path}genTestCase.py ParserSuite')
+            if platform.system == 'Windows':
+                subprocess.run(f"{python_version} {testing_generator_path}genTestCase.py ParserSuite")
+            else:
+                subprocess.run([python_version, os.path.join(testing_generator_path, 'genTestCase.py'), 'ParserSuite'])
         else:
             printUsage()
     else:
