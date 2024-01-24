@@ -29,13 +29,14 @@ array_declared: ID (LBRACKET list_NUMBER_LIT RBRACKET);
 list_NUMBER_LIT: NUMBER_LIT (COMMA list_NUMBER_LIT) | NUMBER_LIT;
 
 /* function declaration */
-function: FUNC ID LPARENT prameters_list? RPARENT (ignore? statement | ignore);
+function: FUNC ID LPARENT prameters_list? RPARENT (ignore? return_statement | ignore? block_statement | ignore);
 prameters_list: prim_type (ID | array_declared) COMMA prameters_list
 				| prim_type (ID | array_declared)
 				| DYNAMIC ID;
 
 /* Statement */
-statement_list: (ignore? statement | ignore) statement_list | (ignore? statement | ignore);
+statement_list: statement statement_list | statement;
+// statement_list: (ignore? statement | ignore) statement_list | (ignore? statement | ignore);
 statement: declaration_statement | assignment_statement 
             | if_statement | for_statement 
             | break_statement | continue_statement 
@@ -69,7 +70,7 @@ write: 'write' LPARENT expression RPARENT;
 readString: 'readString' LPARENT RPARENT;
 writeString: 'writeString' LPARENT expression RPARENT;
 
-block_statement: BEGIN statement_list? END ignore;
+block_statement: BEGIN ignore statement_list? END ignore;
 
 
 /* Expression */
@@ -88,8 +89,8 @@ expression8: array_element | literal | ID | (LPARENT expression RPARENT) | func_
 
 /* Value */
 literal: NUMBER_LIT | STRING_LIT | TRUE | FALSE | array_literal;
-array_literal: LBRACKET expression_list? RBRACKET;
-
+array_literal: LBRACKET list_literal? RBRACKET;
+list_literal: literal COMMA list_literal | literal;
 
 /* Ignore */
 ignore: NEWLINE (COMMENTS NEWLINE | NEWLINE)*;
