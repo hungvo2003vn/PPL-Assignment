@@ -8,6 +8,10 @@ for path in ['./test/', './test/testcases/', './main/zcode/parser/', './main/zco
              './main/zcode/checker/', './main/zcode/codegen/', '../target/']:
     sys.path.append(path)
 
+import platform
+if platform.system() != 'Windows':
+    sys.path.append('../target/main/zcode/parser/')
+
 from ZCodeLexer import ZCodeLexer
 from ZCodeParser import ZCodeParser
 from lexererr import *

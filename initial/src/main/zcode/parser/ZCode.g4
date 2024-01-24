@@ -23,19 +23,19 @@ implicit_dynamic: DYNAMIC ID (ASSIGN expression)?;
 prim_type: BOOL | NUMBER | STRING;
 
 /* array */
-array_element: (ID | func_call) index_operators;
-index_operators: (LBRACKET expression_list RBRACKET) index_operators | (LBRACKET expression_list RBRACKET); 
+array_element: array_element index_operators | (ID | func_call) index_operators;
+index_operators: (LBRACKET expression_list RBRACKET);
 array_declared: ID (LBRACKET list_NUMBER_LIT RBRACKET);
 list_NUMBER_LIT: NUMBER_LIT (COMMA list_NUMBER_LIT) | NUMBER_LIT;
 
 /* function declaration */
-function: FUNC ID LPARENT prameters_list? RPARENT (ignore? statement | ignore);
+function: FUNC ID LPARENT prameters_list? RPARENT (ignore? return_statement | ignore? block_statement | ignore);
 prameters_list: prim_type (ID | array_declared) COMMA prameters_list
 				| prim_type (ID | array_declared)
 				| DYNAMIC ID;
 
 /* Statement */
-statement_list: (ignore? statement | ignore) statement_list | (ignore? statement | ignore);
+statement_list: statement statement_list | statement;
 statement: declaration_statement | assignment_statement 
             | if_statement | for_statement 
             | break_statement | continue_statement 
@@ -44,11 +44,10 @@ statement: declaration_statement | assignment_statement
 declaration_statement: variables ignore;
 assignment_statement: (ID | array_element) ASSIGN expression ignore;
 
-if_statement: (IF condition_block statement_block_if) (elif_statement_list)? (else_statement)?;
-elif_statement: ELIF condition_block statement_block_if;
+if_statement: (IF expression statement_block_if) (elif_statement_list)? (else_statement)?;
+elif_statement: ELIF expression statement_block_if;
 elif_statement_list: elif_statement elif_statement_list | elif_statement;
 else_statement: ELSE statement_block_if;
-condition_block: LPARENT expression RPARENT | expression;
 statement_block_if: (ignore? statement ignore?);
 
 for_statement: FOR ID UNTIL expression BY expression (ignore statement);
@@ -69,7 +68,7 @@ write: 'write' LPARENT expression RPARENT;
 readString: 'readString' LPARENT RPARENT;
 writeString: 'writeString' LPARENT expression RPARENT;
 
-block_statement: BEGIN statement_list? END ignore;
+block_statement: BEGIN ignore statement_list? END ignore;
 
 
 /* Expression */
@@ -88,8 +87,8 @@ expression8: array_element | literal | ID | (LPARENT expression RPARENT) | func_
 
 /* Value */
 literal: NUMBER_LIT | STRING_LIT | TRUE | FALSE | array_literal;
-array_literal: LBRACKET expression_list? RBRACKET;
-
+array_literal: LBRACKET list_literal? RBRACKET;
+list_literal: literal COMMA list_literal | literal;
 
 /* Ignore */
 ignore: NEWLINE (COMMENTS NEWLINE | NEWLINE)*;

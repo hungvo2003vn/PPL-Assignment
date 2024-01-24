@@ -108,9 +108,12 @@ class ParserSuite(unittest.TestCase):
         self.assertTrue(TestParser.test(input, expect, 210))   
         
         input = """ 
-            func main(number a) break ##12
+            func main(number a) 
+                begin 
+                    break ##12 
+                end
         """
-        expect = "Error on line 2 col 38: ##12"
+        expect = "Error on line 4 col 26: ##12 "
         self.assertTrue(TestParser.test(input, expect, 211))    
 
         input = """ 
@@ -125,7 +128,10 @@ class ParserSuite(unittest.TestCase):
             func main(number a) 
                 ##12
                 
-                break
+                begin 
+                    break
+                end
+                
                 ##12
                 ##12
             func main(number a)
@@ -150,11 +156,7 @@ class ParserSuite(unittest.TestCase):
         input = """func main(number a) """
         expect = "Error on line 1 col 20: <EOF>"
         self.assertTrue(TestParser.test(input, expect, 216))  
-             
-             
-             
-             
-                            
+                                   
     def test_Expression(self):
         """Expression"""
         #! nối chuỗi không có tính kết hợp
@@ -250,12 +252,12 @@ class ParserSuite(unittest.TestCase):
         input = """ 
             var VoTien <- a() + 1 / 2 *3 <= 3 ... "v" >= 2
             var VoTien <- a(1,2)[1,2,3 ... 2] + false + true
-            var VoTien <- a(x,array[2])[2,3+2,true,false]
             var VoTien <- a(z,k[2][3] ... 2)[true]
             var VoTien <- (a ... 3) ... b and (a >= b) < b[1][2][3]
-            var VoTien <-  [1, 2, 3, 4, 5] + [[1, 2 + 2 * 2 / 3, 3], [4, 5, 6]]
+            var VoTien <-  ["tr", 2, 3, 4, 5] + [[1, 2 + 2 * 2 / 3, 3], [4, 5, 6]]
+            var VoTien <- a(x,array[2])[2,3+2,true,false]
         """
-        expect = "successful"
+        expect = "Error on line 6 col 55: +"
         self.assertTrue(TestParser.test(input, expect, 223))  
 
         input = """var VoTien <- a[1]()
@@ -270,9 +272,11 @@ class ParserSuite(unittest.TestCase):
         input = """
         ## comment
         func main()
-        
+
             ## comment
+            begin
             aPI <- 3.14
+            end
             ## comment
             
         ## comment
@@ -282,7 +286,8 @@ class ParserSuite(unittest.TestCase):
         self.assertTrue(TestParser.test(input, expect, 230))
         
         input = """
-        func main() begin end
+        func main() begin 
+        end
         func main() 
             begin 
                 ## comment0
@@ -308,23 +313,29 @@ class ParserSuite(unittest.TestCase):
         
         input = """
         func main()
+            begin
             aPI + 1 <- 3.14
+            end
         """
-        expect = "Error on line 3 col 16: +"
+        expect = "Error on line 4 col 16: +"
         self.assertTrue(TestParser.test(input, expect, 232))
         
         input = """
         func main()
+            begin
             aPI()<- 3.14
+            end
         """
-        expect = "Error on line 3 col 17: <-"
+        expect = "Error on line 4 col 17: <-"
         self.assertTrue(TestParser.test(input, expect, 233))
         
         input = """
         func main()
+            begin
             (aPI)[2]<- 3.14
+            end
         """
-        expect = "Error on line 3 col 12: ("
+        expect = "Error on line 4 col 12: ("
         self.assertTrue(TestParser.test(input, expect, 234))
                 
         #! test if_statement 
@@ -371,11 +382,13 @@ class ParserSuite(unittest.TestCase):
         #! test for break Continue
         input = """
         func main()
+            begin
             for i until i >= 10 by 1 + 1
                 ## comment
                 
                 a <- 1
             ## comment
+            end
             
         """
         expect = "successful"
@@ -383,18 +396,22 @@ class ParserSuite(unittest.TestCase):
         
         input = """
         func main()
+            begin
             for i[1] until i >= 10 by 1 + 1
                 a <- 1
+            end
         """
-        expect = "Error on line 3 col 17: ["
+        expect = "Error on line 4 col 17: ["
         self.assertTrue(TestParser.test(input, expect, 238))    
 
         input = """
         func main()
+            begin
             for i+1 until i >= 10 by 1 + 1
                 a <- 1
+            end
         """
-        expect = "Error on line 3 col 17: +"
+        expect = "Error on line 4 col 17: +"
         self.assertTrue(TestParser.test(input, expect, 239)) 
         
         input = """
@@ -414,9 +431,11 @@ class ParserSuite(unittest.TestCase):
         
         input = """
         func main()
+            begin
             for i until i >= 10 by 1 + 1
+            end
         """
-        expect = "Error on line 4 col 8: <EOF>"
+        expect = "Error on line 5 col 12: end"
         self.assertTrue(TestParser.test(input, expect, 241))  
         
         
@@ -430,7 +449,9 @@ class ParserSuite(unittest.TestCase):
 
         input = """
         func main()
+            begin
             main()
+            end
         """    
         expect = "successful"
         self.assertTrue(TestParser.test(input, expect, 243))
@@ -491,8 +512,7 @@ class ParserSuite(unittest.TestCase):
         input = """var aPI <- 3.14"""
         expect = "Error on line 1 col 15: <EOF>"
         self.assertTrue(TestParser.test(input, expect, 250))          
-
-    
+  
     def test_Source_Code(self): # test 270 -> ...
         """Source_Code"""
         input = """
@@ -557,14 +577,16 @@ class ParserSuite(unittest.TestCase):
         end
         
         func a()
-        begin end
-        func a() begin end
+        begin 
+        end
+        func a() begin 
+        end
         func a() begin 
         end
         func a() begin ## comment
         end
         """
-        expect = "Error on line 18 col 23: ## comment"
+        expect = "Error on line 20 col 23: ## comment"
         self.assertTrue(TestParser.test(input, expect, 274))  
         
 
@@ -595,4 +617,25 @@ class ParserSuite(unittest.TestCase):
         end ## comment
         """
         expect = "Error on line 7 col 12: ## comment"
-        self.assertTrue(TestParser.test(input, expect, 277))
+        self.assertTrue(TestParser.test(input, expect, 277))  
+        
+        input = """    
+        func a()
+            fun()
+        """
+        expect = "Error on line 3 col 12: fun"
+        self.assertTrue(TestParser.test(input, expect, 278))  
+        
+        input = """    
+        func a()
+            if x <= 1 return false
+        """
+        expect = "Error on line 3 col 12: if"
+        self.assertTrue(TestParser.test(input, expect, 279))  
+        
+        input = """    
+        func a()
+            return if x <= 1 return false
+        """
+        expect = "Error on line 3 col 19: if"
+        self.assertTrue(TestParser.test(input, expect, 280))  
