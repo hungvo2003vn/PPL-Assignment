@@ -36,7 +36,6 @@ prameters_list: prim_type (ID | array_declared) COMMA prameters_list
 
 /* Statement */
 statement_list: statement statement_list | statement;
-// statement_list: (ignore? statement | ignore) statement_list | (ignore? statement | ignore);
 statement: declaration_statement | assignment_statement 
             | if_statement | for_statement 
             | break_statement | continue_statement 
@@ -45,11 +44,10 @@ statement: declaration_statement | assignment_statement
 declaration_statement: variables ignore;
 assignment_statement: (ID | array_element) ASSIGN expression ignore;
 
-if_statement: (IF condition_block statement_block_if) (elif_statement_list)? (else_statement)?;
-elif_statement: ELIF condition_block statement_block_if;
+if_statement: (IF expression statement_block_if) (elif_statement_list)? (else_statement)?;
+elif_statement: ELIF expression statement_block_if;
 elif_statement_list: elif_statement elif_statement_list | elif_statement;
 else_statement: ELSE statement_block_if;
-condition_block: LPARENT expression RPARENT | expression;
 statement_block_if: (ignore? statement ignore?);
 
 for_statement: FOR ID UNTIL expression BY expression (ignore statement);
