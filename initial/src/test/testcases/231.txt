@@ -1,5 +1,6 @@
 
-        func main() begin end
+        func main() begin 
+        end
         func main() 
             begin 
                 ## comment0
@@ -14,7 +15,7 @@
                 VoTien[1+a] <- 1
                 
                 ## comment4
-                VoTien[2][3+4] <- 1
+                VoTien[3+4,2,4] <- 1
                 
                 ## comment5
             end

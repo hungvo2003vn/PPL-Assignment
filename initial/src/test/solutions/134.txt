@@ -1,4 +1,3 @@
 a,
 ,
-,
-,Error Token #
+,b,<EOF>

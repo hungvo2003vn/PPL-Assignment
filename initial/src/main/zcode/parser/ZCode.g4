@@ -11,7 +11,7 @@ options {
 
 
 // declared
-program: (COMMENTS NEWLINE | NEWLINE)* list_declared EOF;
+program: NEWLINE* list_declared EOF;
 
 list_declared: declared list_declared | declared;
 declared:  function | variables ignore;
@@ -23,20 +23,17 @@ keyword_var: prim_type (ID | array_declared) (ASSIGN expression)?;
 implicit_dynamic: DYNAMIC ID (ASSIGN expression)?;
 prim_type: BOOL | NUMBER | STRING;
 
-/* array */
-array_element: array_element index_operators | (ID | func_call) index_operators;
-index_operators: (LBRACKET expression_list RBRACKET);
+/* array declaration */
 array_declared: ID (LBRACKET list_NUMBER_LIT RBRACKET);
 list_NUMBER_LIT: NUMBER_LIT (COMMA list_NUMBER_LIT) | NUMBER_LIT;
 
 /* function declaration */
 function: FUNC ID LPARENT prameters_list? RPARENT (ignore? return_statement | ignore? block_statement | ignore);
 prameters_list: prim_type (ID | array_declared) COMMA prameters_list
-				| prim_type (ID | array_declared)
-				| DYNAMIC ID;
+				| prim_type (ID | array_declared);
 
 /* Statement */
-statement_list: statement statement_list | statement;
+statement_list: statement statement_list | ;
 statement: declaration_statement | assignment_statement 
             | if_statement | for_statement 
             | break_statement | continue_statement 
@@ -54,7 +51,7 @@ statement_block_if: (ignore? statement ignore?);
 for_statement: FOR ID UNTIL expression BY expression (ignore statement);
 break_statement: BREAK ignore;
 continue_statement: CONTINUE ignore;
-return_statement: RETURN expression ignore;
+return_statement: RETURN (expression | ) ignore;
 
 call_statement: (
 	ID (LPARENT expression_list? RPARENT) | non_returned_func
@@ -69,7 +66,7 @@ write: 'write' LPARENT expression RPARENT;
 readString: 'readString' LPARENT RPARENT;
 writeString: 'writeString' LPARENT expression RPARENT;
 
-block_statement: BEGIN ignore statement_list? END ignore;
+block_statement: BEGIN ignore statement_list END ignore;
 
 
 /* Expression */
@@ -81,8 +78,7 @@ expression3: expression3 (ADD | SUB) expression4 | expression4;
 expression4: expression4 (MUL | DIV | MOD) expression5 | expression5;
 expression5: NOT expression5 | expression6;
 expression6: SUB expression6 | expression7;
-expression7: expression7 (LBRACKET expression_list RBRACKET) | expression8;
-expression8: array_element | literal | ID | (LPARENT expression RPARENT) | func_call;
+expression7: array_element | literal | ID | (LPARENT expression RPARENT) | func_call;
 
 
 
@@ -90,9 +86,11 @@ expression8: array_element | literal | ID | (LPARENT expression RPARENT) | func_
 literal: NUMBER_LIT | STRING_LIT | TRUE | FALSE | array_literal;
 array_literal: LBRACKET list_literal? RBRACKET;
 list_literal: literal COMMA list_literal | literal;
+array_element: (ID | func_call) index_operators;
+index_operators: (LBRACKET expression_list RBRACKET);
 
 /* Ignore */
-ignore: NEWLINE (COMMENTS NEWLINE | NEWLINE)*;
+ignore: NEWLINE+;
 
 //! --------------------------  Lexical structure ----------------------- //
 
@@ -173,7 +171,7 @@ BOOL_LIT: TRUE | FALSE;
 
 // NEWLINE COMMENTS WS
 NEWLINE: [\n]; // 
-COMMENTS: '##' ~[\n\r\f]*; // Comments
+COMMENTS: '##' ~[\n\r\f]* -> skip; // Comments
 WS : [ \t\r]+ -> skip ; // skip spaces, tabs
 
 
