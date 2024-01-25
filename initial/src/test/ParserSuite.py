@@ -717,4 +717,24 @@ class ParserSuite(unittest.TestCase):
             end
         """
         expect = "Error on line 4 col 19: ["
-        self.assertTrue(TestParser.test(input, expect, 291))                            
+        self.assertTrue(TestParser.test(input, expect, 291))      
+        
+        input = """    
+        func a()
+            begin
+                c <- (1)[1]
+            end
+        """
+        expect = "Error on line 4 col 24: ["
+        self.assertTrue(TestParser.test(input, expect, 292))    
+        
+        input = """    
+        func a()
+            begin
+                var c <- 1 var c <- 1
+            end
+        """
+        expect = "Error on line 4 col 27: var"
+        self.assertTrue(TestParser.test(input, expect, 293))      
+        
+                              
