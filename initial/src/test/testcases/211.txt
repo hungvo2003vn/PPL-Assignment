@@ -1,3 +1,7 @@
  
-            func main(number a) break ##12
+            func main(string a) 
+                begin 
+                    break ## 12
+                end
+            func main(dynamic a) 
         

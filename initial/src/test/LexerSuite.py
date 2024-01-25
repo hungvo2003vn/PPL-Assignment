@@ -84,16 +84,18 @@ class LexerSuite(unittest.TestCase):
     
     def test_Comments_newline(self):
         """test Comments và newline""" 
-        self.assertTrue(TestLexer.test("## Vo tien","## Vo tien,<EOF>",130))    
-        self.assertTrue(TestLexer.test("###","###,<EOF>",131)) 
-        self.assertTrue(TestLexer.test("a##1","a,##1,<EOF>",132)) 
+        self.assertTrue(TestLexer.test("## Vo tien","<EOF>",130))    
+        self.assertTrue(TestLexer.test("###","<EOF>",131)) 
+        self.assertTrue(TestLexer.test("a##1","a,<EOF>",132)) 
         self.assertTrue(TestLexer.test("a#","a,Error Token #",133))    
-        self.assertTrue(TestLexer.test("a\n##1\nb","a,\n,##1,\n,b,<EOF>",134))  
+        self.assertTrue(TestLexer.test("a\n##1\nb","a,\n,\n,b,<EOF>",134))  
         self.assertTrue(TestLexer.test("a\n\n\n#","a,\n,\n,\n,Error Token #",135))
         input = """a
-                    ## comment"""
+                    ## comment
+                """
         expect = """a,
-,## comment,<EOF>"""
+,
+,<EOF>"""
         self.assertTrue(TestLexer.test(input,expect,136))   
 
 
@@ -124,14 +126,14 @@ class LexerSuite(unittest.TestCase):
 """ ##Vo Tien
 ##Vo Tien\n
 ##Vo Tien """,
-"""##Vo Tien,
-,##Vo Tien,
+"""
 ,
-,##Vo Tien ,<EOF>""", 151))
+,
+,<EOF>""", 151))
         
         self.assertTrue(TestLexer.test(
 """ ##Vo tien "123" ## 12 \n""",
-"""##Vo tien "123" ## 12 ,
+"""
 ,<EOF>""", 152))
         
         self.assertTrue(TestLexer.test(
