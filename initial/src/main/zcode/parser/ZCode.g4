@@ -53,13 +53,7 @@ break_statement: BREAK ignore;
 continue_statement: CONTINUE ignore;
 return_statement: RETURN (expression | ) ignore;
 
-// call_statement: (
-// 	ID (LPARENT expression_list? RPARENT) | non_returned_func
-// ) ignore;
-// func_call: ID (LPARENT expression_list? RPARENT) | returned_func;
 call_statement: func_call ignore;
-// returned_func: readNumber | readBool | readString;
-// non_returned_func: writeNumber | write | writeString;
 func_call: (
 	ID (LPARENT expression_list? RPARENT) |
 	readNumber | readBool | readString |
