@@ -54,17 +54,7 @@ continue_statement: CONTINUE ignore;
 return_statement: RETURN (expression | ) ignore;
 
 call_statement: func_call ignore;
-func_call: (
-	ID (LPARENT expression_list? RPARENT) |
-	readNumber | readBool | readString |
-	writeNumber | write | writeString
-);
-readNumber: 'readNumber' LPARENT RPARENT;
-writeNumber: 'writeNumber' LPARENT expression RPARENT;
-readBool: 'readBool' LPARENT RPARENT;
-write: 'write' LPARENT expression RPARENT;
-readString: 'readString' LPARENT RPARENT;
-writeString: 'writeString' LPARENT expression RPARENT;
+func_call: ID (LPARENT expression_list? RPARENT);
 
 block_statement: BEGIN ignore statement_list END ignore;
 
