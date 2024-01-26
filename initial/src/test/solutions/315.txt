@@ -1,0 +1,11 @@
+str(Program([
+	ImplicitVarDecl(Id("x"), , BinExpr("...", NumberLit(1), StringLit("2"))),
+	ImplicitVarDecl(Id("x"), , BinExpr("<=", NumberLit(1), StringLit("2"))),
+	ImplicitVarDecl(Id("x"), , BinExpr("or", BinExpr("and", NumberLit(1), NumberLit(2)), NumberLit(3))),
+	ImplicitVarDecl(Id("x"), , BinExpr("-", BinExpr("+", NumberLit(1), NumberLit(2)), NumberLit(3))),
+	ImplicitVarDecl(Id("x"), , BinExpr("%", BinExpr("/", BinExpr("*", NumberLit(1), NumberLit(2)), NumberLit(3)), NumberLit(4))),
+	ImplicitVarDecl(Id("x"), , UnExpr("-", UnExpr("-", UnExpr("-", NumberLit(1))))),
+	ImplicitVarDecl(Id("x"), , UnExpr("not", UnExpr("not", NumberLit(1)))),
+	ImplicitVarDecl(Id("x"), , Id("x")),
+	ImplicitVarDecl(Id("x"), , ArrayCell(Id("a"), [NumberLit(1), NumberLit(2), NumberLit(3)]))
+]))

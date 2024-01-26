@@ -1,0 +1,3 @@
+str(Program([
+	FuncDecl(Id("main"), [], None)
+]))

@@ -1,0 +1,3 @@
+str(Program([
+	ImplicitVarDecl(Id("Votien"), , NumberLit(1))
+]))

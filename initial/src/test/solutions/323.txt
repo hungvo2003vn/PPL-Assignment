@@ -1,0 +1,10 @@
+str(Program([
+	FuncDecl(Id("main"), [], BlockStmt([
+	ContinueStmt(),
+	ContinueStmt(),
+	BreakStmt(),
+	BlockStmt([
+	ContinueStmt(),
+	ContinueStmt(),
+	BreakStmt()])]))
+]))

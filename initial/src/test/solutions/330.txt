@@ -1,0 +1,5 @@
+str(Program([
+	ImplicitVarDecl(Id("c"), , ArrayCell(Id("a"), [NumberLit(1), NumberLit(2)])),
+	ImplicitVarDecl(Id("c"), , ArrayCell(FuncCall(Id("fun"), []), [NumberLit(1), NumberLit(2)])),
+	ImplicitVarDecl(Id("c"), , ArrayCell(FuncCall(Id("fun"), [NumberLit(1), NumberLit(2)]), [NumberLit(1), NumberLit(3)]))
+]))

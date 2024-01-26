@@ -1,0 +1,6 @@
+str(Program([
+	FuncDecl(Id("main"), [], BlockStmt([
+	IfStmt(BooleanLit(True), ReturnStmt(NumberLit(1)), [] ,)])),
+	FuncDecl(Id("main"), [], BlockStmt([
+	IfStmt(BooleanLit(True), ReturnStmt(NumberLit(2)), [] ,ReturnStmt(NumberLit(3)))]))
+]))

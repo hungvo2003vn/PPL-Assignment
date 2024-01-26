@@ -1,0 +1,6 @@
+str(Program([
+	ImplicitVarDecl(Id("x"), , NumberLit(1)),
+	ImplicitVarDecl(Id("x"), , StringLit("123")),
+	ImplicitVarDecl(Id("x"), , BooleanLit(True)),
+	ImplicitVarDecl(Id("x"), , BooleanLit(False))
+]))

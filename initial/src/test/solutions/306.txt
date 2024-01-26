@@ -1,0 +1,4 @@
+str(Program([
+	ImplicitDynamicDecl(Id("Votien"), , NumberLit(1)),
+	ImplicitDynamicDecl(Id("Votien"), )
+]))

@@ -1,0 +1,3 @@
+str(Program([
+	ImplicitVarDecl(Id("x"), , FuncCall(Id("fun"), [BinExpr("+", NumberLit(1), NumberLit(1)), StringLit("a")]))
+]))

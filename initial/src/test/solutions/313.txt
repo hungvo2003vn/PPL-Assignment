@@ -1,0 +1,3 @@
+str(Program([
+	ImplicitVarDecl(Id("x"), , ArrayLit([NumberLit(1), StringLit("a"), BooleanLit(True), BooleanLit(False)]))
+]))

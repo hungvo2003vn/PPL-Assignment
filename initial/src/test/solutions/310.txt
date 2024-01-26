@@ -1,0 +1,4 @@
+str(Program([
+	FuncDecl(Id("main"), [], BlockStmt([
+	BreakStmt()]))
+]))
