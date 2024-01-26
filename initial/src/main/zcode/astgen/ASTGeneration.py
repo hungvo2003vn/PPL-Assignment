@@ -35,16 +35,17 @@ class ASTGeneration(ZCodeVisitor):
     def visitKeyword_var(self, ctx:ZCodeParser.Keyword_varContext):
 
         lhs = None
-        typ = None
+        typ = self.visit(ctx.prim_type())
         if ctx.ID():
 
             lhs = Id(ctx.ID().getText())
-            typ = self.visit(ctx.prim_type())
 
         elif ctx.array_declared():
 
-            res = self.visitArray_declared(ctx)
+            res = self.visitArray_declared(ctx.array_declared())
             lhs = res["ID"]
+
+            res["typ"].typ = typ
             typ = res["typ"]
 
         if ctx.getChildCount() == 4:
@@ -76,20 +77,19 @@ class ASTGeneration(ZCodeVisitor):
     def visitArray_declared(self, ctx:ZCodeParser.Array_declaredContext):
 
         arr_ID = Id(ctx.ID().getText())
-        arr_typ = self.visit(ctx.prim_type())
         arr_dimensions = self.visit(ctx.list_NUMBER_LIT())
 
         return {
             "ID": arr_ID,
-            "typ": ArrayType(arr_dimensions, arr_typ)
+            "typ": ArrayType(arr_dimensions, None)
         }
 
 
     # list_NUMBER_LIT: NUMBER_LIT (COMMA list_NUMBER_LIT) | NUMBER_LIT;
     def visitList_NUMBER_LIT(self, ctx:ZCodeParser.List_NUMBER_LITContext):
         if ctx.list_NUMBER_LIT():
-            return [NumberLit(float(ctx.NUMBER_LIT().getText()))] + self.visit(ctx.list_NUMBER_LIT())
-        return [NumberLit(float(ctx.NUMBER_LIT().getText()))]
+            return [NumberLit(int(ctx.NUMBER_LIT().getText()))] + self.visit(ctx.list_NUMBER_LIT())
+        return [NumberLit(int(ctx.NUMBER_LIT().getText()))]
 
 
     # function: FUNC ID LPARENT prameters_list? RPARENT (ignore? return_statement | ignore? block_statement | ignore);
@@ -322,7 +322,7 @@ class ASTGeneration(ZCodeVisitor):
     # literal: NUMBER_LIT | STRING_LIT | TRUE | FALSE | array_literal;
     def visitLiteral(self, ctx:ZCodeParser.LiteralContext):
         if ctx.NUMBER_LIT():
-            return NumberLit(float(ctx.NUMBER_LIT().getText()))
+            return NumberLit(int(ctx.NUMBER_LIT().getText()))
         elif ctx.STRING_LIT():
             return StringLit(ctx.STRING_LIT().getText())
         elif ctx.TRUE():
@@ -336,7 +336,7 @@ class ASTGeneration(ZCodeVisitor):
     # array_literal: LBRACKET list_literal? RBRACKET;
     def visitArray_literal(self, ctx:ZCodeParser.Array_literalContext):
         if ctx.list_literal():
-            return ArrayLit([self.visit(ctx.list_literal())])
+            return ArrayLit(self.visit(ctx.list_literal()))
         return ArrayLit([])
 
 
@@ -350,7 +350,7 @@ class ASTGeneration(ZCodeVisitor):
 
     # array_element: (ID | func_call) index_operators;
     def visitArray_element(self, ctx:ZCodeParser.Array_elementContext):
-        name = self.visitExpression7(ctx.getChild(0))
+        name = Id(ctx.ID().getText()) if ctx.ID() else self.visit(ctx.func_call())
         cell = self.visit(ctx.index_operators())
 
         return ArrayCell(name, cell)
