@@ -6,24 +6,24 @@ from functools import reduce
 class ASTGeneration(ZCodeVisitor):
     # program: NEWLINE* list_declared EOF;
     def visitProgram(self, ctx:ZCodeParser.ProgramContext):
-        return Program(self.visitChildren(ctx.list_declared()))
+        return Program(self.visit(ctx.list_declared()))
 
 
     # list_declared: declared list_declared | declared;
     def visitList_declared(self, ctx:ZCodeParser.List_declaredContext):
         if ctx.list_declared():
             return [self.visit(ctx.declared())] + self.visit(ctx.list_declared())
-        return [self.visitChildren(ctx.declared())]
+        return [self.visit(ctx.declared())]
 
 
     # declared:  function | variables ignore;
     def visitDeclared(self, ctx:ZCodeParser.DeclaredContext):
-        return self.visitChildren(ctx.getChild(0))
+        return self.visit(ctx.getChild(0))
 
 
     # variables: implicit_var | keyword_var | implicit_dynamic; 
     def visitVariables(self, ctx:ZCodeParser.VariablesContext):
-        return self.visitChildren(ctx.getChild(0))
+        return self.visit(ctx.getChild(0))
 
 
     # implicit_var: VAR ID ASSIGN expression;
@@ -229,8 +229,8 @@ class ASTGeneration(ZCodeVisitor):
     # expression: expression1 CONCAT expression1 | expression1;
     def visitExpression(self, ctx:ZCodeParser.ExpressionContext):
 
-        if self.getChildCount() == 1:
-            return self.visit(ctx.expression1())
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.expression1(0))
 
         op = ctx.CONCAT().getText()
         left = self.visit(ctx.expression1(0))
@@ -241,8 +241,8 @@ class ASTGeneration(ZCodeVisitor):
 
     # expression1: expression2 (EQUAL | STRCMP | NOT_EQUAL | LT | GT | LE | GE) expression2 | expression2;
     def visitExpression1(self, ctx:ZCodeParser.Expression1Context):
-        if self.getChildCount() == 1:
-            return self.visit(ctx.expression2())
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.expression2(0))
 
         op = ctx.getChild(1).getText()
         left = self.visit(ctx.expression2(0))
@@ -252,7 +252,7 @@ class ASTGeneration(ZCodeVisitor):
 
     # expression2: expression2 (AND | OR) expression3 | expression3;
     def visitExpression2(self, ctx:ZCodeParser.Expression2Context):
-        if self.getChildCount() == 1:
+        if ctx.getChildCount() == 1:
             return self.visit(ctx.expression3())
 
         op = ctx.getChild(1).getText()
@@ -264,7 +264,7 @@ class ASTGeneration(ZCodeVisitor):
 
     # expression3: expression3 (ADD | SUB) expression4 | expression4;
     def visitExpression3(self, ctx:ZCodeParser.Expression3Context):
-        if self.getChildCount() == 1:
+        if ctx.getChildCount() == 1:
             return self.visit(ctx.expression4())
 
         op = ctx.getChild(1).getText()
@@ -276,7 +276,7 @@ class ASTGeneration(ZCodeVisitor):
 
     # expression4: expression4 (MUL | DIV | MOD) expression5 | expression5;
     def visitExpression4(self, ctx:ZCodeParser.Expression4Context):
-        if self.getChildCount() == 1:
+        if ctx.getChildCount() == 1:
             return self.visit(ctx.expression5())
 
         op = ctx.getChild(1).getText()
@@ -288,7 +288,7 @@ class ASTGeneration(ZCodeVisitor):
 
     # expression5: NOT expression5 | expression6;
     def visitExpression5(self, ctx:ZCodeParser.Expression5Context):
-        if self.getChildCount() == 1:
+        if ctx.getChildCount() == 1:
             return self.visit(ctx.expression6())
         
         op = ctx.getChild(0).getText()
@@ -299,7 +299,7 @@ class ASTGeneration(ZCodeVisitor):
 
     # expression6: SUB expression6 | expression7;
     def visitExpression6(self, ctx:ZCodeParser.Expression6Context):
-        if self.getChildCount() == 1:
+        if ctx.getChildCount() == 1:
             return self.visit(ctx.expression7())
         
         op = ctx.getChild(0).getText()
