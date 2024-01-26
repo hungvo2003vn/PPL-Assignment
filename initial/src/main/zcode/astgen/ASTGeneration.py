@@ -34,24 +34,24 @@ class ASTGeneration(ZCodeVisitor):
     # keyword_var: prim_type (ID | array_declared) (ASSIGN expression)?;
     def visitKeyword_var(self, ctx:ZCodeParser.Keyword_varContext):
 
-        lhs = None
+        name = None
         typ = self.visit(ctx.prim_type())
         if ctx.ID():
 
-            lhs = Id(ctx.ID().getText())
+            name = Id(ctx.ID().getText())
 
         elif ctx.array_declared():
 
             res = self.visitArray_declared(ctx.array_declared())
-            lhs = res["ID"]
+            name = res["ID"]
 
             res["typ"].typ = typ
             typ = res["typ"]
 
         if ctx.getChildCount() == 4:
-            return VarDecl(lhs, typ, self.visit(ctx.expression()))
+            return VarDecl(name, typ, self.visit(ctx.expression()))
 
-        return VarDecl(lhs, typ)
+        return VarDecl(name, typ)
 
 
     # implicit_dynamic: DYNAMIC ID (ASSIGN expression)?;
@@ -88,8 +88,8 @@ class ASTGeneration(ZCodeVisitor):
     # list_NUMBER_LIT: NUMBER_LIT (COMMA list_NUMBER_LIT) | NUMBER_LIT;
     def visitList_NUMBER_LIT(self, ctx:ZCodeParser.List_NUMBER_LITContext):
         if ctx.list_NUMBER_LIT():
-            return [NumberLit(int(ctx.NUMBER_LIT().getText()))] + self.visit(ctx.list_NUMBER_LIT())
-        return [NumberLit(int(ctx.NUMBER_LIT().getText()))]
+            return [int(ctx.NUMBER_LIT().getText())] + self.visit(ctx.list_NUMBER_LIT())
+        return [int(ctx.NUMBER_LIT().getText())]
 
 
     # function: FUNC ID LPARENT prameters_list? RPARENT (ignore? return_statement | ignore? block_statement | ignore);
@@ -109,10 +109,22 @@ class ASTGeneration(ZCodeVisitor):
 	#			| prim_type (ID | array_declared);
     def visitPrameters_list(self, ctx:ZCodeParser.Prameters_listContext):
        
-        keyword_var = self.visitKeyword_var(ctx)
+        name = None
+        typ = self.visit(ctx.prim_type())
+        if ctx.ID():
+            name = ctx.ID().getText()
+        elif ctx.array_declared():
+
+            res = self.visitArray_declared(ctx.array_declared())
+            name = res["ID"].name
+
+            res["typ"].typ = typ
+            typ = res["typ"]
+        keyword_var = ParamDecl(name, typ)
+
         if ctx.prameters_list():
-            return [ParamDecl(keyword_var.name, keyword_var.typ)] + self.visit(ctx.prameters_list())
-        return [ParamDecl(keyword_var.name, keyword_var.typ)]
+            return [keyword_var] + self.visit(ctx.prameters_list())
+        return [keyword_var]
 
 
     # statement_list: statement statement_list | ;
