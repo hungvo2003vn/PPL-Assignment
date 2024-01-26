@@ -121,7 +121,7 @@ class ASTGenSuite(unittest.TestCase):
         expect = str(Program([
                     FuncDecl(Id("main"), [ParamDecl("a", NumberType())], None),
                     FuncDecl(Id("main"), [ParamDecl("a", NumberType()), ParamDecl("a", StringType()), ParamDecl("a", ArrayType([2], BooleanType()))], None),
-                    FuncDecl(Id("main"), [ParamDecl("Votien", ArrayType([1, 2], NumberType()))], ReturnStmt())
+                    FuncDecl(Id("main"), [ParamDecl("Votien", ArrayType([1, 2], NumberType()))], ReturnStmt(None))
                 ]))
         # print(expect)
         self.assertTrue(TestAST.test(input, expect, 311))
