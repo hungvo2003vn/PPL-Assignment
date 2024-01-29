@@ -42,13 +42,13 @@ statement: declaration_statement | assignment_statement
 declaration_statement: variables ignore;
 assignment_statement: (ID | ID index_operators) ASSIGN expression ignore;
 
-if_statement: (IF expression statement_block_if) (elif_statement_list)? (else_statement)?;
-elif_statement: ELIF expression statement_block_if;
+if_statement: (IF LPARENT expression RPARENT statement_block_if) (elif_statement_list)? (else_statement)?;
+elif_statement: ELIF LPARENT expression RPARENT statement_block_if;
 elif_statement_list: elif_statement elif_statement_list | elif_statement;
 else_statement: ELSE statement_block_if;
 statement_block_if: (ignore? statement ignore?);
 
-for_statement: FOR ID UNTIL expression BY expression (ignore statement);
+for_statement: FOR ID UNTIL expression BY expression (ignore? statement);
 break_statement: BREAK ignore;
 continue_statement: CONTINUE ignore;
 return_statement: RETURN (expression | ) ignore;
@@ -67,15 +67,14 @@ expression2: expression2 (AND | OR) expression3 | expression3;
 expression3: expression3 (ADD | SUB) expression4 | expression4;
 expression4: expression4 (MUL | DIV | MOD) expression5 | expression5;
 expression5: NOT expression5 | expression6;
-expression6: SUB expression6 | expression7;
+expression6: (SUB | ADD) expression6 | expression7;
 expression7: array_element | literal | ID | (LPARENT expression RPARENT) | func_call;
 
 
 
 /* Value */
 literal: NUMBER_LIT | STRING_LIT | TRUE | FALSE | array_literal;
-array_literal: LBRACKET list_literal? RBRACKET;
-list_literal: literal COMMA list_literal | literal;
+array_literal: LBRACKET expression_list RBRACKET;
 array_element: (ID | func_call) index_operators;
 index_operators: (LBRACKET expression_list RBRACKET);
 
@@ -146,7 +145,7 @@ ID: [a-zA-Z_][a-zA-Z0-9_]*;
 // STRING
 STRING_LIT: '"'(VALID_SEQUENCE | VALID_ESCAPE)* '"'{self.text = self.text[1:-1];};
 fragment VALID_ESCAPE: '\\' [bfrnt'\\] | '\'"';
-fragment VALID_SEQUENCE: ~[\r\n\f\\'"];
+fragment VALID_SEQUENCE: ~[\r\n\f\\"];
 
 //NUMBER
 NUMBER_LIT: DIGIT+ (DECIMAL | DECIMAL? EXPONENT?);
@@ -168,13 +167,15 @@ WS : [ \t\r]+ -> skip ; // skip spaces, tabs
 // TODO ERROR
 ERROR_CHAR: . {raise ErrorToken(self.text)};
 UNCLOSE_STRING: '"' (VALID_SEQUENCE | VALID_ESCAPE)* ('\r\n' | '\n' | EOF) { 
-	tmp = self.text[1:].split("\n")[0]
-	tmp = tmp.split("\r")[0]
-	self.text = tmp
-	raise UncloseString(self.text)
+    if(len(self.text) >= 2 and self.text[-1] == '\n' and self.text[-2] == '\r'):
+        raise UncloseString(self.text[1:-2])
+    elif (self.text[-1] == '\n'):
+        raise UncloseString(self.text[1:-1])
+    else:
+        raise UncloseString(self.text[1:])
 };
 ILLEGAL_ESCAPE: '"' (VALID_SEQUENCE | VALID_ESCAPE)* INVALID_ESCAPE {raise IllegalEscape(self.text[1:])};
-fragment INVALID_ESCAPE: '\\' ~[bfrnt'\\] | ~'\\' | [']~["];
+fragment INVALID_ESCAPE: [\r\f] | '\\' ~[bfrnt'\\];
 
 
 
