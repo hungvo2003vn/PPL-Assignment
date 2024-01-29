@@ -5,7 +5,7 @@
             begin
                 var num1 <- readNumber()
                 var num2 <- readNumber()
-                if areDivisors(num1, num2) printString("Yes")
+                if (areDivisors(num1, num2)) printString("Yes")
                 else printString("No")
             end
         
