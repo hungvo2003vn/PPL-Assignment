@@ -1,11 +1,1 @@
-str(Program([
-	ImplicitVarDecl(Id("x"), , BinExpr("...", NumberLit(1), StringLit("2"))),
-	ImplicitVarDecl(Id("x"), , BinExpr("<=", NumberLit(1), StringLit("2"))),
-	ImplicitVarDecl(Id("x"), , BinExpr("or", BinExpr("and", NumberLit(1), NumberLit(2)), NumberLit(3))),
-	ImplicitVarDecl(Id("x"), , BinExpr("-", BinExpr("+", NumberLit(1), NumberLit(2)), NumberLit(3))),
-	ImplicitVarDecl(Id("x"), , BinExpr("%", BinExpr("/", BinExpr("*", NumberLit(1), NumberLit(2)), NumberLit(3)), NumberLit(4))),
-	ImplicitVarDecl(Id("x"), , UnExpr("-", UnExpr("-", UnExpr("-", NumberLit(1))))),
-	ImplicitVarDecl(Id("x"), , UnExpr("not", UnExpr("not", NumberLit(1)))),
-	ImplicitVarDecl(Id("x"), , Id("x")),
-	ImplicitVarDecl(Id("x"), , ArrayCell(Id("a"), [NumberLit(1), NumberLit(2), NumberLit(3)]))
-]))
+Program([VarDecl(Id(x),BinaryOp(...,NumLit(1),StringLit(2))),VarDecl(Id(x),BinaryOp(<=,NumLit(1),StringLit(2))),VarDecl(Id(x),BinaryOp(or,BinaryOp(and,NumLit(1),NumLit(2)),NumLit(3))),VarDecl(Id(x),BinaryOp(-,BinaryOp(+,NumLit(1),NumLit(2)),NumLit(3))),VarDecl(Id(x),BinaryOp(%,BinaryOp(/,BinaryOp(*,NumLit(1),NumLit(2)),NumLit(3)),NumLit(4))),VarDecl(Id(x),UnaryOp(-,UnaryOp(-,UnaryOp(-,NumLit(1))))),VarDecl(Id(x),UnaryOp(not,UnaryOp(not,NumLit(1)))),VarDecl(Id(x),Id(x)),VarDecl(Id(x),ArrayCell(Id(a),[NumLit(1),NumLit(2),NumLit(3)]))])

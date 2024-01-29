@@ -1,3 +1,1 @@
-str(Program([
-	ImplicitVarDecl(Id("x"), , BinExpr("...", BinExpr("...", NumberLit(2), NumberLit(3)), NumberLit(4)))
-]))
+Program([VarDecl(Id(x),BinaryOp(...,BinaryOp(...,NumLit(2),NumLit(3)),NumLit(4)))])

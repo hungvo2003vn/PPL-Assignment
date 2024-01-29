@@ -1,5 +1,1 @@
-str(Program([
-	ImplicitVarDecl(Id("c"), , ArrayCell(Id("a"), [NumberLit(1), NumberLit(2)])),
-	ImplicitVarDecl(Id("c"), , ArrayCell(FuncCall(Id("fun"), []), [NumberLit(1), NumberLit(2)])),
-	ImplicitVarDecl(Id("c"), , ArrayCell(FuncCall(Id("fun"), [NumberLit(1), NumberLit(2)]), [NumberLit(1), NumberLit(3)]))
-]))
+Program([VarDecl(Id(c),ArrayCell(Id(a),[NumLit(1),NumLit(2)])),VarDecl(Id(c),ArrayCell(CallExpr(Id(fun),[]),[NumLit(1),NumLit(2)])),VarDecl(Id(c),ArrayCell(CallExpr(Id(fun),[NumLit(1),NumLit(2)]),[NumLit(1),NumLit(3)]))])

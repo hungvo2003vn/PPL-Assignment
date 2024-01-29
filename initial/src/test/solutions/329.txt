@@ -1,4 +1,1 @@
-str(Program([
-	FuncDecl(Id("main"), [], BlockStmt([
-	IfStmt(BooleanLit(True), ReturnStmt(NumberLit(1)), [[BooleanLit(True),ReturnStmt(NumberLit(1))],[BooleanLit(True),ReturnStmt(NumberLit(1))]] ,ReturnStmt(NumberLit(1)))]))
-]))
+Program([FuncDecl(Id(main),[], Block([If(BooleanLit(True),Return(NumLit(1)),BooleanLit(True),Return(NumLit(1)),BooleanLit(True),Return(NumLit(1)),Return(NumLit(1)))]))])

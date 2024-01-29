@@ -17,7 +17,7 @@ class ASTGenSuite(unittest.TestCase):
             string VoTien <- 1
         """
         expect = str(Program([
-                VarDecl(Id("VoTien"), StringType(), NumberLit(1))
+                VarDecl(Id("VoTien"), StringType(), None, NumberLiteral(1))
             ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 302))
@@ -30,9 +30,9 @@ class ASTGenSuite(unittest.TestCase):
         """
         expect = str(Program([
                 VarDecl(Id("Votien"), StringType()),
-                VarDecl(Id("Votien"), BooleanType()),
-                VarDecl(Id("Votien"), StringType(), NumberLit(1)),
-                VarDecl(Id("Votien"), BooleanType(), NumberLit(1))
+                VarDecl(Id("Votien"), BoolType()),
+                VarDecl(Id("Votien"), StringType(), None, NumberLiteral(1)),
+                VarDecl(Id("Votien"), BoolType(), None, NumberLiteral(1))
             ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 303))
@@ -42,7 +42,7 @@ class ASTGenSuite(unittest.TestCase):
             string VoTien[5]
         """
         expect = str(Program([
-                VarDecl(Id("VoTien"), ArrayType([5], StringType()), NumberLit(1)),
+                VarDecl(Id("VoTien"), ArrayType([5], StringType()), None, NumberLiteral(1)),
                 VarDecl(Id("VoTien"), ArrayType([5], StringType()))
             ]))
         #print(expect)
@@ -53,8 +53,8 @@ class ASTGenSuite(unittest.TestCase):
             bool VoTien[2,3,4]
         """
         expect = str(Program([
-                VarDecl(Id("VoTien"), ArrayType([5, 3, 4], NumberType()), NumberLit(1)),
-                VarDecl(Id("VoTien"), ArrayType([2, 3, 4], BooleanType()))
+                VarDecl(Id("VoTien"), ArrayType([5, 3, 4], NumberType()), None, NumberLiteral(1)),
+                VarDecl(Id("VoTien"), ArrayType([2, 3, 4], BoolType()))
             ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 305))
@@ -64,8 +64,8 @@ class ASTGenSuite(unittest.TestCase):
             dynamic Votien
         """
         expect = str(Program([
-                    ImplicitDynamicDecl(Id("Votien"), NumberLit(1)),
-                    ImplicitDynamicDecl(Id("Votien"))
+                    VarDecl(Id("Votien"), None, None, NumberLiteral(1)),
+                    VarDecl(Id("Votien"), None)
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 306))
@@ -74,7 +74,7 @@ class ASTGenSuite(unittest.TestCase):
             var Votien <- 1
         """
         expect = str(Program([
-                    ImplicitVarDecl(Id("Votien"), NumberLit(1))
+                    VarDecl(Id("Votien"), None, None, NumberLiteral(1))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 307))
@@ -94,7 +94,7 @@ class ASTGenSuite(unittest.TestCase):
                 end
         """
         expect = str(Program([
-                    FuncDecl(Id("main"), [], BlockStmt([]))
+                    FuncDecl(Id("main"), [], Block([]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 309))
@@ -106,8 +106,8 @@ class ASTGenSuite(unittest.TestCase):
                 end
         """
         expect = str(Program([
-                    FuncDecl(Id("main"), [], BlockStmt([
-                    BreakStmt()]))
+                    FuncDecl(Id("main"), [], Block([
+                    Break()]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 310))
@@ -119,9 +119,11 @@ class ASTGenSuite(unittest.TestCase):
                 return
         """
         expect = str(Program([
-                    FuncDecl(Id("main"), [ParamDecl("a", NumberType())], None),
-                    FuncDecl(Id("main"), [ParamDecl("a", NumberType()), ParamDecl("a", StringType()), ParamDecl("a", ArrayType([2], BooleanType()))], None),
-                    FuncDecl(Id("main"), [ParamDecl("Votien", ArrayType([1, 2], NumberType()))], ReturnStmt(None))
+                    FuncDecl(Id("main"), [VarDecl("a", NumberType())], None),
+                    FuncDecl(Id("main"), [VarDecl("a", NumberType()), 
+                                          VarDecl("a", StringType()), 
+                                          VarDecl("a", ArrayType([2], BoolType()))], None),
+                    FuncDecl(Id("main"), [VarDecl("Votien", ArrayType([1, 2], NumberType()))], Return(None))
                 ]))
         # print(expect)
         self.assertTrue(TestAST.test(input, expect, 311))
@@ -135,10 +137,10 @@ class ASTGenSuite(unittest.TestCase):
             var x <- false
         """
         expect = str(Program([
-                    ImplicitVarDecl(Id("x"), NumberLit(1)),
-                    ImplicitVarDecl(Id("x"), StringLit("123")),
-                    ImplicitVarDecl(Id("x"), BooleanLit(True)),
-                    ImplicitVarDecl(Id("x"), BooleanLit(False))
+                    VarDecl(Id("x"), None, None,  NumberLiteral(1)),
+                    VarDecl(Id("x"), None, None,  StringLiteral("123")),
+                    VarDecl(Id("x"), None, None,  BooleanLiteral(True)),
+                    VarDecl(Id("x"), None, None,  BooleanLiteral(False))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 312))
@@ -147,7 +149,7 @@ class ASTGenSuite(unittest.TestCase):
             var x <- [1, "a", true, false]
         """
         expect = str(Program([
-                    ImplicitVarDecl(Id("x"), ArrayLit([NumberLit(1), StringLit("a"), BooleanLit(True), BooleanLit(False)]))
+                    VarDecl(Id("x"), None, None,  ArrayLiteral([NumberLiteral(1), StringLiteral("a"), BooleanLiteral(True), BooleanLiteral(False)]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 313))   
@@ -157,8 +159,8 @@ class ASTGenSuite(unittest.TestCase):
             var x <- [[1]]
         """
         expect = str(Program([
-                    ImplicitVarDecl(Id("x"), ArrayLit([ArrayLit([NumberLit(1)]), ArrayLit([NumberLit(1)])])),
-                    ImplicitVarDecl(Id("x"), ArrayLit([ArrayLit([NumberLit(1)])]))
+                    VarDecl(Id("x"), None, None,  ArrayLiteral([ArrayLiteral([NumberLiteral(1)]), ArrayLiteral([NumberLiteral(1)])])),
+                    VarDecl(Id("x"), None, None,  ArrayLiteral([ArrayLiteral([NumberLiteral(1)])]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 314))  
@@ -175,15 +177,15 @@ class ASTGenSuite(unittest.TestCase):
             var x <- a[1,2,3]
         """
         expect = str(Program([
-                    ImplicitVarDecl(Id("x"), BinExpr("...", NumberLit(1), StringLit("2"))),
-                    ImplicitVarDecl(Id("x"), BinExpr("<=", NumberLit(1), StringLit("2"))),
-                    ImplicitVarDecl(Id("x"), BinExpr("or", BinExpr("and", NumberLit(1), NumberLit(2)), NumberLit(3))),
-                    ImplicitVarDecl(Id("x"), BinExpr("-", BinExpr("+", NumberLit(1), NumberLit(2)), NumberLit(3))),
-                    ImplicitVarDecl(Id("x"), BinExpr("%", BinExpr("/", BinExpr("*", NumberLit(1), NumberLit(2)), NumberLit(3)), NumberLit(4))),
-                    ImplicitVarDecl(Id("x"), UnExpr("-", UnExpr("-", UnExpr("-", NumberLit(1))))),
-                    ImplicitVarDecl(Id("x"), UnExpr("not", UnExpr("not", NumberLit(1)))),
-                    ImplicitVarDecl(Id("x"), Id("x")),
-                    ImplicitVarDecl(Id("x"), ArrayCell(Id("a"), [NumberLit(1), NumberLit(2), NumberLit(3)]))
+                    VarDecl(Id("x"), None, None,  BinaryOp("...", NumberLiteral(1), StringLiteral("2"))),
+                    VarDecl(Id("x"), None, None,  BinaryOp("<=", NumberLiteral(1), StringLiteral("2"))),
+                    VarDecl(Id("x"), None, None,  BinaryOp("or", BinaryOp("and", NumberLiteral(1), NumberLiteral(2)), NumberLiteral(3))),
+                    VarDecl(Id("x"), None, None,  BinaryOp("-", BinaryOp("+", NumberLiteral(1), NumberLiteral(2)), NumberLiteral(3))),
+                    VarDecl(Id("x"), None, None,  BinaryOp("%", BinaryOp("/", BinaryOp("*", NumberLiteral(1), NumberLiteral(2)), NumberLiteral(3)), NumberLiteral(4))),
+                    VarDecl(Id("x"), None, None,  UnaryOp("-", UnaryOp("-", UnaryOp("-", NumberLiteral(1))))),
+                    VarDecl(Id("x"), None, None,  UnaryOp("not", UnaryOp("not", NumberLiteral(1)))),
+                    VarDecl(Id("x"), None, None,  Id("x")),
+                    VarDecl(Id("x"), None, None,  ArrayCell(Id("a"), [NumberLiteral(1), NumberLiteral(2), NumberLiteral(3)]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 315))  
@@ -192,7 +194,7 @@ class ASTGenSuite(unittest.TestCase):
             var x <- 2 or 3 and 1 <= 2 ... 4 <= 5 + a * 3 + c - -1 + not - 2
         """
         expect = str(Program([
-                ImplicitVarDecl(Id("x"), BinExpr("...", BinExpr("<=", BinExpr("and", BinExpr("or", NumberLit(2), NumberLit(3)), NumberLit(1)), NumberLit(2)), BinExpr("<=", NumberLit(4), BinExpr("+", BinExpr("-", BinExpr("+", BinExpr("+", NumberLit(5), BinExpr("*", Id("a"), NumberLit(3))), Id("c")), UnExpr("-", NumberLit(1))), UnExpr("not", UnExpr("-", NumberLit(2)))))))
+                VarDecl(Id("x"), None, None,  BinaryOp("...", BinaryOp("<=", BinaryOp("and", BinaryOp("or", NumberLiteral(2), NumberLiteral(3)), NumberLiteral(1)), NumberLiteral(2)), BinaryOp("<=", NumberLiteral(4), BinaryOp("+", BinaryOp("-", BinaryOp("+", BinaryOp("+", NumberLiteral(5), BinaryOp("*", Id("a"), NumberLiteral(3))), Id("c")), UnaryOp("-", NumberLiteral(1))), UnaryOp("not", UnaryOp("-", NumberLiteral(2)))))))
             ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 316))  
@@ -201,7 +203,7 @@ class ASTGenSuite(unittest.TestCase):
             var x <- -a[1+2] ... 2
         """
         expect = str(Program([
-                    ImplicitVarDecl(Id("x"), BinExpr("...", UnExpr("-", ArrayCell(Id("a"), [BinExpr("+", NumberLit(1), NumberLit(2))])), NumberLit(2)))
+                    VarDecl(Id("x"), None, None,  BinaryOp("...", UnaryOp("-", ArrayCell(Id("a"), [BinaryOp("+", NumberLiteral(1), NumberLiteral(2))])), NumberLiteral(2)))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 317))  
@@ -210,7 +212,7 @@ class ASTGenSuite(unittest.TestCase):
             var x <- fun()
         """
         expect = str(Program([
-                    ImplicitVarDecl(Id("x"), FuncCall(Id("fun"), []))
+                    VarDecl(Id("x"), None, None,  CallExpr(Id("fun"), []))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 318)) 
@@ -219,7 +221,7 @@ class ASTGenSuite(unittest.TestCase):
             var x <- fun(1+1, "a")
         """
         expect = str(Program([
-                    ImplicitVarDecl(Id("x"), FuncCall(Id("fun"), [BinExpr("+", NumberLit(1), NumberLit(1)), StringLit("a")]))
+                    VarDecl(Id("x"), None, None,  CallExpr(Id("fun"), [BinaryOp("+", NumberLiteral(1), NumberLiteral(1)), StringLiteral("a")]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 319)) 
@@ -228,7 +230,7 @@ class ASTGenSuite(unittest.TestCase):
             var x <- fun(fun())
         """
         expect = str(Program([
-                    ImplicitVarDecl(Id("x"), FuncCall(Id("fun"), [FuncCall(Id("fun"), [])]))
+                    VarDecl(Id("x"), None, None,  CallExpr(Id("fun"), [CallExpr(Id("fun"), [])]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 320)) 
@@ -237,7 +239,7 @@ class ASTGenSuite(unittest.TestCase):
             var x <- (2 ... 3) ... 4
         """
         expect = str(Program([
-                    ImplicitVarDecl(Id("x"), BinExpr("...", BinExpr("...", NumberLit(2), NumberLit(3)), NumberLit(4)))
+                    VarDecl(Id("x"), None, None,  BinaryOp("...", BinaryOp("...", NumberLiteral(2), NumberLiteral(3)), NumberLiteral(4)))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 321)) 
@@ -251,8 +253,8 @@ class ASTGenSuite(unittest.TestCase):
                 end
         """
         expect = str(Program([
-                    FuncDecl(Id("main"), [], BlockStmt([
-                    ContinueStmt()]))
+                    FuncDecl(Id("main"), [], Block([
+                    Continue()]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 322))
@@ -271,14 +273,14 @@ class ASTGenSuite(unittest.TestCase):
                 end
         """
         expect = str(Program([
-                    FuncDecl(Id("main"), [], BlockStmt([
-                    ContinueStmt(),
-                    ContinueStmt(),
-                    BreakStmt(),
-                        BlockStmt([
-                        ContinueStmt(),
-                        ContinueStmt(),
-                        BreakStmt()])]))
+                    FuncDecl(Id("main"), [], Block([
+                    Continue(),
+                    Continue(),
+                    Break(),
+                        Block([
+                        Continue(),
+                        Continue(),
+                        Break()])]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 323))
@@ -292,9 +294,9 @@ class ASTGenSuite(unittest.TestCase):
                 return 1
         """
         expect = str(Program([
-                    FuncDecl(Id("main"), [], BlockStmt([
-                    ReturnStmt(BinExpr("+", NumberLit(1), NumberLit(1)))])),
-                    FuncDecl(Id("main"), [], ReturnStmt(NumberLit(1)))
+                    FuncDecl(Id("main"), [], Block([
+                    Return(BinaryOp("+", NumberLiteral(1), NumberLiteral(1)))])),
+                    FuncDecl(Id("main"), [], Return(NumberLiteral(1)))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 324))
@@ -311,10 +313,10 @@ class ASTGenSuite(unittest.TestCase):
                 end
         """
         expect = str(Program([
-                    FuncDecl(Id("main"), [], BlockStmt([
+                    FuncDecl(Id("main"), [], Block([
                     CallStmt(Id("main"), [Id("a")]),
-                    CallStmt(Id("main"), [NumberLit(1), NumberLit(1)])])),
-                    FuncDecl(Id("main"), [], BlockStmt([
+                    CallStmt(Id("main"), [NumberLiteral(1), NumberLiteral(1)])])),
+                    FuncDecl(Id("main"), [], Block([
                     CallStmt(Id("main"), [])]))
                 ]))
         #print(expect)
@@ -333,12 +335,12 @@ class ASTGenSuite(unittest.TestCase):
                 end
         """
         expect = str(Program([
-                    FuncDecl(Id("main"), [], BlockStmt([
-                    AssignStmt(Id("a"), NumberLit(1)),
-                    AssignStmt(ArrayCell(Id("a"), [NumberLit(1)]), NumberLit(2)),
-                    AssignStmt(ArrayCell(Id("a"), [NumberLit(3), NumberLit(2)]), BinExpr("+", NumberLit(4), NumberLit(2)))])),
-                    FuncDecl(Id("main"), [], BlockStmt([
-                    AssignStmt(ArrayCell(Id("a"), [BinExpr("+", NumberLit(1), NumberLit(1)), NumberLit(3)]), NumberLit(1))]))
+                    FuncDecl(Id("main"), [], Block([
+                    Assign(Id("a"), NumberLiteral(1)),
+                    Assign(ArrayCell(Id("a"), [NumberLiteral(1)]), NumberLiteral(2)),
+                    Assign(ArrayCell(Id("a"), [NumberLiteral(3), NumberLiteral(2)]), BinaryOp("+", NumberLiteral(4), NumberLiteral(2)))])),
+                    FuncDecl(Id("main"), [], Block([
+                    Assign(ArrayCell(Id("a"), [BinaryOp("+", NumberLiteral(1), NumberLiteral(1)), NumberLiteral(3)]), NumberLiteral(1))]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 326))
@@ -358,11 +360,11 @@ class ASTGenSuite(unittest.TestCase):
                 end
         """
         expect = str(Program([
-                    FuncDecl(Id("main"), [], BlockStmt([
-                    ForStmt(Id("i"), BinExpr(">", Id("i"), NumberLit(2)), BinExpr("+", NumberLit(1), NumberLit(1)), CallStmt(Id("print"), [NumberLit(1)]))])),
-                    FuncDecl(Id("main"), [], BlockStmt([
-                    ForStmt(Id("i"), Id("i"), ArrayLit([NumberLit(1)]), BlockStmt([
-                    CallStmt(Id("print"), [NumberLit(1)])]))]))
+                    FuncDecl(Id("main"), [], Block([
+                    For(Id("i"), BinaryOp(">", Id("i"), NumberLiteral(2)), BinaryOp("+", NumberLiteral(1), NumberLiteral(1)), CallStmt(Id("print"), [NumberLiteral(1)]))])),
+                    FuncDecl(Id("main"), [], Block([
+                    For(Id("i"), Id("i"), ArrayLiteral([NumberLiteral(1)]), Block([
+                    CallStmt(Id("print"), [NumberLiteral(1)])]))]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 327))
@@ -370,19 +372,19 @@ class ASTGenSuite(unittest.TestCase):
         input = """
             func main()
                 begin
-                    if true return 1
+                    if (true) return 1
                 end
             func main()
                 begin
-                    if true return 2
+                    if (true) return 2
                     else return 3
                 end
         """
         expect = str(Program([
-                    FuncDecl(Id("main"), [], BlockStmt([
-                    IfStmt(BooleanLit(True), ReturnStmt(NumberLit(1)), [] ,)])),
-                    FuncDecl(Id("main"), [], BlockStmt([
-                    IfStmt(BooleanLit(True), ReturnStmt(NumberLit(2)), [] ,ReturnStmt(NumberLit(3)))]))
+                    FuncDecl(Id("main"), [], Block([
+                    If(BooleanLiteral(True), Return(NumberLiteral(1)), [] , None)])),
+                    FuncDecl(Id("main"), [], Block([
+                    If(BooleanLiteral(True), Return(NumberLiteral(2)), [] ,Return(NumberLiteral(3)))]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 328))
@@ -391,16 +393,19 @@ class ASTGenSuite(unittest.TestCase):
         input = """
             func main()
                 begin
-                    if true return 1
-                    elif true return 1
-                    elif true return 1
+                    if (true) return 1
+                    elif (true) return 1
+                    elif (true) return 1
                     else return 1
                 end
 
         """
         expect =str(Program([
-                    FuncDecl(Id("main"), [], BlockStmt([
-                    IfStmt(BooleanLit(True), ReturnStmt(NumberLit(1)), [[BooleanLit(True),ReturnStmt(NumberLit(1))],[BooleanLit(True),ReturnStmt(NumberLit(1))]] ,ReturnStmt(NumberLit(1)))]))
+                    FuncDecl(Id("main"), [], Block([
+                    If(BooleanLiteral(True), Return(NumberLiteral(1)), 
+                       [(BooleanLiteral(True),Return(NumberLiteral(1))),
+                        (BooleanLiteral(True),Return(NumberLiteral(1)))] 
+                    ,Return(NumberLiteral(1)))]))
                 ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 329))     
@@ -411,9 +416,9 @@ class ASTGenSuite(unittest.TestCase):
             var c <- fun(1,2)[1,3]
         """
         expect = str(Program([
-            ImplicitVarDecl(Id("c"), ArrayCell(Id("a"), [NumberLit(1), NumberLit(2)])),
-            ImplicitVarDecl(Id("c"), ArrayCell(FuncCall(Id("fun"), []), [NumberLit(1), NumberLit(2)])),
-            ImplicitVarDecl(Id("c"), ArrayCell(FuncCall(Id("fun"), [NumberLit(1), NumberLit(2)]), [NumberLit(1), NumberLit(3)]))
+            VarDecl(Id("c"), None, None, ArrayCell(Id("a"), [NumberLiteral(1), NumberLiteral(2)])),
+            VarDecl(Id("c"), None, None, ArrayCell(CallExpr(Id("fun"), []), [NumberLiteral(1), NumberLiteral(2)])),
+            VarDecl(Id("c"), None, None, ArrayCell(CallExpr(Id("fun"), [NumberLiteral(1), NumberLiteral(2)]), [NumberLiteral(1), NumberLiteral(3)]))
         ]))
         #print(expect)
         self.assertTrue(TestAST.test(input, expect, 330))    

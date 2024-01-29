@@ -1,4 +1,1 @@
-str(Program([
-	FuncDecl(Id("main"), [], BlockStmt([
-	]))
-]))
+Program([FuncDecl(Id(main),[], Block([]))])

@@ -204,11 +204,6 @@ class ZCodeVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ZCodeParser#list_literal.
-    def visitList_literal(self, ctx:ZCodeParser.List_literalContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by ZCodeParser#array_element.
     def visitArray_element(self, ctx:ZCodeParser.Array_elementContext):
         return self.visitChildren(ctx)

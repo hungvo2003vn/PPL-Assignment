@@ -1,3 +1,1 @@
-str(Program([
-	ImplicitVarDecl(Id("x"), , ArrayLit([NumberLit(1), StringLit("a"), BooleanLit(True), BooleanLit(False)]))
-]))
+Program([VarDecl(Id(x),[NumLit(1),StringLit(a),BooleanLit(True),BooleanLit(False)])])

@@ -1,5 +1,1 @@
-str(Program([
-	FuncDecl(Id("main"), [], BlockStmt([
-	ReturnStmt(BinExpr("+", NumberLit(1), NumberLit(1)))])),
-	FuncDecl(Id("main"), [], ReturnStmt(NumberLit(1)))
-]))
+Program([FuncDecl(Id(main),[], Block([Return(BinaryOp(+,NumLit(1),NumLit(1)))])),FuncDecl(Id(main),[], Return(NumLit(1)))])

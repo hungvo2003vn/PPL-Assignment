@@ -1,5 +1,1 @@
-str(Program([
-	FuncDecl(Id("main"), [ParamDecl("a", NumberType())], None),
-	FuncDecl(Id("main"), [ParamDecl("a", NumberType()), ParamDecl("a", StringType()), ParamDecl("a", ArrayType([2], BooleanType()))], None),
-	FuncDecl(Id("main"), [ParamDecl("Votien", ArrayType([1, 2], NumberType()))], ReturnStmt())
-]))
+Program([FuncDecl(Id(main),[VarDecl(NumberType,a)]),FuncDecl(Id(main),[VarDecl(NumberType,a),VarDecl(StringType,a),VarDecl(ArrayType([2],BoolType),a)]),FuncDecl(Id(main),[VarDecl(ArrayType([1,2],NumberType),Votien)], Return())])

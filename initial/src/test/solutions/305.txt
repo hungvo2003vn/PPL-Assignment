@@ -1,4 +1,1 @@
-str(Program([
-	VarDecl(Id("VoTien"), ArrayType([5, 3, 4], NumberType()), NumberLit(1)),
-	VarDecl(Id("VoTien"), ArrayType([2, 3, 4], BooleanType()))
-]))
+Program([VarDecl(ArrayType([5,3,4],NumberType),Id(VoTien),NumLit(1)),VarDecl(ArrayType([2,3,4],BoolType),Id(VoTien))])

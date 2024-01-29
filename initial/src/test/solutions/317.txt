@@ -1,3 +1,1 @@
-str(Program([
-	ImplicitVarDecl(Id("x"), , BinExpr("...", UnExpr("-", ArrayCell(Id("a"), [BinExpr("+", NumberLit(1), NumberLit(2))])), NumberLit(2)))
-]))
+Program([VarDecl(Id(x),BinaryOp(...,UnaryOp(-,ArrayCell(Id(a),[BinaryOp(+,NumLit(1),NumLit(2))])),NumLit(2)))])

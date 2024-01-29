@@ -28,7 +28,7 @@ class ASTGeneration(ZCodeVisitor):
 
     # implicit_var: VAR ID ASSIGN expression;
     def visitImplicit_var(self, ctx:ZCodeParser.Implicit_varContext):
-        return ImplicitVarDecl( Id(ctx.ID().getText()), self.visit(ctx.expression()))
+        return VarDecl( Id(ctx.ID().getText()), None , None, self.visit(ctx.expression()))
 
 
     # keyword_var: prim_type (ID | array_declared) (ASSIGN expression)?;
@@ -45,11 +45,11 @@ class ASTGeneration(ZCodeVisitor):
             res = self.visitArray_declared(ctx.array_declared())
             name = res["ID"]
 
-            res["typ"].typ = typ
+            res["typ"].eleType = typ
             typ = res["typ"]
 
         if ctx.getChildCount() == 4:
-            return VarDecl(name, typ, self.visit(ctx.expression()))
+            return VarDecl(name, typ, None, self.visit(ctx.expression()))
 
         return VarDecl(name, typ)
 
@@ -58,16 +58,16 @@ class ASTGeneration(ZCodeVisitor):
     def visitImplicit_dynamic(self, ctx:ZCodeParser.Implicit_dynamicContext):
 
         if ctx.getChildCount() == 4:
-            return ImplicitDynamicDecl(Id(ctx.ID().getText()), self.visit(ctx.expression()))
+            return VarDecl(Id(ctx.ID().getText()), None, None, self.visit(ctx.expression()))
         
-        return ImplicitDynamicDecl(Id(ctx.ID().getText()))
+        return VarDecl(Id(ctx.ID().getText()))
 
 
     # prim_type: BOOL | NUMBER | STRING;
     def visitPrim_type(self, ctx:ZCodeParser.Prim_typeContext):
 
         if ctx.BOOL():
-            return BooleanType()
+            return BoolType()
         elif ctx.NUMBER():
             return NumberType()
         return StringType()
@@ -118,9 +118,9 @@ class ASTGeneration(ZCodeVisitor):
             res = self.visitArray_declared(ctx.array_declared())
             name = res["ID"].name
 
-            res["typ"].typ = typ
+            res["typ"].eleType = typ
             typ = res["typ"]
-        keyword_var = ParamDecl(name, typ)
+        keyword_var = VarDecl(name, typ)
 
         if ctx.prameters_list():
             return [keyword_var] + self.visit(ctx.prameters_list())
@@ -156,10 +156,10 @@ class ASTGeneration(ZCodeVisitor):
         else:
             lhs = Id(ctx.ID().getText())
 
-        return AssignStmt(lhs, self.visit(ctx.expression()))
+        return Assign(lhs, self.visit(ctx.expression()))
 
 
-    # if_statement: (IF expression statement_block_if) (elif_statement_list)? (else_statement)?;
+    # if_statement: (IF LPARENT expression RPARENT statement_block_if) (elif_statement_list)? (else_statement)?;
     def visitIf_statement(self, ctx:ZCodeParser.If_statementContext):
         
         cond = self.visit(ctx.expression())
@@ -167,12 +167,12 @@ class ASTGeneration(ZCodeVisitor):
         Elif = [] if not ctx.elif_statement_list() else self.visit(ctx.elif_statement_list())
         fstmt = None if not ctx.else_statement() else self.visit(ctx.else_statement())
 
-        return IfStmt(cond, tstmt, Elif, fstmt)
+        return If(cond, tstmt, Elif, fstmt)
 
 
-    # elif_statement: ELIF expression statement_block_if;
+    # elif_statement: ELIF LPARENT expression RPARENT statement_block_if;
     def visitElif_statement(self, ctx:ZCodeParser.Elif_statementContext):
-        return [self.visit(ctx.expression()), self.visit(ctx.statement_block_if())]
+        return tuple([self.visit(ctx.expression()), self.visit(ctx.statement_block_if())])
 
     # elif_statement_list: elif_statement elif_statement_list | elif_statement;
     def visitElif_statement_list(self, ctx:ZCodeParser.Elif_statement_listContext):
@@ -191,7 +191,7 @@ class ASTGeneration(ZCodeVisitor):
     def visitStatement_block_if(self, ctx:ZCodeParser.Statement_block_ifContext):
         return self.visit(ctx.statement())
 
-    # for_statement: FOR ID UNTIL expression BY expression (ignore statement);
+    # for_statement: FOR ID UNTIL expression BY expression (ignore? statement);
     def visitFor_statement(self, ctx:ZCodeParser.For_statementContext):
         
         init = Id(ctx.ID().getText())
@@ -199,22 +199,22 @@ class ASTGeneration(ZCodeVisitor):
         upd = self.visit(ctx.expression(1))
         stmt = self.visit(ctx.statement())
 
-        return ForStmt(init, cond, upd, stmt)
+        return For(init, cond, upd, stmt)
 
     # break_statement: BREAK ignore;
     def visitBreak_statement(self, ctx:ZCodeParser.Break_statementContext):
-        return BreakStmt()
+        return Break()
 
 
     # continue_statement: CONTINUE ignore;
     def visitContinue_statement(self, ctx:ZCodeParser.Continue_statementContext):
-        return ContinueStmt()
+        return Continue()
 
 
     # return_statement: RETURN (expression | ) ignore;
     def visitReturn_statement(self, ctx:ZCodeParser.Return_statementContext):
         expr = None if not ctx.expression() else self.visit(ctx.expression()) 
-        return ReturnStmt(expr)
+        return Return(expr)
 
     # call_statement: func_call ignore;
     def visitCall_statement(self, ctx:ZCodeParser.Call_statementContext):
@@ -225,11 +225,11 @@ class ASTGeneration(ZCodeVisitor):
     def visitFunc_call(self, ctx:ZCodeParser.Func_callContext):
         args = [] if not ctx.expression_list() else self.visit(ctx.expression_list())
         name  = Id(ctx.ID().getText())
-        return FuncCall(name, args)
+        return CallExpr(name, args)
 
     # block_statement: BEGIN ignore statement_list END ignore;
     def visitBlock_statement(self, ctx:ZCodeParser.Block_statementContext):
-        return BlockStmt(self.visit(ctx.statement_list()))
+        return Block(self.visit(ctx.statement_list()))
 
     # expression_list: expression COMMA expression_list | expression;
     def visitExpression_list(self, ctx:ZCodeParser.Expression_listContext):
@@ -248,7 +248,7 @@ class ASTGeneration(ZCodeVisitor):
         left = self.visit(ctx.expression1(0))
         right = self.visit(ctx.expression1(1))
 
-        return BinExpr(op, left, right)
+        return BinaryOp(op, left, right)
 
 
     # expression1: expression2 (EQUAL | STRCMP | NOT_EQUAL | LT | GT | LE | GE) expression2 | expression2;
@@ -260,7 +260,7 @@ class ASTGeneration(ZCodeVisitor):
         left = self.visit(ctx.expression2(0))
         right = self.visit(ctx.expression2(1))
 
-        return BinExpr(op, left, right)
+        return BinaryOp(op, left, right)
 
     # expression2: expression2 (AND | OR) expression3 | expression3;
     def visitExpression2(self, ctx:ZCodeParser.Expression2Context):
@@ -271,7 +271,7 @@ class ASTGeneration(ZCodeVisitor):
         left = self.visit(ctx.expression2())
         right = self.visit(ctx.expression3())
 
-        return BinExpr(op, left, right)
+        return BinaryOp(op, left, right)
 
 
     # expression3: expression3 (ADD | SUB) expression4 | expression4;
@@ -283,7 +283,7 @@ class ASTGeneration(ZCodeVisitor):
         left = self.visit(ctx.expression3())
         right = self.visit(ctx.expression4())
 
-        return BinExpr(op, left, right)
+        return BinaryOp(op, left, right)
 
 
     # expression4: expression4 (MUL | DIV | MOD) expression5 | expression5;
@@ -295,7 +295,7 @@ class ASTGeneration(ZCodeVisitor):
         left = self.visit(ctx.expression4())
         right = self.visit(ctx.expression5())
 
-        return BinExpr(op, left, right)
+        return BinaryOp(op, left, right)
 
 
     # expression5: NOT expression5 | expression6;
@@ -306,10 +306,10 @@ class ASTGeneration(ZCodeVisitor):
         op = ctx.getChild(0).getText()
         val = self.visit(ctx.expression5())
 
-        return UnExpr(op, val)
+        return UnaryOp(op, val)
 
 
-    # expression6: SUB expression6 | expression7;
+    # expression6: (SUB | ADD) expression6 | expression7;
     def visitExpression6(self, ctx:ZCodeParser.Expression6Context):
         if ctx.getChildCount() == 1:
             return self.visit(ctx.expression7())
@@ -317,7 +317,7 @@ class ASTGeneration(ZCodeVisitor):
         op = ctx.getChild(0).getText()
         val = self.visit(ctx.expression6())
 
-        return UnExpr(op, val)
+        return UnaryOp(op, val)
 
 
     # expression7: array_element | literal | ID | (LPARENT expression RPARENT) | func_call;
@@ -334,30 +334,20 @@ class ASTGeneration(ZCodeVisitor):
     # literal: NUMBER_LIT | STRING_LIT | TRUE | FALSE | array_literal;
     def visitLiteral(self, ctx:ZCodeParser.LiteralContext):
         if ctx.NUMBER_LIT():
-            return NumberLit(int(ctx.NUMBER_LIT().getText()))
+            return NumberLiteral(int(ctx.NUMBER_LIT().getText()))
         elif ctx.STRING_LIT():
-            return StringLit(ctx.STRING_LIT().getText())
+            return StringLiteral(ctx.STRING_LIT().getText())
         elif ctx.TRUE():
-            return BooleanLit(True)
+            return BooleanLiteral(True)
         elif ctx.FALSE():
-            return BooleanLit(False)
+            return BooleanLiteral(False)
         
         return self.visit(ctx.array_literal())
 
 
-    # array_literal: LBRACKET list_literal? RBRACKET;
+    # array_literal: LBRACKET expression_list RBRACKET;
     def visitArray_literal(self, ctx:ZCodeParser.Array_literalContext):
-        if ctx.list_literal():
-            return ArrayLit(self.visit(ctx.list_literal()))
-        return ArrayLit([])
-
-
-    # list_literal: literal COMMA list_literal | literal;
-    def visitList_literal(self, ctx:ZCodeParser.List_literalContext):
-        
-        if not ctx.list_literal():
-            return [self.visit(ctx.literal())]
-        return [self.visit(ctx.literal())] + self.visit(ctx.list_literal())
+        return ArrayLiteral(self.visit(ctx.expression_list()))
 
 
     # array_element: (ID | func_call) index_operators;

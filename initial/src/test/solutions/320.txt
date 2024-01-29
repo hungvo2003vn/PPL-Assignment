@@ -1,3 +1,1 @@
-str(Program([
-	ImplicitVarDecl(Id("x"), , FuncCall(Id("fun"), [FuncCall(Id("fun"), [])]))
-]))
+Program([VarDecl(Id(x),CallExpr(Id(fun),[CallExpr(Id(fun),[])]))])

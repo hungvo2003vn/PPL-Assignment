@@ -1,4 +1,1 @@
-str(Program([
-	ImplicitVarDecl(Id("x"), , ArrayLit([ArrayLit([NumberLit(1)]), ArrayLit([NumberLit(1)])])),
-	ImplicitVarDecl(Id("x"), , ArrayLit([ArrayLit([NumberLit(1)])]))
-]))
+Program([VarDecl(Id(x),[[NumLit(1)],[NumLit(1)]]),VarDecl(Id(x),[[NumLit(1)]])])

@@ -1,10 +1,1 @@
-str(Program([
-	FuncDecl(Id("main"), [], BlockStmt([
-	ContinueStmt(),
-	ContinueStmt(),
-	BreakStmt(),
-	BlockStmt([
-	ContinueStmt(),
-	ContinueStmt(),
-	BreakStmt()])]))
-]))
+Program([FuncDecl(Id(main),[], Block([Continue,Continue,Break,Block([Continue,Continue,Break])]))])

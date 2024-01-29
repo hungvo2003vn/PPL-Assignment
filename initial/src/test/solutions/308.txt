@@ -1,3 +1,1 @@
-str(Program([
-	FuncDecl(Id("main"), [], None)
-]))
+Program([FuncDecl(Id(main),[])])

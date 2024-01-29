@@ -1,3 +1,1 @@
-str(Program([
-	ImplicitVarDecl(Id("x"), , BinExpr("...", BinExpr("<=", BinExpr("and", BinExpr("or", NumberLit(2), NumberLit(3)), NumberLit(1)), NumberLit(2)), BinExpr("<=", NumberLit(4), BinExpr("+", BinExpr("-", BinExpr("+", BinExpr("+", NumberLit(5), BinExpr("*", Id("a"), NumberLit(3))), Id("c")), UnExpr("-", NumberLit(1))), UnExpr("not", UnExpr("-", NumberLit(2)))))))
-]))
+Program([VarDecl(Id(x),BinaryOp(...,BinaryOp(<=,BinaryOp(and,BinaryOp(or,NumLit(2),NumLit(3)),NumLit(1)),NumLit(2)),BinaryOp(<=,NumLit(4),BinaryOp(+,BinaryOp(-,BinaryOp(+,BinaryOp(+,NumLit(5),BinaryOp(*,Id(a),NumLit(3))),Id(c)),UnaryOp(-,NumLit(1))),UnaryOp(not,UnaryOp(-,NumLit(2)))))))])

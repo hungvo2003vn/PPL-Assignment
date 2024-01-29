@@ -1,4 +1,1 @@
-str(Program([
-	ImplicitDynamicDecl(Id("Votien"), , NumberLit(1)),
-	ImplicitDynamicDecl(Id("Votien"), )
-]))
+Program([VarDecl(Id(Votien),NumLit(1)),VarDecl(Id(Votien))])

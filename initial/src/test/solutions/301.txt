@@ -1,3 +1,1 @@
-str(Program([
-	VarDecl(Id("VoTien"), NumberType())
-]))
+Program([VarDecl(NumberType,Id(VoTien))])

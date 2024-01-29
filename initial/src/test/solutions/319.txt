@@ -1,3 +1,1 @@
-str(Program([
-	ImplicitVarDecl(Id("x"), , FuncCall(Id("fun"), [BinExpr("+", NumberLit(1), NumberLit(1)), StringLit("a")]))
-]))
+Program([VarDecl(Id(x),CallExpr(Id(fun),[BinaryOp(+,NumLit(1),NumLit(1)),StringLit(a)]))])

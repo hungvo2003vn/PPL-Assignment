@@ -1,7 +1,1 @@
-str(Program([
-	FuncDecl(Id("main"), [], BlockStmt([
-	ForStmt(Id("i"), BinExpr(">", Id("i"), NumberLit(2)), BinExpr("+", NumberLit(1), NumberLit(1)), CallStmt(Id("print"), [NumberLit(1)]))])),
-	FuncDecl(Id("main"), [], BlockStmt([
-	ForStmt(Id("i"), Id("i"), ArrayLit([NumberLit(1)]), BlockStmt([
-	CallStmt(Id("print"), [NumberLit(1)])]))]))
-]))
+Program([FuncDecl(Id(main),[], Block([For(Id(i),BinaryOp(>,Id(i),NumLit(2)),BinaryOp(+,NumLit(1),NumLit(1)),Call(Id(print),[NumLit(1)])])])),FuncDecl(Id(main),[], Block([For(Id(i),Id(i),[NumLit(1)],Block([Call(Id(print),[NumLit(1)])])])]))])

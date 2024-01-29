@@ -1,7 +1,1 @@
-str(Program([
-	FuncDecl(Id("main"), [], BlockStmt([
-	CallStmt(Id("main"), [Id("a")]),
-	CallStmt(Id("main"), [NumberLit(1), NumberLit(1)])])),
-	FuncDecl(Id("main"), [], BlockStmt([
-	CallStmt(Id("main"), [])]))
-]))
+Program([FuncDecl(Id(main),[], Block([Call(Id(main),[Id(a)]),Call(Id(main),[NumLit(1),NumLit(1)])])),FuncDecl(Id(main),[], Block([Call(Id(main),[])]))])
