@@ -112,11 +112,11 @@ class ASTGeneration(ZCodeVisitor):
         name = None
         typ = self.visit(ctx.prim_type())
         if ctx.ID():
-            name = ctx.ID().getText()
+            name = Id(ctx.ID().getText())
         elif ctx.array_declared():
 
             res = self.visitArray_declared(ctx.array_declared())
-            name = res["ID"].name
+            name = res["ID"]
 
             res["typ"].eleType = typ
             typ = res["typ"]
