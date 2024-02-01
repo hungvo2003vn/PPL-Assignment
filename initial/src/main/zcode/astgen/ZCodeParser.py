@@ -157,9 +157,9 @@ def serializedATN():
         buf.write("\u014c\u014d\3\2\2\2\u014dE\3\2\2\2\u014e\u014c\3\2\2")
         buf.write("\2\u014f\u0150\7\26\2\2\u0150\u0153\5F$\2\u0151\u0153")
         buf.write("\5H%\2\u0152\u014f\3\2\2\2\u0152\u0151\3\2\2\2\u0153G")
-        buf.write("\3\2\2\2\u0154\u0155\t\5\2\2\u0155\u0158\5H%\2\u0156\u0158")
-        buf.write("\5J&\2\u0157\u0154\3\2\2\2\u0157\u0156\3\2\2\2\u0158I")
-        buf.write("\3\2\2\2\u0159\u0162\5P)\2\u015a\u0162\5L\'\2\u015b\u0162")
+        buf.write("\3\2\2\2\u0154\u0155\7\32\2\2\u0155\u0158\5H%\2\u0156")
+        buf.write("\u0158\5J&\2\u0157\u0154\3\2\2\2\u0157\u0156\3\2\2\2\u0158")
+        buf.write("I\3\2\2\2\u0159\u0162\5P)\2\u015a\u0162\5L\'\2\u015b\u0162")
         buf.write("\7,\2\2\u015c\u015d\7)\2\2\u015d\u015e\5<\37\2\u015e\u015f")
         buf.write("\7*\2\2\u015f\u0162\3\2\2\2\u0160\u0162\5\66\34\2\u0161")
         buf.write("\u0159\3\2\2\2\u0161\u015a\3\2\2\2\u0161\u015b\3\2\2\2")
@@ -1993,7 +1993,7 @@ class ZCodeParser ( Parser ):
             self.state = 259
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [ZCodeParser.TRUE, ZCodeParser.FALSE, ZCodeParser.NOT, ZCodeParser.ADD, ZCodeParser.SUB, ZCodeParser.LBRACKET, ZCodeParser.LPARENT, ZCodeParser.ID, ZCodeParser.STRING_LIT, ZCodeParser.NUMBER_LIT]:
+            if token in [ZCodeParser.TRUE, ZCodeParser.FALSE, ZCodeParser.NOT, ZCodeParser.SUB, ZCodeParser.LBRACKET, ZCodeParser.LPARENT, ZCodeParser.ID, ZCodeParser.STRING_LIT, ZCodeParser.NUMBER_LIT]:
                 self.state = 257
                 self.expression()
                 pass
@@ -2106,7 +2106,7 @@ class ZCodeParser ( Parser ):
             self.state = 269
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << ZCodeParser.TRUE) | (1 << ZCodeParser.FALSE) | (1 << ZCodeParser.NOT) | (1 << ZCodeParser.ADD) | (1 << ZCodeParser.SUB) | (1 << ZCodeParser.LBRACKET) | (1 << ZCodeParser.LPARENT) | (1 << ZCodeParser.ID) | (1 << ZCodeParser.STRING_LIT) | (1 << ZCodeParser.NUMBER_LIT))) != 0):
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << ZCodeParser.TRUE) | (1 << ZCodeParser.FALSE) | (1 << ZCodeParser.NOT) | (1 << ZCodeParser.SUB) | (1 << ZCodeParser.LBRACKET) | (1 << ZCodeParser.LPARENT) | (1 << ZCodeParser.ID) | (1 << ZCodeParser.STRING_LIT) | (1 << ZCodeParser.NUMBER_LIT))) != 0):
                 self.state = 268
                 self.expression_list()
 
@@ -2688,7 +2688,7 @@ class ZCodeParser ( Parser ):
                 self.state = 334
                 self.expression5()
                 pass
-            elif token in [ZCodeParser.TRUE, ZCodeParser.FALSE, ZCodeParser.ADD, ZCodeParser.SUB, ZCodeParser.LBRACKET, ZCodeParser.LPARENT, ZCodeParser.ID, ZCodeParser.STRING_LIT, ZCodeParser.NUMBER_LIT]:
+            elif token in [ZCodeParser.TRUE, ZCodeParser.FALSE, ZCodeParser.SUB, ZCodeParser.LBRACKET, ZCodeParser.LPARENT, ZCodeParser.ID, ZCodeParser.STRING_LIT, ZCodeParser.NUMBER_LIT]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 335
                 self.expression6()
@@ -2712,15 +2712,12 @@ class ZCodeParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def expression6(self):
-            return self.getTypedRuleContext(ZCodeParser.Expression6Context,0)
-
-
         def SUB(self):
             return self.getToken(ZCodeParser.SUB, 0)
 
-        def ADD(self):
-            return self.getToken(ZCodeParser.ADD, 0)
+        def expression6(self):
+            return self.getTypedRuleContext(ZCodeParser.Expression6Context,0)
+
 
         def expression7(self):
             return self.getTypedRuleContext(ZCodeParser.Expression7Context,0)
@@ -2742,20 +2739,14 @@ class ZCodeParser ( Parser ):
 
         localctx = ZCodeParser.Expression6Context(self, self._ctx, self.state)
         self.enterRule(localctx, 70, self.RULE_expression6)
-        self._la = 0 # Token type
         try:
             self.state = 341
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [ZCodeParser.ADD, ZCodeParser.SUB]:
+            if token in [ZCodeParser.SUB]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 338
-                _la = self._input.LA(1)
-                if not(_la==ZCodeParser.ADD or _la==ZCodeParser.SUB):
-                    self._errHandler.recoverInline(self)
-                else:
-                    self._errHandler.reportMatch(self)
-                    self.consume()
+                self.match(ZCodeParser.SUB)
                 self.state = 339
                 self.expression6()
                 pass

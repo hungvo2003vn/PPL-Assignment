@@ -309,7 +309,7 @@ class ASTGeneration(ZCodeVisitor):
         return UnaryOp(op, val)
 
 
-    # expression6: (SUB | ADD) expression6 | expression7;
+    # expression6: SUB expression6 | expression7;
     def visitExpression6(self, ctx:ZCodeParser.Expression6Context):
         if ctx.getChildCount() == 1:
             return self.visit(ctx.expression7())
