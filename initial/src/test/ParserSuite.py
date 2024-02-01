@@ -260,7 +260,7 @@ class ParserSuite(unittest.TestCase):
             var VoTien <-  ["tr", 2, 3, 4, 5] + [[1, 2 + 2 * 2 / 3, 3], [4, 5, 6]]
             var VoTien <- a(x,array[2])[2,3+2,true,false]
         """
-        expect = "successful"
+        expect = "Error on line 2 col 32: +"
         self.assertTrue(TestParser.test(input, expect, 223))  
 
         input = """var VoTien <- a[1]()
