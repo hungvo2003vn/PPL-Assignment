@@ -67,7 +67,7 @@ expression2: expression2 (AND | OR) expression3 | expression3;
 expression3: expression3 (ADD | SUB) expression4 | expression4;
 expression4: expression4 (MUL | DIV | MOD) expression5 | expression5;
 expression5: NOT expression5 | expression6;
-expression6: (SUB | ADD) expression6 | expression7;
+expression6: SUB expression6 | expression7;
 expression7: array_element | literal | ID | (LPARENT expression RPARENT) | func_call;
 
 
@@ -81,15 +81,11 @@ index_operators: (LBRACKET expression_list RBRACKET);
 /* Ignore */
 ignore: NEWLINE+;
 
+//! -------------------------- end Syntax analysis ----------------------- //
+
 //! --------------------------  Lexical structure ----------------------- //
 
-/*
-* hiện thực phần KeyWord và Operators và Separators và  Identifiers và Literal  và ERROR
-* kiểm tra test case python/python3 run.py test LexerSuite
-*/
-
-
-// TODO KeyWord
+/* KeyWord */
 TRUE: 'true';
 FALSE: 'false';
 NUMBER: 'number';
@@ -114,7 +110,7 @@ NOT: 'not';
 AND: 'and';
 OR: 'or';
 
-// TODO Operators
+/* Operators */
 ADD: '+';
 SUB: '-';
 MUL: '*';
@@ -130,18 +126,18 @@ GE: '>=';
 CONCAT: '...';
 STRCMP: '==';
 
-// TODO Separators
+/* Separators */
 LBRACKET: '[';
 RBRACKET: ']';
 LPARENT: '(';
 RPARENT: ')';
 COMMA: ',';
 
-// TODO Identifiers
+/* Identifiers */
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 
 
-// TODO Literal 
+/* Literal */
 // STRING
 STRING_LIT: '"'(VALID_SEQUENCE | VALID_ESCAPE)* '"'{self.text = self.text[1:-1];};
 fragment VALID_ESCAPE: '\\' [bfrnt'\\] | '\'"';
@@ -159,12 +155,12 @@ fragment DECIMAL: '.' DIGIT*;
 BOOL_LIT: TRUE | FALSE;
 
 // NEWLINE COMMENTS WS
-NEWLINE: [\n]; // 
+NEWLINE: [\n]; // Newline
 COMMENTS: '##' ~[\n\r\f]* -> skip; // Comments
 WS : [ \t\r]+ -> skip ; // skip spaces, tabs
 
 
-// TODO ERROR
+/* ERROR */
 ERROR_CHAR: . {raise ErrorToken(self.text)};
 UNCLOSE_STRING: '"' (VALID_SEQUENCE | VALID_ESCAPE)* ('\r\n' | '\n' | EOF) { 
     if(len(self.text) >= 2 and self.text[-1] == '\n' and self.text[-2] == '\r'):
@@ -175,7 +171,7 @@ UNCLOSE_STRING: '"' (VALID_SEQUENCE | VALID_ESCAPE)* ('\r\n' | '\n' | EOF) {
         raise UncloseString(self.text[1:])
 };
 ILLEGAL_ESCAPE: '"' (VALID_SEQUENCE | VALID_ESCAPE)* INVALID_ESCAPE {raise IllegalEscape(self.text[1:])};
-fragment INVALID_ESCAPE: [\r\f] | '\\' ~[bfrnt'\\];
+fragment INVALID_ESCAPE: [\r\f\\] | '\\' ~[bfrnt'\\];
 
 
 
