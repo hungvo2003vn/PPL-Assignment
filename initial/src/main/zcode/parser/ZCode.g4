@@ -1,7 +1,8 @@
+// MSSV: 2113623
+// Tên: Võ Tấn Hưng
 grammar ZCode;
 
 @lexer::header {
-## MSSV: 2113623
 from lexererr import *
 }
 
@@ -157,7 +158,7 @@ BOOL_LIT: TRUE | FALSE;
 // NEWLINE COMMENTS WS
 NEWLINE: [\n]; // Newline
 COMMENTS: '##' ~[\n\r\f]* -> skip; // Comments
-WS : [ \t\r]+ -> skip ; // skip spaces, tabs
+WS : [ \t\r\b\f]+ -> skip ; // skip spaces, tabs
 
 
 /* ERROR */
