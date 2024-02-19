@@ -1,1 +1,1 @@
-Program([FuncDecl(Id(main),[], Block([Break]))])
+Program([FuncDecl(Id(main), [], Block([Break]))])

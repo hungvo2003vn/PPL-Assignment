@@ -28,7 +28,7 @@ class ASTGeneration(ZCodeVisitor):
 
     # implicit_var: VAR ID ASSIGN expression;
     def visitImplicit_var(self, ctx:ZCodeParser.Implicit_varContext):
-        return VarDecl( Id(ctx.ID().getText()), None , None, self.visit(ctx.expression()))
+        return VarDecl( Id(ctx.ID().getText()), None , "var", self.visit(ctx.expression()))
 
 
     # keyword_var: prim_type (ID | array_declared) (ASSIGN expression)?;
@@ -58,9 +58,9 @@ class ASTGeneration(ZCodeVisitor):
     def visitImplicit_dynamic(self, ctx:ZCodeParser.Implicit_dynamicContext):
 
         if ctx.getChildCount() == 4:
-            return VarDecl(Id(ctx.ID().getText()), None, None, self.visit(ctx.expression()))
+            return VarDecl(Id(ctx.ID().getText()), None, "dynamic", self.visit(ctx.expression()))
         
-        return VarDecl(Id(ctx.ID().getText()))
+        return VarDecl(Id(ctx.ID().getText()), None, "dynamic")
 
 
     # prim_type: BOOL | NUMBER | STRING;
@@ -88,8 +88,8 @@ class ASTGeneration(ZCodeVisitor):
     # list_NUMBER_LIT: NUMBER_LIT (COMMA list_NUMBER_LIT) | NUMBER_LIT;
     def visitList_NUMBER_LIT(self, ctx:ZCodeParser.List_NUMBER_LITContext):
         if ctx.list_NUMBER_LIT():
-            return [int(ctx.NUMBER_LIT().getText())] + self.visit(ctx.list_NUMBER_LIT())
-        return [int(ctx.NUMBER_LIT().getText())]
+            return [float(ctx.NUMBER_LIT().getText())] + self.visit(ctx.list_NUMBER_LIT())
+        return [float(ctx.NUMBER_LIT().getText())]
 
 
     # function: FUNC ID LPARENT prameters_list? RPARENT (ignore? return_statement | ignore? block_statement | ignore);
@@ -334,7 +334,7 @@ class ASTGeneration(ZCodeVisitor):
     # literal: NUMBER_LIT | STRING_LIT | TRUE | FALSE | array_literal;
     def visitLiteral(self, ctx:ZCodeParser.LiteralContext):
         if ctx.NUMBER_LIT():
-            return NumberLiteral(int(ctx.NUMBER_LIT().getText()))
+            return NumberLiteral(float(ctx.NUMBER_LIT().getText()))
         elif ctx.STRING_LIT():
             return StringLiteral(ctx.STRING_LIT().getText())
         elif ctx.TRUE():

@@ -1,1 +1,1 @@
-Program([VarDecl(ArrayType([5,3,4],NumberType),Id(VoTien),NumLit(1)),VarDecl(ArrayType([2,3,4],BoolType),Id(VoTien))])
+Program([VarDecl(Id(VoTien), ArrayType([5.0, 3.0, 4.2], NumberType), None, NumLit(1.0)), VarDecl(Id(VoTien), ArrayType([2.0, 3.0, 4.0], BoolType), None, None)])
