@@ -159,13 +159,13 @@ class ASTGeneration(ZCodeVisitor):
         return Assign(lhs, self.visit(ctx.expression()))
 
 
-    # if_statement: (IF LPARENT expression RPARENT statement_block_if) (elif_statement_list)? (else_statement)?;
+    # if_statement: (IF LPARENT expression RPARENT statement_block_if) elif_statement_list else_statement;
     def visitIf_statement(self, ctx:ZCodeParser.If_statementContext):
         
         cond = self.visit(ctx.expression())
         tstmt = self.visit(ctx.statement_block_if())
-        Elif = [] if not ctx.elif_statement_list() else self.visit(ctx.elif_statement_list())
-        fstmt = None if not ctx.else_statement() else self.visit(ctx.else_statement())
+        Elif = self.visit(ctx.elif_statement_list())
+        fstmt = self.visit(ctx.else_statement())
 
         return If(cond, tstmt, Elif, fstmt)
 
@@ -174,20 +174,20 @@ class ASTGeneration(ZCodeVisitor):
     def visitElif_statement(self, ctx:ZCodeParser.Elif_statementContext):
         return tuple([self.visit(ctx.expression()), self.visit(ctx.statement_block_if())])
 
-    # elif_statement_list: elif_statement elif_statement_list | elif_statement;
+    # elif_statement_list: elif_statement elif_statement_list | ;
     def visitElif_statement_list(self, ctx:ZCodeParser.Elif_statement_listContext):
         
-        if not ctx.elif_statement_list():
-            return [self.visit(ctx.elif_statement())]
+        if ctx.getChildCount() == 0:
+            return []
         return [self.visit(ctx.elif_statement())] + self.visit(ctx.elif_statement_list())
 
 
-    # else_statement: ELSE statement_block_if;
+    # else_statement: ELSE statement_block_if | ;
     def visitElse_statement(self, ctx:ZCodeParser.Else_statementContext):
-        return self.visit(ctx.statement_block_if())
+        return None if (not ctx.statement_block_if()) else self.visit(ctx.statement_block_if())
 
 
-    # statement_block_if: (ignore? statement ignore?);
+    # statement_block_if: (ignore? statement);
     def visitStatement_block_if(self, ctx:ZCodeParser.Statement_block_ifContext):
         return self.visit(ctx.statement())
 

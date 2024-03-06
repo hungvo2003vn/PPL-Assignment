@@ -43,11 +43,11 @@ statement: declaration_statement | assignment_statement
 declaration_statement: variables ignore;
 assignment_statement: (ID | ID index_operators) ASSIGN expression ignore;
 
-if_statement: (IF LPARENT expression RPARENT statement_block_if) (elif_statement_list)? (else_statement)?;
+if_statement: (IF LPARENT expression RPARENT statement_block_if) elif_statement_list else_statement;
 elif_statement: ELIF LPARENT expression RPARENT statement_block_if;
-elif_statement_list: elif_statement elif_statement_list | elif_statement;
-else_statement: ELSE statement_block_if;
-statement_block_if: (ignore? statement ignore?);
+elif_statement_list: elif_statement elif_statement_list | ;
+else_statement: ELSE statement_block_if | ;
+statement_block_if: (ignore? statement);
 
 for_statement: FOR ID UNTIL expression BY expression (ignore? statement);
 break_statement: BREAK ignore;
