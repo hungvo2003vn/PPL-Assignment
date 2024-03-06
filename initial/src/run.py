@@ -90,7 +90,7 @@ def main(argv):
             sys.path.append(testing_generator_path)
         if len(argv) < 2:
             printUsage()
-        elif argv[1] in ['LexerSuite', 'ParserSuite']:
+        elif argv[1] in ['LexerSuite', 'ParserSuite', 'ASTGenSuite']:
             if platform.system() == 'Windows':
                 subprocess.run(f"{python_version} {testing_generator_path}genTestCase.py {argv[1]}")
             else:
@@ -128,6 +128,7 @@ def printUsage():
     print("python3 run.py test CodeGenSuite")
     print("python3 run.py genTest LexerSuite")
     print("python3 run.py genTest ParserSuite")
+    print("python3 run.py genTest ASTGenSuite")
 
 
 if __name__ == "__main__":

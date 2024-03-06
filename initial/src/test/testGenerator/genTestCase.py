@@ -1,8 +1,9 @@
-import os, subprocess, sys
+import sys
 from abc import ABC
 from antlr4 import *
 from antlr4.error.ErrorListener import ConsoleErrorListener
-from genTestVisitor import *
+import random
+from genTestVisitor import ZCodeProgram
 
 for path in ['./test/', './test/testcases/', './main/zcode/parser/', './main/zcode/utils/', './main/zcode/astgen/', 
              './main/zcode/checker/', './main/zcode/codegen/', '../target/']:
@@ -15,7 +16,7 @@ if platform.system() != 'Windows':
 from ZCodeLexer import ZCodeLexer
 from ZCodeParser import ZCodeParser
 from lexererr import *
-# from ASTGeneration import *
+from ASTGeneration import *
 # from StaticChecker import *
 # from StaticError import *
 # from CodeGenerator import *
@@ -78,7 +79,7 @@ class LexerGenerator(TestCaseGenerator):
                 output += err.message
             
             finally:
-                test = f"""\n\tdef test_{num}(self):\n\t\tself.assertTrue(TestLexer.test(\"{f"{iden}"}\", \"{f"{output}"}\", {num}))\n"""
+                test = """\n\tdef test_{}(self):\n\t\tself.assertTrue(TestLexer.test(\"{}\", \"{}\", {}))\n""".format(str(num), iden, output, str(num))
                 f.write(test)
                 f.close()
     
@@ -109,7 +110,7 @@ class LexerGenerator(TestCaseGenerator):
                 output += err.message
             
             finally:
-                test = f"""\n\tdef test_{num}(self):\n\t\tself.assertTrue(TestLexer.test(\"{f"{numLit}"}\", \"{f"{output}"}\", {num}))\n"""
+                test = """\n\tdef test_{}(self):\n\t\tself.assertTrue(TestLexer.test(\"{}\", \"{}\", {}))\n""".format(str(num), numLit, output, str(num))
                 f.write(test)
                 f.close()
 
@@ -166,13 +167,8 @@ class LexerGenerator(TestCaseGenerator):
                 if output[0] == "'":
                     output = output[1:]
                     output = "\\'" + output
-                
-                if output[-1] == '"':
-                    output = output[:-1]
-                    output = output + '\\"'
 
-
-                test = f"""\n\tdef test_{num}(self):\n\t\tself.assertTrue(TestLexer.test(\'\'\'{f"{strLit}"}\'\'\', \"\"\"{f"{output}"}\"\"\", {num}))\n"""
+                test = """\n\tdef test_{}(self):\n\t\tself.assertTrue(TestLexer.test(\'\'\'{}\'\'\', \'\'\'{}\'\'\', {}))\n""".format(str(num), strLit, output, str(num))
                 f.write(test)
                 f.close()
     
@@ -192,7 +188,7 @@ class LexerGenerator(TestCaseGenerator):
                 output += err.message
             
             finally:
-                test = f"""\n\tdef test_{num}(self):\n\t\tself.assertTrue(TestLexer.test(\'\'\'{f"{cmt}"}\'\'\', \'\'\'{f"{output}"}\'\'\', {num}))\n"""
+                test = """\n\tdef test_{}(self):\n\t\tself.assertTrue(TestLexer.test(\'\'\'{}\'\'\', \'\'\'{}\'\'\', {}))\n""".format(str(num), cmt, output, str(num))
                 f.write(test)
                 f.close()
     
@@ -221,7 +217,7 @@ class ParserGenerator(TestCaseGenerator):
     def __init__ (self, inputFile = './test/ParserSuite.py'):
         self.inputFile = inputFile
         self.importLib()
-        self.prog = Program('parser')
+        self.prog = ZCodeProgram('parser')
     
     def importLib(self):
         with open(self.inputFile, 'w') as f:
@@ -257,20 +253,56 @@ class ParserGenerator(TestCaseGenerator):
             program = '\n' + self.prog.gen()
             input = TestSource.makeSource(program, num)
             expect = ParserGenerator.genResult(input)
-            test = f"""\n\tdef test_{num}(self):\n\t\tinput = \'\'\'{f'{program}'}\'\'\'\n\t\texpect = \'\'\'{f'{expect}'}\'\'\'\n\t\tself.assertTrue(TestParser.test(input, expect, {num}))\n"""
+            test = """\n\tdef test_{}(self):\n\t\tinput = \'\'\'{}\'\'\'\n\t\texpect = \'\'\'{}\'\'\'\n\t\tself.assertTrue(TestParser.test(input, expect, {}))\n""".format(str(num), program, expect, str(num))
             f.write(test)
             f.close()
+
+class ASTGenerator(TestCaseGenerator):
+    def __init__(self, inputFile: str = './test/ASTGenSuite.py') -> None:
+        self.inputFile = inputFile
+        self.importLib()
+        self.prog = ZCodeProgram('ast')
+    
+    def importLib(self):
+        with open(self.inputFile, 'w') as f:
+            importLine = """import unittest\nfrom TestUtils import TestAST\nfrom main.zcode.utils.AST import *\n\nclass ASTGenSuite(unittest.TestCase):"""
+            f.write(importLine)
+            f.close()
+    
+    @staticmethod
+    def genResult(inputfile):
+        lexer = Lexer(inputfile)
+        tokens = CommonTokenStream(lexer)
+        parser = Parser(tokens)
+        tree = parser.program()
+        asttree = ASTGeneration().visit(tree)
+        return str(asttree)
+    
+    def gen(self, num: int):
+        with open(self.inputFile, 'a') as f:
+            program = '\n' + self.prog.gen()
+            input = TestSource.makeSource(program, num)
+            expect = ASTGenerator.genResult(input)
+            test = """\n\tdef test_{}(self):\n\t\tinput = \'\'\'{}\'\'\'\n\t\texpect = \'\'\'{}\'\'\'\n\t\tself.assertTrue(TestAST.test(input, expect, {}))\n""".format(str(num), program, expect, str(num))
+            f.write(test)
+            f.close()
+        
 
 def main(argv):
     if argv[0] == 'LexerSuite':
         lexer = LexerGenerator()
-        for test in range(100, 200):
+        for test in range(101, 201):
             lexer.gen(test)
     
-    else:
+    elif argv[0] == 'ParserSuite':
         parser = ParserGenerator()
-        for test in range(200, 300):
+        for test in range(201, 301):
             parser.gen(test)
+    
+    elif argv[0] == 'ASTGenSuite':
+        ast = ASTGenerator()
+        for test in range(301, 401):
+            ast.gen(test)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
