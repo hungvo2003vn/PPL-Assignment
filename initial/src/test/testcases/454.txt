@@ -1,0 +1,7 @@
+
+            func a()
+                return 1
+            func main(number k, number j) begin 
+                number a <- a()
+            end
+        

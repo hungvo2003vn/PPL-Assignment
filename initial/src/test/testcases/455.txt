@@ -1,0 +1,8 @@
+
+            func a()
+                return
+            func main(number k, number j) begin 
+                a()
+                b()
+            end
+        

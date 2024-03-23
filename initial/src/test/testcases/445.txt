@@ -1,0 +1,7 @@
+
+            number a
+            number b
+            var c <- d
+            func main() begin 
+            end
+        

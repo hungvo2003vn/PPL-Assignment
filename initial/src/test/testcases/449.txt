@@ -1,0 +1,12 @@
+
+            number a
+            number b
+            var c <- a
+            func main(number k, number j) begin 
+                number z <- z
+                begin
+                    var c <- a
+                    var b <- x
+                end
+            end
+        

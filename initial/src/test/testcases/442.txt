@@ -1,0 +1,6 @@
+
+            func writeString() begin
+            end
+            func main() begin 
+            end
+        

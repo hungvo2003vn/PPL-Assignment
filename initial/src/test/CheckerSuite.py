@@ -23,7 +23,7 @@ class CheckerSuite(unittest.TestCase):
             number a
         """
         expect = "No Entry Point"
-        self.assertTrue(TestChecker.test(input, expect, 400))
+        self.assertTrue(TestChecker.test(input, expect, 402))
 
         input = """
             number a
@@ -31,7 +31,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "No Entry Point"
-        self.assertTrue(TestChecker.test(input, expect, 400))
+        self.assertTrue(TestChecker.test(input, expect, 403))
         
         input = """
             number a
@@ -39,7 +39,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "No Entry Point"
-        self.assertTrue(TestChecker.test(input, expect, 400))
+        self.assertTrue(TestChecker.test(input, expect, 404))
         
         input = """
             number a
@@ -47,13 +47,13 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "No Entry Point"
-        self.assertTrue(TestChecker.test(input, expect, 400))
+        self.assertTrue(TestChecker.test(input, expect, 405))
         
         input = """
             number main
         """
         expect = "No Entry Point"
-        self.assertTrue(TestChecker.test(input, expect, 400))
+        self.assertTrue(TestChecker.test(input, expect, 406))
 
 
         input = """
@@ -62,7 +62,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "['s', 'u', 'c', 'c', 'e', 's', 's', 'f', 'u', 'l']"
-        self.assertTrue(TestChecker.test(input, expect, 400))
+        self.assertTrue(TestChecker.test(input, expect, 407))
         
     def test_Break_Continue_in_loop(self):
         input = """
@@ -98,7 +98,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "['s', 'u', 'c', 'c', 'e', 's', 's', 'f', 'u', 'l']"
-        self.assertTrue(TestChecker.test(input, expect, 403))
+        self.assertTrue(TestChecker.test(input, expect, 408))
 
         input = """
             func main() begin 
@@ -111,7 +111,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Break Not In Loop"
-        self.assertTrue(TestChecker.test(input, expect, 403))    
+        self.assertTrue(TestChecker.test(input, expect, 409))    
         
         input = """
             func main() begin 
@@ -126,7 +126,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Continue Not In Loop"
-        self.assertTrue(TestChecker.test(input, expect, 403))   
+        self.assertTrue(TestChecker.test(input, expect, 410))   
         
         
             
@@ -138,7 +138,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "No Function Definition: a"
-        self.assertTrue(TestChecker.test(input, expect, 401))
+        self.assertTrue(TestChecker.test(input, expect, 411))
 
         input = """
             func a()
@@ -149,7 +149,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401))    
+        self.assertTrue(TestChecker.test(input, expect, 412))    
 
         input = """
             func a(number c)
@@ -160,7 +160,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "['s', 'u', 'c', 'c', 'e', 's', 's', 'f', 'u', 'l']"
-        self.assertTrue(TestChecker.test(input, expect, 401))  
+        self.assertTrue(TestChecker.test(input, expect, 413))  
                 
         input = """
             func a(number c)
@@ -171,7 +171,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401))    
+        self.assertTrue(TestChecker.test(input, expect, 414))    
         
         input = """
             func a(number c)
@@ -182,7 +182,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401))    
+        self.assertTrue(TestChecker.test(input, expect, 415))    
         
         input = """
             func a() begin 
@@ -192,7 +192,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401))    
+        self.assertTrue(TestChecker.test(input, expect, 416))    
 
         input = """
             func a()
@@ -201,7 +201,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 417)) 
                 
         input = """
             func a() begin 
@@ -212,7 +212,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401))    
+        self.assertTrue(TestChecker.test(input, expect, 418))    
         
         input = """
             func a(number a) begin 
@@ -223,7 +223,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401))    
+        self.assertTrue(TestChecker.test(input, expect, 419))    
 
         input = """
             func a() begin 
@@ -233,7 +233,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401))    
+        self.assertTrue(TestChecker.test(input, expect, 420))    
         
                 
         input = """
@@ -244,7 +244,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401))  
+        self.assertTrue(TestChecker.test(input, expect, 421))  
         
         input = """
             number a
@@ -254,7 +254,7 @@ class CheckerSuite(unittest.TestCase):
 
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401))  
+        self.assertTrue(TestChecker.test(input, expect, 422))  
         
         input = """
             func a(string c)
@@ -264,7 +264,7 @@ class CheckerSuite(unittest.TestCase):
 
         """
         expect = "Redeclared Variable: a"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 423)) 
         
         input = """
             string a
@@ -273,7 +273,7 @@ class CheckerSuite(unittest.TestCase):
             number a
         """
         expect = "Redeclared Variable: a"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 424)) 
         
         input = """
             func a(number a, number c, string a)
@@ -281,7 +281,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Parameter: a"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 425)) 
         
         input = """
             func a(number a, number c, string a)
@@ -289,7 +289,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Parameter: a"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 426)) 
         
         input = """
             func a(number a, number c[3])
@@ -299,7 +299,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Parameter: a"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 427)) 
         
         input = """
             func a(number a, number c[3])
@@ -310,7 +310,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Variable: a"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 428)) 
 
         input = """
             func a(number a, number c[3])
@@ -322,7 +322,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Variable: c"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 429)) 
                 
 
         input = """
@@ -335,7 +335,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Variable: e"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 430)) 
                
 
         input = """
@@ -349,7 +349,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Variable: e"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 431)) 
                
         input = """
             func a(number a, number c[3])
@@ -366,7 +366,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Variable: k"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 432)) 
                
         input = """
             func a(number a, number c[3])
@@ -385,7 +385,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Variable: z"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 433)) 
         
         
         # check Type array
@@ -397,7 +397,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 434)) 
 
         input = """
             func a(number a[1,3])
@@ -407,7 +407,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 435)) 
                              
         input = """
             func a(number a[1,3,2,4])
@@ -417,7 +417,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 436)) 
                              
         input = """
             func a(number a[1,3,2])
@@ -427,7 +427,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 437)) 
 
         input = """
             number readNumber
@@ -435,7 +435,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Variable: readNumber"
-        self.assertTrue(TestChecker.test(input, expect, 401))              
+        self.assertTrue(TestChecker.test(input, expect, 438))              
 
         input = """
             func readNumber()
@@ -443,7 +443,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: readNumber"
-        self.assertTrue(TestChecker.test(input, expect, 401))    
+        self.assertTrue(TestChecker.test(input, expect, 439))    
 
         input = """
             func readNumber() begin
@@ -452,7 +452,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: readNumber"
-        self.assertTrue(TestChecker.test(input, expect, 401))          
+        self.assertTrue(TestChecker.test(input, expect, 440))          
 
         input = """
             func writeString()
@@ -460,7 +460,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: writeString"
-        self.assertTrue(TestChecker.test(input, expect, 401))    
+        self.assertTrue(TestChecker.test(input, expect, 441))    
 
         input = """
             func writeString() begin
@@ -469,7 +469,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Redeclared Function: writeString"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 442)) 
         
                 
         input = """
@@ -480,7 +480,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "['s', 'u', 'c', 'c', 'e', 's', 's', 'f', 'u', 'l']"
-        self.assertTrue(TestChecker.test(input, expect, 401)) 
+        self.assertTrue(TestChecker.test(input, expect, 443)) 
 
     
     def test_Undeclared(self):
@@ -495,7 +495,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Undeclared Identifier: z"
-        self.assertTrue(TestChecker.test(input, expect, 404))   
+        self.assertTrue(TestChecker.test(input, expect, 444))   
         
         input = """
             number a
@@ -505,7 +505,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Undeclared Identifier: d"
-        self.assertTrue(TestChecker.test(input, expect, 404))  
+        self.assertTrue(TestChecker.test(input, expect, 445))  
         
         input = """
             number a
@@ -516,7 +516,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "['s', 'u', 'c', 'c', 'e', 's', 's', 'f', 'u', 'l']"
-        self.assertTrue(TestChecker.test(input, expect, 404))    
+        self.assertTrue(TestChecker.test(input, expect, 446))    
     
         input = """
             number a
@@ -527,7 +527,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Undeclared Identifier: d"
-        self.assertTrue(TestChecker.test(input, expect, 404))   
+        self.assertTrue(TestChecker.test(input, expect, 447))   
         
         input = """
             number a
@@ -540,7 +540,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Undeclared Identifier: d"
-        self.assertTrue(TestChecker.test(input, expect, 404))  
+        self.assertTrue(TestChecker.test(input, expect, 448))  
         
         input = """
             number a
@@ -555,7 +555,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Undeclared Identifier: x"
-        self.assertTrue(TestChecker.test(input, expect, 404))  
+        self.assertTrue(TestChecker.test(input, expect, 449))  
         
         input = """
             func a()
@@ -566,7 +566,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Undeclared Function: b"
-        self.assertTrue(TestChecker.test(input, expect, 404))  
+        self.assertTrue(TestChecker.test(input, expect, 450))  
         
         input = """
             func a()
@@ -576,7 +576,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Undeclared Identifier: a"
-        self.assertTrue(TestChecker.test(input, expect, 404)) 
+        self.assertTrue(TestChecker.test(input, expect, 451)) 
         
         input = """
             func a()
@@ -586,7 +586,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Undeclared Function: k"
-        self.assertTrue(TestChecker.test(input, expect, 404)) 
+        self.assertTrue(TestChecker.test(input, expect, 452)) 
 
         input = """
             func a()
@@ -597,7 +597,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Undeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 404)) 
+        self.assertTrue(TestChecker.test(input, expect, 453)) 
 
         input = """
             func a()
@@ -607,7 +607,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Undeclared Function: a"
-        self.assertTrue(TestChecker.test(input, expect, 404)) 
+        self.assertTrue(TestChecker.test(input, expect, 454)) 
         
         
                 
@@ -620,7 +620,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Undeclared Function: b"
-        self.assertTrue(TestChecker.test(input, expect, 404)) 
+        self.assertTrue(TestChecker.test(input, expect, 455)) 
         
         input = """
             func a() begin
@@ -632,7 +632,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Undeclared Function: main"
-        self.assertTrue(TestChecker.test(input, expect, 404)) 
+        self.assertTrue(TestChecker.test(input, expect, 456)) 
         
         input = """
             func a()
@@ -648,5 +648,5 @@ class CheckerSuite(unittest.TestCase):
             func a() return
         """
         expect = "['s', 'u', 'c', 'c', 'e', 's', 's', 'f', 'u', 'l']"
-        self.assertTrue(TestChecker.test(input, expect, 404)) 
+        self.assertTrue(TestChecker.test(input, expect, 457)) 
            
