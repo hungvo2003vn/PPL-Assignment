@@ -196,12 +196,12 @@ class StaticChecker(BaseVisitor, Utils):
     def visitStringLiteral(self, ast, param): return StringLiteral(ast.value)
     def visitArrayLiteral(self, ast, param):
         for lit in ast.value:
-            self.visit(lit, [{}] + param)
-        typ = self.visit(ast.value[0], [{}] + param)
-        if typ in [NumberType(), BoolType(), StringType()]:
-            return ArrayType(len(ast.value, typ))
-        elif typ is ArrayType():
-            return ArrayType(len(ast.value), typ.size, typ.eleType)
+            lit = self.visit(lit, [{}] + param)
+        typ = ast.value[0]
+        if self.comparListType([typ]*3, [NumberType(), BoolType(), StringType()]):
+            return ArrayType([len(ast.value)], typ)
+        elif isinstance(typ, ArrayType):
+            return ArrayType([len(ast.value)] + typ.size, typ.eleType)
 
     def visitBinaryOp(self, ast, param):
         pass
