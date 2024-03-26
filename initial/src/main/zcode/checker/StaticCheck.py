@@ -34,7 +34,7 @@ class StaticChecker(BaseVisitor, Utils):
         
     def check(self):
         self.visit(self.ast, self.io)
-        return "successful"    
+        return ''
     
     def comparType(self, LHS, RHS):
         #TODO: so sánh 2 biến type, kiểm tra array type sẽ kiểm tra size và eletype 
@@ -67,7 +67,7 @@ class StaticChecker(BaseVisitor, Utils):
             
         #TODO  check No entry point in param
         main_func = param[0].get('main')
-        if (main_func is None) or not isinstance(main_func, FuncZcode) or (len(main_func.param) > 0): 
+        if (main_func is None) or not isinstance(main_func, FuncZcode) or (len(main_func.param) > 0) or (type(main_func.typ) != VoidType): 
             raise NoEntryPoint()
 
         return
@@ -75,11 +75,25 @@ class StaticChecker(BaseVisitor, Utils):
     def visitVarDecl(self, ast, param):
         #TODO kiểm tra name có trong param[0] hay không nén ra lỗi Redeclared
         if param[0].get(ast.name.name) is not None: raise Redeclared(Variable(), ast.name.name)
-    
-        param[0][ast.name.name] = VarZcode(ast.varType) #! cập nhật param mới
+        param[0][ast.name.name] = VarZcode(ast.varType)
 
-        #! phần này xử lí nhiều hơn ở task2
-        if ast.varInit: self.visit(ast.varInit, param)
+        #TODO kiểm tra TypeCannotBeInferred và TypeMismatchInStatement xử lí ast.varInit nếu tồn tại
+        if ast.varInit:
+            LHS = self.visit(ast.varType, param) if ast.varType else param[0][ast.name.name]
+            RHS = self.visit(ast.varInit, param)
+
+            #  TH1 : cả 2 đều trả về Zcode -> TypeCannotBeInferred
+            if isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
+                raise TypeCannotBeInferred(stmt=ast)
+            # TH2, 3: nếu 1 trong 2 bên trả về Zcode bên kia xác định type thì gán type của Zcode với type đó
+            elif not isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
+                RHS.typ = LHS
+            elif isinstance(LHS, Zcode) and not isinstance(RHS, Zcode):
+                LHS.typ = RHS
+            # TH4 : cả 2 đều có type nên kiểm tra xem 2 type có giống nhau không
+            elif not self.comparType(LHS, RHS):
+                raise TypeMismatchInStatement(stmt=ast)
+            
         return param
 
     def visitFuncDecl(self, ast, param):
@@ -99,18 +113,26 @@ class StaticChecker(BaseVisitor, Utils):
             typeParam += [funcParam.varType]
         
         #TODO chia làm 3 TH
-        #* TH 1: là method đã so sẵn nghĩa là được khai báo 1 phần trước yêu cầu kiểm tra 2 list có giống nhau không nếu không nén ra Redeclared
-        if self.comparType(FuncZcode(), declared_function) and not self.comparListType(typeParam, declared_function.param): 
-            raise Redeclared(Function(), ast.name.name)
-        
-        #* TH 2: là khai báo 1 phần ast.body is None
-        if self.comparType(FuncZcode(), declared_function) and declared_function.body:
-            raise Redeclared(Function(), ast.name.name)
+        if self.comparType(FuncZcode(), declared_function):
 
-        #* TH 3: là khai báo toàn bộ
+            #* TH 1: là method đã so sẵn nghĩa là được khai báo 1 phần trước yêu cầu 
+            # kiểm tra 2 list có giống nhau không nếu không nén ra Redeclared
+            if not self.comparListType(typeParam, declared_function.param): 
+                raise Redeclared(Function(), ast.name.name)
+        
+            #* TH 2: là khai báo 1 phần ast.body is None
+            elif not ast.body:
+                raise Redeclared(Function(), ast.name.name)
+            
+            #* TH 3: là khai báo toàn bộ
+            elif declared_function.body:
+                raise Redeclared(Function(), ast.name.name)
+
         if ast.body: 
             param[0][ast.name.name] = FuncZcode(typeParam, None, True)
+            self.function =  param[0][ast.name.name]
             self.visit(ast.body, [listParam] + param)
+            self.function = None
         else:
             param[0][ast.name.name] = FuncZcode(typeParam, None, False)
 
@@ -124,8 +146,9 @@ class StaticChecker(BaseVisitor, Utils):
         for scope in param:
             id = scope.get(ast.name)
             if id:
-                if isinstance(id, FuncZcode): Undeclared(Identifier(), ast.name)
-                else: return
+                if isinstance(id, FuncZcode): raise Undeclared(Identifier(), ast.name)
+                if not id.typ: return id
+                else: return id.typ
         
         raise Undeclared(Identifier(), ast.name)
 
@@ -191,17 +214,17 @@ class StaticChecker(BaseVisitor, Utils):
     def visitBoolType(self, ast, param): return ast
     def visitStringType(self, ast, param): return ast
     def visitArrayType(self, ast, param): return ast
-    def visitNumberLiteral(self, ast, param): return NumberLiteral(ast.value)
-    def visitBooleanLiteral(self, ast, param): return BooleanLiteral(ast.value)
-    def visitStringLiteral(self, ast, param): return StringLiteral(ast.value)
+    def visitNumberLiteral(self, ast, param): return NumberType()
+    def visitBooleanLiteral(self, ast, param): return BoolType()
+    def visitStringLiteral(self, ast, param): return StringType()
     def visitArrayLiteral(self, ast, param):
-        for lit in ast.value:
-            lit = self.visit(lit, [{}] + param)
-        typ = ast.value[0]
-        if self.comparListType([typ]*3, [NumberType(), BoolType(), StringType()]):
+
+        for lit in ast.value: self.visit(lit, param)
+        typ = self.visit(ast.value[0], param)
+
+        if type(typ) in [StringType, BoolType, NumberType]:
             return ArrayType([len(ast.value)], typ)
-        elif isinstance(typ, ArrayType):
-            return ArrayType([len(ast.value)] + typ.size, typ.eleType)
+        return ArrayType([len(ast.value)] + typ.size, typ.eleType)
 
     def visitBinaryOp(self, ast, param):
         pass
@@ -216,8 +239,40 @@ class StaticChecker(BaseVisitor, Utils):
         pass
 
     def visitAssign(self, ast, param):
-        pass
+        
+        LHS = self.visit(ast.lhs, param)
+        RHS = self.visit(ast.rhs, param)
+
+        # TH1 : cả 2 đều trả về Zcode -> TypeCannotBeInferred
+        if isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
+            raise TypeCannotBeInferred(stmt=ast)
+        # TH2, 3: nếu 1 trong 2 bên trả về Zcode bên kia xác định type thì gán type của Zcode với type đó
+        elif not isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
+            RHS.typ = LHS
+        elif isinstance(LHS, Zcode) and not isinstance(RHS, Zcode):
+            LHS.typ = RHS
+        # TH4 : cả 2 đều có type nên kiểm tra xem 2 type có giống nhau không
+        elif not self.comparType(LHS, RHS):
+            raise TypeMismatchInStatement(stmt=ast)
 
     def visitReturn(self, ast, param):
-        pass
+
+        LHS = self.visit(self.function.typ, param) if self.function.typ else self.function
+        RHS = self.visit(ast.expr, param) if ast.expr else VoidType()
+
+        # TH1 : cả 2 đều trả về Zcode -> TypeCannotBeInferred
+        if isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
+            raise TypeCannotBeInferred(stmt=ast.expr)
+        # TH2, 3: nếu 1 trong 2 bên trả về Zcode bên kia xác định type thì gán type của Zcode với type đó
+        elif not isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
+            RHS.typ = LHS
+        elif isinstance(LHS, Zcode) and not isinstance(RHS, Zcode):
+            LHS.typ = RHS
+        # TH4 : cả 2 đều có type nên kiểm tra xem 2 type có giống nhau không
+        elif not self.comparType(LHS, RHS):
+            raise TypeMismatchInStatement(stmt=ast.expr)
+
+
+
+
 
