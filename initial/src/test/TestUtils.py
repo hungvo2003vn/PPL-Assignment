@@ -146,8 +146,8 @@ class TestChecker:
         dest = open(os.path.join(soldir, str(num) + ".txt"),"w")     
         checker = StaticChecker(asttree)
         try:
-            res = checker.check()
-            dest.write(str(res))
+            checker.check()
+            dest.write("")
         except StaticError as e:
             dest.write(str(e))
         finally:

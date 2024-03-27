@@ -34,7 +34,7 @@ class StaticChecker(BaseVisitor, Utils):
         
     def check(self):
         self.visit(self.ast, self.io)
-        return ''
+        return None
     
     def comparType(self, LHS, RHS):
         #TODO: so sánh 2 biến type, kiểm tra array type sẽ kiểm tra size và eletype 
@@ -154,39 +154,81 @@ class StaticChecker(BaseVisitor, Utils):
 
     def visitCallStmt(self, ast, param):
         #TODO kiểm tra xem name có trong toàn bộ param nén lỗi Undeclared
-        found = False
+        found = None
         for scope in param:
             decl = scope.get(ast.name.name)
             if not decl: continue
             if not self.comparType(FuncZcode(), decl): raise Undeclared(Function(), ast.name.name)
-            found = True
+            found = decl
             break
 
         # Cannot find the function declaration
         if not found:  
             raise Undeclared(Function(), ast.name.name)
         
-        # Visit args:
-        for arg in ast.args:
-            self.visit(arg, param)
+        listLHS = found.param
+        listRHS = ast.args
+
+        # Check param and args
+        if len(listLHS) != len(listRHS):
+            raise TypeMismatchInStatement(ast)
+        
+        for i in range(len(listLHS)):
+
+            LHS = self.visit(listLHS[i], param)
+            RHS = self.visit(listRHS[i], param)
+
+            if isinstance(RHS, Zcode):
+                RHS.typ = LHS
+            elif not self.comparType(LHS, RHS):
+                raise TypeMismatchInStatement(ast)
+
+        # Check return type
+        function_found = found
+        if function_found.typ is None: return FuncZcode()
+        if not self.comparType(function_found.typ, VoidType()):
+            raise TypeMismatchInStatement(ast)
+
+        return function_found.typ
 
     def visitCallExpr(self, ast, param):
         #TODO kiểm tra xem name có trong toàn bộ param nén lỗi Undeclared
-        found = False
+        found = None
         for scope in param:
             decl = scope.get(ast.name.name)
             if not decl: continue
             if not self.comparType(FuncZcode(), decl): raise Undeclared(Function(), ast.name.name)
-            found = True
+            found = decl
             break
 
         # Cannot find the function declaration
         if not found:  
             raise Undeclared(Function(), ast.name.name)
         
-        # Visit args:
-        for arg in ast.args:
-            self.visit(arg, param)
+        listLHS = found.param
+        listRHS = ast.args
+
+        # Check param and args
+        if len(listLHS) != len(listRHS):
+            raise TypeMismatchInExpression(ast)
+        
+        for i in range(len(listLHS)):
+
+            LHS = self.visit(listLHS[i], param)
+            RHS = self.visit(listRHS[i], param)
+
+            if isinstance(RHS, Zcode):
+                RHS.typ = LHS
+            elif not self.comparType(LHS, RHS):
+                raise TypeMismatchInExpression(ast)
+
+        # Check return type
+        function_found = found
+        if function_found.typ is None: return FuncZcode()
+        if self.comparType(function_found.typ, VoidType()):
+            raise TypeMismatchInExpression(ast)
+
+        return function_found.typ
 
 
     def visitBlock(self, ast, param):
@@ -197,6 +239,26 @@ class StaticChecker(BaseVisitor, Utils):
 
 
     def visitFor(self, ast, param):
+
+        #TODO Check type
+        listLHS = [NumberType(), BoolType(), NumberType()]
+        listRHS = [
+            self.visit(ast.name, param), 
+            self.visit(ast.condExpr, param),
+            self.visit(ast.updExpr, param)
+        ]
+        
+        for i in range(3):
+
+            LHS = listLHS[i]
+            RHS = listRHS[i]
+
+            if isinstance(RHS, Zcode):
+                RHS.typ = LHS
+            elif not self.comparType(LHS, RHS):
+                raise TypeMismatchInStatement(ast)
+
+
         self.BlockFor += 1 #! vào trong vòng for nào anh em
         self.visit(ast.body, [{}] + param)
         self.BlockFor -= 1 #! cút khỏi vòng for nào anh em
@@ -236,7 +298,38 @@ class StaticChecker(BaseVisitor, Utils):
         pass
 
     def visitIf(self, ast, param):
-        pass
+        
+        # Check first condition
+        expr = self.visit(ast.expr, param)
+        if isinstance(expr, Zcode):
+            expr.typ = BoolType()
+        elif not self.comparType(expr, BoolType()):
+            raise TypeMismatchInStatement(ast)
+        
+        # visit thenStmt
+        self.visit(ast.thenStmt, [{}] + param)
+
+        # visit all elifStmt
+        for ele in ast.elifStmt:
+
+            # Check condition type
+            elif_expr = self.visit(ele[0], param)
+
+            if isinstance(elif_expr, Zcode):
+                elif_expr.typ = BoolType()
+            elif not self.comparType(elif_expr, BoolType()):
+                raise TypeMismatchInStatement(ast)
+            
+            # visit stmt of elif
+            self.visit(ele[1], [{}] + param)
+        
+        # Visit elseStmt
+        if ast.elseStmt:
+            self.visit(ast.elseStmt, [{}] + param)
+        
+        return
+
+        
 
     def visitAssign(self, ast, param):
         
@@ -270,7 +363,7 @@ class StaticChecker(BaseVisitor, Utils):
             LHS.typ = RHS
         # TH4 : cả 2 đều có type nên kiểm tra xem 2 type có giống nhau không
         elif not self.comparType(LHS, RHS):
-            raise TypeMismatchInStatement(stmt=ast.expr)
+            raise TypeMismatchInStatement(stmt=ast)
 
 
 
