@@ -73,9 +73,9 @@ def main(argv):
         elif argv[1] == 'ASTGenSuite':
             from ASTGenSuite import ASTGenSuite
             getAndTest(ASTGenSuite)
-        elif argv[1] == 'CheckerSuite':
-            from CheckerSuite import CheckerSuite
-            getAndTest(CheckerSuite)
+        elif argv[1] == 'CheckSuite':
+            from CheckSuite import CheckSuite
+            getAndTest(CheckSuite)
         elif argv[1] == 'CodeGenSuite':
             from CodeGenSuite import CheckCodeGenSuite
             getAndTest(CheckCodeGenSuite)
@@ -124,7 +124,7 @@ def printUsage():
     print("python3 run.py test LexerSuite")
     print("python3 run.py test ParserSuite")
     print("python3 run.py test ASTGenSuite")
-    print("python3 run.py test CheckerSuite")
+    print("python3 run.py test CheckSuite")
     print("python3 run.py test CodeGenSuite")
     print("python3 run.py genTest LexerSuite")
     print("python3 run.py genTest ParserSuite")

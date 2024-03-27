@@ -2,7 +2,7 @@ import unittest
 from TestUtils import TestChecker
 from AST import *
 
-class CheckerSuite(unittest.TestCase):
+class CheckSuite(unittest.TestCase):
     def test_1_No_entry_point(self):
         input = """
             func main() return
