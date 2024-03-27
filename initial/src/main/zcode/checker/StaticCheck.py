@@ -289,10 +289,76 @@ class StaticChecker(BaseVisitor, Utils):
         return ArrayType([len(ast.value)] + typ.size, typ.eleType)
 
     def visitBinaryOp(self, ast, param):
-        pass
+        LHS = self.visit(ast.left, param)
+        RHS = self.visit(ast.right, param)
+
+        type_0 = ['+', '-', '*', '/', '%']
+        type_1 = ['=', '!=', '<', '>', '>=', '<=']
+        type_2 = ['and', 'or']
+        type_3 = ['==']
+        type_4 = ['...']
+
+        def checkTypeHelper(input_type, output_type):
+
+            if not isinstance(LHS, Zcode) and not isinstance(RHS, Zcode):
+                if not self.comparType(LHS, RHS):
+                    raise TypeMismatchInExpression(ast)
+                if not self.comparType(LHS, input_type) or not self.comparType(RHS, input_type):
+                    raise TypeMismatchInExpression(ast)
+                
+            elif not isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
+                RHS.typ = LHS
+
+                if not self.comparType(LHS, input_type):
+                    raise TypeMismatchInExpression(ast)
+                
+            elif isinstance(LHS, Zcode) and not isinstance(RHS, Zcode):
+                LHS.typ = RHS
+
+                if not self.comparType(RHS, input_type):
+                    raise TypeMismatchInExpression(ast)
+                
+            else:
+                LHS.typ = input_type
+                RHS.typ = input_type
+
+            return output_type
+        
+        if ast.op in type_0:
+            return checkTypeHelper(NumberType(), NumberType())
+        elif ast.op in type_1:
+            return checkTypeHelper(NumberType(), BoolType())
+        elif ast.op in type_2:
+            return checkTypeHelper(BoolType(), BoolType()) 
+        elif ast.op in type_3:
+            return checkTypeHelper(StringType(), BoolType())
+        elif ast.op in type_4:
+            return checkTypeHelper(StringType(), StringType())
+        
+        return Zcode()
 
     def visitUnaryOp(self, ast, param):
-        pass
+        
+        operand = self.visit(ast.operand, param)
+
+        type_0 = ['+', '-']
+        type_1 = ['not']
+
+        def checkTypeHelper(input_type, output_type):
+            
+            if isinstance(operand, Zcode):
+                operand.typ = input_type
+            elif not self.comparType(operand, input_type):
+                raise TypeMismatchInExpression(ast)
+
+            return output_type
+        
+        if ast.op in type_0:
+            return checkTypeHelper(NumberType(), NumberType())
+        elif ast.op in type_1:
+            return checkTypeHelper(BoolType(), BoolType()) 
+        
+        return Zcode()
 
     def visitArrayCell(self, ast, param):
         
