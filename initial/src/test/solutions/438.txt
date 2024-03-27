@@ -1,1 +1,1 @@
-Redeclared Variable: readNumber
+Type Cannot Be Inferred: Id(a)

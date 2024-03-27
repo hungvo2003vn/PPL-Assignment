@@ -1,13 +1,9 @@
 
-            func a()
-            func main() begin 
-                a()
-                writeNumber(1.1)
-                writeString("string")
-                writeBool(true)
-                var a <- readNumber()
-                var b <- readString()
-                var c <- readBool()
+            func foo() begin
+                dynamic a 
+                dynamic b <- 2
+                dynamic c
+                for a until b by c return
             end
-            func a() return
+            func main() return
         

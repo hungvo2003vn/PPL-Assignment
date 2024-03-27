@@ -1,6 +1,10 @@
 
-            func writeString() begin
+            func foo() begin
+                number a
+                dynamic b
+                a <- b
+                b <- 1
             end
-            func main() begin 
-            end
+
+            func main() return
         

@@ -1,5 +1,8 @@
 
-            number readNumber
-            func main() begin 
+            func foo() begin
+                dynamic a
+                return a
             end
+
+            func main() return
         

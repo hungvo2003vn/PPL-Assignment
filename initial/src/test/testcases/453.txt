@@ -1,8 +1,6 @@
 
-            func a()
-                return 1
-            func main(number k, number j) begin 
-                number a
-                var c <- a()
+            func main()begin
+                dynamic a <- 1
+                if (a) return
             end
         

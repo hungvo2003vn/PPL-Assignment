@@ -1,1 +1,1 @@
-Undeclared Function: b
+Type Mismatch In Statement: CallStmt(Id(foo), [StringLit(1)])

@@ -1,8 +1,12 @@
 
-            func a()
-                return
-            func main(number k, number j) begin 
-                a()
-                b()
+            func foo() begin
+                dynamic a
+                dynamic b
+                dynamic c
+                for a until b by c return
+                a <- 1
+                b <- true
+                c <- 1
             end
+            func main() return
         

@@ -1,8 +1,5 @@
 
-            number a
-            number b
-            var c <- c
-            var d <- z
-            func main() begin 
-            end
+            number a <- "1"
+
+            func main() return
         

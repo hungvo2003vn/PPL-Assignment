@@ -1,10 +1,8 @@
 
-            number a
-            number b
-            var c <- a
-            func main(number k, number j) begin 
-                var x <- k
-                var y <- c
-                var c <- d
+            func foo() return
+
+            func main()begin
+                foo()
+                foo(1)
             end
         

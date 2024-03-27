@@ -1,8 +1,3 @@
 
-            func a(number a, number c[3])
-            func main() begin 
-            end
-            func a(number a, number c[3]) begin
-                number c
-            end
+            func main() return
         

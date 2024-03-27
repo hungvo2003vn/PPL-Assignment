@@ -1,7 +1,7 @@
 
-            func a(number a[1,3,2,4])
-            func main() begin 
-            end
-            func a(number a[1,3,2]) begin
-            end
+            number VoTien
+            var a <- VoTien
+            number b <- a
+
+            func main() return
         

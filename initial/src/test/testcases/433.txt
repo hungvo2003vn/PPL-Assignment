@@ -1,16 +1,5 @@
 
-            func a(number a, number c[3])
-            func main() begin 
-            end
-            func a(number a, number c[3]) begin
-                number e
-                begin
-                    number e
-                    number z
-                    begin
-                        number e
-                    end
-                    number z
-                end
+            func main() begin
+                break
             end
         

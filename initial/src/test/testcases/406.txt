@@ -1,3 +1,6 @@
 
-            number main
+            func foo(number a)
+            func foo(number a) return     
+        
+            func main() return
         

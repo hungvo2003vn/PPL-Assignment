@@ -1,5 +1,7 @@
 
-            func a(number a, number c, string a)
-            func main() begin 
+            number a <- a
+            func main() begin
+                number b <- a
+                number c <- e
             end
         

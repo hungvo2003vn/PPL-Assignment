@@ -1,10 +1,7 @@
 
-            func a(number a, number c[3])
-            func main() begin 
+            func a()
+            func main() begin
+                a()
             end
-            func a(number a, number c[3]) begin
-                number e
-                number k
-                string e
-            end
+            func a() return
         

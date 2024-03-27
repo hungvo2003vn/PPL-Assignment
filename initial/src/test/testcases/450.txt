@@ -1,8 +1,7 @@
 
-            func a()
-                return 1
-            func main(number k, number j) begin 
-                var c <- a()
-                var d <- b()
+            func foo(number a) return
+
+            func main()begin
+                foo("1")
             end
         

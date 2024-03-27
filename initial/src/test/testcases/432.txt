@@ -1,14 +1,22 @@
 
-            func a(number a, number c[3])
-            func main() begin 
-            end
-            func a(number a, number c[3]) begin
-                number e
+            func main() begin
+                var i <- 2
+                for i until true by 1
                 begin
-                    number a
-                    number e
-                    number k
-                    string k
+                    break
+                    continue
+                    begin
+                        break
+                        continue
+                    end
+                    
+                    for i until true by 1
+                    begin
+                        break
+                        continue
+                    end
+                    break
+                    continue
                 end
             end
         

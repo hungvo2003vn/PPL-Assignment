@@ -1,7 +1,7 @@
 
-            func a(number a[1,3,2])
-            func main() begin 
-            end
-            func a(string a[1,3,2]) begin
-            end
+            dynamic VoTien
+            number a <- VoTien
+            number b <- VoTien
+
+            func main() return
         

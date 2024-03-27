@@ -317,7 +317,7 @@ class StaticChecker(BaseVisitor, Utils):
         elif left == right:
             return arr.eleType
         elif left > right:
-            return ArrayType(size=arr.size[(right+1):], eleType=arr.eleType)
+            return ArrayType(size=arr.size[right:], eleType=arr.eleType)
 
     def visitIf(self, ast, param):
         

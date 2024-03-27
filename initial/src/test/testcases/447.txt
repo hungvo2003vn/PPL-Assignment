@@ -1,8 +1,5 @@
 
-            number a
-            number b
-            var c <- a
-            func main() begin 
-                var c <- d
-            end
+            number a[1] <- [[1,2]]
+
+            func main() return
         

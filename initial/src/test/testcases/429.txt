@@ -1,9 +1,9 @@
 
-            func a(number a, number c[3])
-            func main() begin 
+            func a() begin
+                a()
             end
-            func a(number a, number c[3]) begin
-                number writeString
-                number c
+            func main() begin
+                a()
+                b()
             end
         

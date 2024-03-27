@@ -1,5 +1,4 @@
 
-            number a
-            func VoTien() begin 
+            func main(number a) begin
             end
         

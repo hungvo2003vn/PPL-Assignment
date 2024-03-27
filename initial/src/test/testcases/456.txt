@@ -1,9 +1,9 @@
 
-            func a() begin
-                a()
-                main()
+            func foo() begin
+                dynamic a <- true
+                dynamic b
+                dynamic c
+                for a until b by c return
             end
-            func main() begin 
-
-            end
+            func main() return
         

@@ -1,7 +1,5 @@
 
-            func a(number a[1,3,4])
-            func main() begin 
-            end
-            func a(number a[1,3,2]) begin
+            func main() begin
+                continue
             end
         

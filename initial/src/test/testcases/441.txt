@@ -1,5 +1,9 @@
 
-            func writeString()
-            func main() begin 
+            func foo() begin
+                dynamic a
+                dynamic b
+                a <- b
             end
+
+            func main() return
         

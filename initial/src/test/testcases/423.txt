@@ -1,7 +1,6 @@
 
-            func a(string c)
-            func main() begin 
-            end
-            number a
-
+            func foo(number a) 
+            func foo(string a) return
+            
+            func main() return
         

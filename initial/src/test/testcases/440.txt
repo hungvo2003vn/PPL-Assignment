@@ -1,6 +1,9 @@
 
-            func readNumber() begin
+            func foo() begin
+                number a
+                return a
+                return 1
             end
-            func main() begin 
-            end
+
+            func main() return
         

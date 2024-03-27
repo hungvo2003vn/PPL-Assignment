@@ -1,7 +1,6 @@
 
-            func a(number a, number c[3])
-            func main() begin 
-            end
-            func a(number a, number a[3]) begin
+            func a() return 1
+            func main() begin
+                number b <- a
             end
         
