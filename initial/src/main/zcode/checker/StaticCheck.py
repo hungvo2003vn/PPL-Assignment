@@ -295,7 +295,29 @@ class StaticChecker(BaseVisitor, Utils):
         pass
 
     def visitArrayCell(self, ast, param):
-        pass
+        
+        arr = self.visit(ast.arr, param)
+        #TODO Không thể suy diễn kiểu từ ArrayType nên cần hỏi thầy !!!!
+        if not isinstance(arr, ArrayType):
+            raise TypeMismatchInExpression(ast)
+        
+        # Check idx
+        for index in ast.idx:
+            expr = self.visit(index, param)
+
+            if isinstance(expr, Zcode):
+                expr.typ = NumberType()
+            elif not self.comparType(expr, NumberType()):
+                raise TypeMismatchInExpression(ast)
+            
+        left = len(arr.size)
+        right = len(ast.idx)
+        if left < right:
+            raise TypeMismatchInExpression(ast)
+        elif left == right:
+            return arr.eleType
+        elif left > right:
+            return ArrayType(size=arr.size[(right+1):], eleType=arr.eleType)
 
     def visitIf(self, ast, param):
         

@@ -667,7 +667,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Type Mismatch In Expression: CallExpr(Id(foo), [])"
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 462))
         
         input = """
             func foo(number a) return 1
@@ -677,7 +677,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Type Mismatch In Expression: CallExpr(Id(foo), [StringLit(1)])"
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 463))
         
         input = """
             func foo(number a) return
@@ -687,7 +687,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Type Mismatch In Expression: CallExpr(Id(foo), [StringLit(1)])"
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 464))
         
         input = """
             func foo(number a) return
@@ -697,7 +697,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Type Mismatch In Expression: CallExpr(Id(foo), [StringLit(1)])"
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 465))
         
         input = """
             func main() begin
@@ -710,7 +710,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = ""
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 466))
         
         input = """
             func main() begin
@@ -723,7 +723,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = ""
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 467))
         
         input = """
             func main() begin
@@ -736,7 +736,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = ""
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 468))
         
 
         input = """
@@ -749,7 +749,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = ""
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 469))
         
         input = """
             func main() begin
@@ -759,7 +759,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Type Mismatch In Expression: ArrayCell(Id(b), [NumLit(1.0)])"
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 470))
         
         input = """
             func main() begin
@@ -769,7 +769,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Type Mismatch In Expression: ArrayCell(Id(b), [NumLit(1.0)])"
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 471))
         
         input = """
             func main() begin
@@ -780,7 +780,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = ""
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 472))
         
         input = """
             func main() begin
@@ -790,7 +790,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Type Mismatch In Expression: ArrayCell(Id(a), [StringLit(1)])"
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 473))
         
         input = """
             func main() begin
@@ -800,7 +800,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = "Type Mismatch In Expression: ArrayCell(Id(a), [NumLit(1.0), NumLit(2.0), NumLit(3.0)])"
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 474))
         
         input = """
             func main() begin
@@ -811,7 +811,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = ""
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 475))
         
         input = """
             func main() begin
@@ -822,7 +822,7 @@ class CheckerSuite(unittest.TestCase):
             end
         """
         expect = ""
-        self.assertTrue(TestChecker.test(input, expect, 461))
+        self.assertTrue(TestChecker.test(input, expect, 476))
 
 
     def test_7_full(self):
@@ -860,4 +860,4 @@ return true
 end
         """
         expect = ""
-        self.assertTrue(TestChecker.test(input, expect, 499))
+        self.assertTrue(TestChecker.test(input, expect, 500))
