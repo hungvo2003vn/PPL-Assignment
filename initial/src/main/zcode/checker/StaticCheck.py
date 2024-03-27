@@ -133,12 +133,14 @@ class StaticChecker(BaseVisitor, Utils):
             self.function =  param[0][ast.name.name]
             self.visit(ast.body, [listParam] + param)
             self.function = None
+        
+            #! nếu không có type khi duyệt qua body thì là voidtype
+            if param[0][ast.name.name].typ is None:
+                param[0][ast.name.name].typ = VoidType()
+
         else:
             param[0][ast.name.name] = FuncZcode(typeParam, None, False)
 
-        #! nếu không có type khi duyệt qua body thì là voidtype
-        if param[0][ast.name.name].typ is None:
-            param[0][ast.name.name].typ = VoidType()
         return param
 
     def visitId(self, ast, param):
