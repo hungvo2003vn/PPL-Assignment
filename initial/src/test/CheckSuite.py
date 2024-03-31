@@ -80,7 +80,7 @@ class CheckSuite(unittest.TestCase):
             
             func main() return
         """
-        expect = "Redeclared Variable: a"
+        expect = "No Function Definition: a"
         self.assertTrue(TestChecker.test(input, expect, 411))
         
         input = """
@@ -112,11 +112,11 @@ class CheckSuite(unittest.TestCase):
         
         input = """
             number foo
-            func foo()
+            func foo() return
             
             func main() return
         """
-        expect = "Redeclared Function: foo"
+        expect = ""
         self.assertTrue(TestChecker.test(input, expect, 415))
         
         input = """
@@ -302,7 +302,7 @@ class CheckSuite(unittest.TestCase):
                 a()
             end
         """
-        expect = "Undeclared Function: a"
+        expect = ""
         self.assertTrue(TestChecker.test(input, expect, 430))
         
         input = """
@@ -396,7 +396,7 @@ class CheckSuite(unittest.TestCase):
 
             func main() return
         """
-        expect = "Type Cannot Be Inferred: Id(a)"
+        expect = "Type Cannot Be Inferred: Return(Id(a))"
         self.assertTrue(TestChecker.test(input, expect, 438))
         
         input = """
@@ -823,6 +823,18 @@ class CheckSuite(unittest.TestCase):
         """
         expect = ""
         self.assertTrue(TestChecker.test(input, expect, 476))
+        
+        input = """
+            func VoTien()
+            func main() begin
+                number VoTien_ <- VoTien()
+            end
+            func VoTien() begin
+            end
+        """
+        # expect = "???"
+        expect = "Type Mismatch In Statement: Return()"
+        self.assertTrue(TestChecker.test(input, expect, 477))
 
 
     def test_7_full(self):
@@ -861,3 +873,4 @@ end
         """
         expect = ""
         self.assertTrue(TestChecker.test(input, expect, 500))
+        

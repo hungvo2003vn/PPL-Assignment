@@ -1,1 +1,1 @@
-Type Cannot Be Inferred: Id(a)
+Type Cannot Be Inferred: Return(Id(a))

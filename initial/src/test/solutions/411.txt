@@ -1,1 +1,1 @@
-Redeclared Variable: a
+No Function Definition: a

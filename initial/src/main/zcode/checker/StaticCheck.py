@@ -23,7 +23,8 @@ class StaticChecker(BaseVisitor, Utils):
         self.ast = ast
         self.BlockFor = 0
         self.function = None
-        self.io = [{
+        self.Return = False
+        self.listFunction = [{
                 "readNumber" : FuncZcode([], NumberType(), True),
                 "readBool" : FuncZcode([], BoolType(), True),
                 "readString" : FuncZcode([], StringType(), True),
@@ -33,7 +34,7 @@ class StaticChecker(BaseVisitor, Utils):
                 }]
         
     def check(self):
-        self.visit(self.ast, self.io)
+        self.visit(self.ast, [{}])
         return None
     
     def comparType(self, LHS, RHS):
@@ -61,13 +62,12 @@ class StaticChecker(BaseVisitor, Utils):
         for decl in ast.decl: self.visit(decl, param)
         
         #TODO check No definition for a function in param
-        for decl_name, decl_desciption in param[0].items():
-            if not isinstance(decl_desciption, FuncZcode): continue
+        for decl_name, decl_desciption in self.listFunction[0].items():
             if not decl_desciption.body: raise NoDefinition(decl_name)
             
         #TODO  check No entry point in param
-        main_func = param[0].get('main')
-        if (main_func is None) or not isinstance(main_func, FuncZcode) or (len(main_func.param) > 0) or (type(main_func.typ) != VoidType): 
+        main_func = self.listFunction[0].get('main')
+        if (main_func is None) or (len(main_func.param) > 0) or (type(main_func.typ) != VoidType): 
             raise NoEntryPoint()
 
         return
@@ -97,11 +97,9 @@ class StaticChecker(BaseVisitor, Utils):
         return param
 
     def visitFuncDecl(self, ast, param):
-        #TODO kiểm tra name có trong param[0] hay không nén ra lỗi Redeclared
-        declared_function = param[0].get(ast.name.name)
-        if declared_function and not self.comparType(FuncZcode(), declared_function): 
-            raise Redeclared(Function(), ast.name.name)
-
+        #TODO kiểm tra name có trong listFunction hay không nén ra lỗi Redeclared
+        declared_function = self.listFunction[0].get(ast.name.name)
+        
         #TODO kiểm tra Param trong hàm
         listParam = {} #! dạng Dict có name
         typeParam = [] #! dạng mảng không cần name
@@ -112,15 +110,17 @@ class StaticChecker(BaseVisitor, Utils):
             listParam[id] = VarZcode(funcParam.varType)
             typeParam += [funcParam.varType]
         
-        #TODO chia làm 3 TH
-        if self.comparType(FuncZcode(), declared_function):
+        self.Return = False
+        body = True if ast.body else False
 
+        #TODO chia làm 3 TH
+        if declared_function:
             #* TH 1: là method đã so sẵn nghĩa là được khai báo 1 phần trước yêu cầu 
             # kiểm tra 2 list có giống nhau không nếu không nén ra Redeclared
             if not self.comparListType(typeParam, declared_function.param): 
                 raise Redeclared(Function(), ast.name.name)
         
-            #* TH 2: là khai báo 1 phần ast.body is None
+            #* TH2 : method tồn tại trước và khai báo 1 phần    
             elif not ast.body:
                 raise Redeclared(Function(), ast.name.name)
             
@@ -128,20 +128,33 @@ class StaticChecker(BaseVisitor, Utils):
             elif declared_function.body:
                 raise Redeclared(Function(), ast.name.name)
 
-        if ast.body: 
-            param[0][ast.name.name] = FuncZcode(typeParam, None, True)
-            self.function =  param[0][ast.name.name]
-            self.visit(ast.body, [listParam] + param)
-            self.function = None
-        
-            #! nếu không có type khi duyệt qua body thì là voidtype
-            if param[0][ast.name.name].typ is None:
-                param[0][ast.name.name].typ = VoidType()
+            self.listFunction[0][ast.name.name].param = typeParam
+            self.listFunction[0][ast.name.name].body = body
 
         else:
-            param[0][ast.name.name] = FuncZcode(typeParam, None, False)
+            
+            self.listFunction[0][ast.name.name] = FuncZcode(typeParam, None, body)
+            
 
-        return param
+        if ast.body:
+
+            self.function = self.listFunction[0][ast.name.name]
+            self.visit(ast.body, [listParam] + param)
+            self.function = None
+
+
+            if not self.Return:
+
+                #! nếu không có type khi duyệt qua body thì là voidtype
+                if self.listFunction[0][ast.name.name].typ is None:
+                    self.listFunction[0][ast.name.name].typ = VoidType()
+
+                #! type đã có so sánh nó với VoidType
+                elif not self.comparType(self.listFunction[0][ast.name.name].typ, VoidType()): 
+                    raise TypeMismatchInStatement(Return(None))
+
+
+        return self.listFunction
 
     def visitId(self, ast, param):
         #TODO kiểm tra xem name có trong toàn bộ param nén lỗi Undeclared
@@ -155,15 +168,9 @@ class StaticChecker(BaseVisitor, Utils):
         raise Undeclared(Identifier(), ast.name)
 
     def visitCallStmt(self, ast, param):
-        #TODO kiểm tra xem name có trong toàn bộ param nén lỗi Undeclared
-        found = None
-        for scope in param:
-            decl = scope.get(ast.name.name)
-            if not decl: continue
-            if not self.comparType(FuncZcode(), decl): raise Undeclared(Function(), ast.name.name)
-            found = decl
-            break
-
+        #TODO kiểm tra xem name có trong toàn bộ listFunction nén lỗi Undeclared
+        found = self.listFunction[0].get(ast.name.name)
+        
         # Cannot find the function declaration
         if not found:  
             raise Undeclared(Function(), ast.name.name)
@@ -187,22 +194,16 @@ class StaticChecker(BaseVisitor, Utils):
 
         # Check return type
         function_found = found
-        if function_found.typ is None: return FuncZcode()
+        if function_found.typ is None: return function_found
         if not self.comparType(function_found.typ, VoidType()):
             raise TypeMismatchInStatement(ast)
 
         return function_found.typ
 
     def visitCallExpr(self, ast, param):
-        #TODO kiểm tra xem name có trong toàn bộ param nén lỗi Undeclared
-        found = None
-        for scope in param:
-            decl = scope.get(ast.name.name)
-            if not decl: continue
-            if not self.comparType(FuncZcode(), decl): raise Undeclared(Function(), ast.name.name)
-            found = decl
-            break
-
+        #TODO kiểm tra xem name có trong toàn bộ listFunction nén lỗi Undeclared
+        found = self.listFunction[0].get(ast.name.name)
+        
         # Cannot find the function declaration
         if not found:  
             raise Undeclared(Function(), ast.name.name)
@@ -226,7 +227,7 @@ class StaticChecker(BaseVisitor, Utils):
 
         # Check return type
         function_found = found
-        if function_found.typ is None: return FuncZcode()
+        if function_found.typ is None: return function_found
         if self.comparType(function_found.typ, VoidType()):
             raise TypeMismatchInExpression(ast)
 
@@ -440,12 +441,13 @@ class StaticChecker(BaseVisitor, Utils):
 
     def visitReturn(self, ast, param):
 
+        self.Return = True
         LHS = self.visit(self.function.typ, param) if self.function.typ else self.function
         RHS = self.visit(ast.expr, param) if ast.expr else VoidType()
 
         # TH1 : cả 2 đều trả về Zcode -> TypeCannotBeInferred
         if isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
-            raise TypeCannotBeInferred(stmt=ast.expr)
+            raise TypeCannotBeInferred(stmt=ast)
         # TH2, 3: nếu 1 trong 2 bên trả về Zcode bên kia xác định type thì gán type của Zcode với type đó
         elif not isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
             RHS.typ = LHS
