@@ -194,8 +194,8 @@ class StaticChecker(BaseVisitor, Utils):
 
         # Check return type
         function_found = found
-        if function_found.typ is None: return function_found
-        if not self.comparType(function_found.typ, VoidType()):
+        if function_found.typ is None: function_found.typ = VoidType()
+        elif not self.comparType(function_found.typ, VoidType()):
             raise TypeMismatchInStatement(ast)
 
         return function_found.typ
@@ -442,7 +442,12 @@ class StaticChecker(BaseVisitor, Utils):
     def visitReturn(self, ast, param):
 
         self.Return = True
-        LHS = self.visit(self.function.typ, param) if self.function.typ else self.function
+        
+        LHS = None
+        if self.function.typ:
+            LHS = self.visit(self.function.typ, param) if not self.comparType(self.function.typ, VoidType()) else self.function.typ
+        else: LHS = self.function
+
         RHS = self.visit(ast.expr, param) if ast.expr else VoidType()
 
         # TH1 : cả 2 đều trả về Zcode -> TypeCannotBeInferred

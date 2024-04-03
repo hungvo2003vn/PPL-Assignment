@@ -873,4 +873,55 @@ end
         """
         expect = ""
         self.assertTrue(TestChecker.test(input, expect, 500))
+
+    def test_8_edgeCases(self):
         
+        input = """
+            func a(number a[1,3,2])
+            func main() begin 
+            end
+            func a(string a[1,3,2]) begin
+            end
+        """
+        expect = "Redeclared Function: a"
+        self.assertTrue(TestChecker.test(input, expect, 501)) 
+
+        input = """
+            func a(number a[1,3,4])
+            func main() begin 
+            end
+            func a(number a[1,3,2]) begin
+            end
+        """
+        expect = "Redeclared Function: a"
+        self.assertTrue(TestChecker.test(input, expect, 502)) 
+
+        input = """
+            func a(number a[1,3])
+            func main() begin 
+            end
+            func a(number a[1,3,2]) begin
+            end
+        """
+        expect = "Redeclared Function: a"
+        self.assertTrue(TestChecker.test(input, expect, 503)) 
+                             
+        input = """
+            func a(number a[1,3,2,4])
+            func main() begin 
+            end
+            func a(number a[1,3,2]) begin
+            end
+        """
+        expect = "Redeclared Function: a"
+        self.assertTrue(TestChecker.test(input, expect, 504)) 
+
+        input = """
+            func a()
+            func main() begin 
+                a()
+            end
+            func a() return 1
+        """
+        expect = "Type Mismatch In Statement: Return(NumLit(1.0))"
+        self.assertTrue(TestChecker.test(input, expect, 505))
