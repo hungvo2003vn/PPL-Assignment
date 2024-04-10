@@ -4,7 +4,7 @@ from Utils import Utils
 from StaticError import *
 from functools import reduce
 
-class Zcode:
+class Zcode(Type):
     pass
 
 class FuncZcode(Zcode):
@@ -17,6 +17,11 @@ class VarZcode(Zcode):
     def __init__(self, typ = None):
         self.typ = typ    
 
+class ArrayZcode(Type):
+    #* eleType: List[Type]
+    #* Type can be Zcode, ArrayZcode, String, bool, number, arraytype
+    def __init__(self, eleType):
+        self.eleType = eleType
 
 class StaticChecker(BaseVisitor, Utils):
     def __init__(self,ast, ):
@@ -57,6 +62,49 @@ class StaticChecker(BaseVisitor, Utils):
 
         return True
     
+    def setTypeArray(self, typeArray: ArrayType, typeArrayZcode: ArrayZcode):
+        #* Trường hợp size khác nhau
+        if int(typeArray.size[0]) != len(typeArrayZcode.eleType):
+            return False
+        
+        #* trường hợp bên trong array là các kiểu nguyên thủy (array 1 chiều)
+           #^ nếu typeArrayZcode.eleType[i] là Zcode : gán typeArrayZcode.eleType[i].typ = typeArray.eleType
+           #^ nếu typeArrayZcode.eleType[i] là arrayZcode : trả về False (vì 1 chiều mà bắt gán 2 chiều :) )
+        if len(typeArray.size) == 1:
+            #TODO implement
+            size_1stD = len(typeArrayZcode.eleType)
+
+            for i in range(size_1stD):
+                RHS = typeArrayZcode.eleType[i]
+
+                if isinstance(RHS, Zcode):
+                    RHS.typ = typeArray.eleType
+                elif isinstance(RHS, ArrayZcode):
+                    return False
+
+        #* trường hợp bên trong array là các arrayType (array >= 2 chiều)
+           #^ nếu typeArrayZcode.eleType[i] là Zcode : gán typeArrayZcode.eleType[i].typ = typeArray.eleType
+           #^ nếu typeArrayZcode.eleType[i] là arrayZcode : gọi đệ quy self.setTypeArray(ArrayType(typeArray.size[1:], typeArray.eleType),typeArrayZcode[i]) để vào bên trong xem có lỗi gì không       
+        else:
+            #TODO implement
+            size_1stD = len(typeArrayZcode.eleType)
+
+            for i in range(size_1stD):
+                RHS = typeArrayZcode.eleType[i]
+
+                if isinstance(RHS, Zcode):
+                    RHS.typ = ArrayType(typeArray.size[1:], typeArray.eleType)
+                elif isinstance(RHS, ArrayZcode):
+
+                    check = self.setTypeArray(
+                        ArrayType(typeArray.size[1:], typeArray.eleType),
+                        RHS
+                    )
+                    if check == False:
+                        return False
+
+        return True
+    
     def visitProgram(self, ast, param):
         #! duyệt qua các biến và hàm toàn cục
         for decl in ast.decl: self.visit(decl, param)
@@ -82,17 +130,34 @@ class StaticChecker(BaseVisitor, Utils):
             LHS = self.visit(ast.varType, param) if ast.varType else param[0][ast.name.name]
             RHS = self.visit(ast.varInit, param)
 
-            #  TH1 : cả 2 đều trả về Zcode -> TypeCannotBeInferred
-            if isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
+            group_1 = [NumberType, StringType, BoolType, ArrayType]
+            group_2 = [FuncZcode, VarZcode]
+            group_3 = [ArrayZcode] # LHS will never in this group
+
+            #  TH1: cả 2 đều trả về Zcode, ArrayZcode -> TypeCannotBeInferred
+            if not (type(LHS) in group_1) and not (type(RHS) in group_1):
                 raise TypeCannotBeInferred(stmt=ast)
-            # TH2, 3: nếu 1 trong 2 bên trả về Zcode bên kia xác định type thì gán type của Zcode với type đó
-            elif not isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
-                RHS.typ = LHS
-            elif isinstance(LHS, Zcode) and not isinstance(RHS, Zcode):
+            # TH2: LHS is Normal Type and RHS is ArrayZcode
+            elif type(LHS) in group_1 and type(RHS) in group_3:
+                
+                # TH2.1: LHS is not ArrayType -> TypeMissMatch
+                if not isinstance(LHS, ArrayType):
+                    raise TypeMismatchInStatement(ast)
+                # TH2.2: LHS is ArrayType -> setTypeArray
+                else:
+                    checkSetTypeArray = self.setTypeArray(LHS, RHS)
+                    if not checkSetTypeArray:
+                        raise TypeMismatchInStatement(ast)
+
+            # TH3: LHS is Zcode and RHS is Normal
+            elif type(LHS) in group_2 and type(RHS) in group_1:
                 LHS.typ = RHS
-            # TH4 : cả 2 đều có type nên kiểm tra xem 2 type có giống nhau không
+            # TH4: LHS is Normal and RHS is Zcode
+            elif type(LHS) in group_1 and type(RHS) in group_2:
+                RHS.typ = LHS
+            # TH5: LHS is Normal and RHS is Normal
             elif not self.comparType(LHS, RHS):
-                raise TypeMismatchInStatement(stmt=ast)
+                raise TypeMismatchInStatement(ast)
             
         return param
 
@@ -189,6 +254,10 @@ class StaticChecker(BaseVisitor, Utils):
 
             if isinstance(RHS, Zcode):
                 RHS.typ = LHS
+            elif isinstance(RHS, ArrayZcode) and isinstance(LHS, ArrayType):
+                check = self.setTypeArray(LHS, RHS)
+                if not check:
+                    raise TypeMismatchInStatement(ast)
             elif not self.comparType(LHS, RHS):
                 raise TypeMismatchInStatement(ast)
 
@@ -222,6 +291,10 @@ class StaticChecker(BaseVisitor, Utils):
 
             if isinstance(RHS, Zcode):
                 RHS.typ = LHS
+            elif isinstance(RHS, ArrayZcode) and isinstance(LHS, ArrayType):
+                check = self.setTypeArray(LHS, RHS)
+                if not check:
+                    raise TypeMismatchInStatement(ast)
             elif not self.comparType(LHS, RHS):
                 raise TypeMismatchInExpression(ast)
 
@@ -262,16 +335,14 @@ class StaticChecker(BaseVisitor, Utils):
                 raise TypeMismatchInStatement(ast)
 
 
-        self.BlockFor += 1 #! vào trong vòng for nào anh em
+        self.BlockFor += 1
         self.visit(ast.body, [{}] + param)
-        self.BlockFor -= 1 #! cút khỏi vòng for nào anh em
+        self.BlockFor -= 1
         
     def visitContinue(self, ast, param):
-        #! kiểm tra đang ở vòng for hay không
         if self.BlockFor == 0: raise MustInLoop(ast)
 
     def visitBreak(self, ast, param):
-        #! kiểm tra đang ở vòng for hay không
         if self.BlockFor == 0: raise MustInLoop(ast)
 
 
@@ -284,16 +355,56 @@ class StaticChecker(BaseVisitor, Utils):
     def visitStringLiteral(self, ast, param): return StringType()
     def visitArrayLiteral(self, ast, param):
 
-        for lit in ast.value: self.visit(lit, param)
-        typ = self.visit(ast.value[0], param)
+        # Step 1: Check type of the ArrayLiteral, catch the first Type()!!
+        typ = None
+        listTyp = []
+        for lit in ast.value:
 
-        if type(typ) in [StringType, BoolType, NumberType]:
-            return ArrayType([len(ast.value)], typ)
-        return ArrayType([len(ast.value)] + typ.size, typ.eleType)
+            checkTyp = self.visit(lit, param)
+            listTyp += [checkTyp]
+
+            # Don't care if visit Zcode and ArrayZcode
+            if not (isinstance(checkTyp, Zcode) or isinstance(checkTyp, ArrayZcode)):
+                typ = checkTyp
+                break
+        
+        # Case 1: typ is None -> ArrayZcode
+        if typ is None: 
+            return ArrayZcode(eleType=listTyp)
+        
+        # Case 2: typ is Normal
+        elif type(typ) in [StringType, BoolType, NumberType]:
+            LHS = typ
+            for lit in ast.value:
+                RHS = self.visit(lit, param)
+                
+                if isinstance(RHS, ArrayZcode):
+                    raise TypeMismatchInExpression(ast)
+                elif isinstance(RHS, Zcode):
+                    RHS.typ = LHS
+                elif not self.comparType(RHS, LHS):
+                    raise TypeMismatchInExpression(ast)
+                
+            return ArrayType(size=[len(ast.value)], eleType=LHS)
+        
+        # Case 3: typ is ArrayType()
+        else:
+            LHS = typ
+            for lit in ast.value:
+                RHS = self.visit(lit, param)
+
+                if isinstance(RHS, ArrayZcode):
+                    checkSetTypeArray = self.setTypeArray(LHS, RHS)
+                    if not checkSetTypeArray:
+                        raise TypeMismatchInExpression(ast)
+                elif isinstance(RHS, Zcode):
+                    RHS.typ = LHS
+                elif not self.comparType(LHS, RHS):
+                    raise TypeMismatchInExpression(ast)
+                
+            return ArrayType(size=[len(ast.value)] + LHS.size, eleType=LHS.eleType)
 
     def visitBinaryOp(self, ast, param):
-        LHS = self.visit(ast.left, param)
-        RHS = self.visit(ast.right, param)
 
         type_0 = ['+', '-', '*', '/', '%']
         type_1 = ['=', '!=', '<', '>', '>=', '<=']
@@ -301,42 +412,36 @@ class StaticChecker(BaseVisitor, Utils):
         type_3 = ['==']
         type_4 = ['...']
 
-        def checkTypeHelper(input_type, output_type):
+        def checkTypeHelper(input_type, output_type, left, right, param):
 
-            if not isinstance(LHS, Zcode) and not isinstance(RHS, Zcode):
-                if not self.comparType(LHS, RHS):
-                    raise TypeMismatchInExpression(ast)
-                if not self.comparType(LHS, input_type) or not self.comparType(RHS, input_type):
-                    raise TypeMismatchInExpression(ast)
-                
-            elif not isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
-                RHS.typ = LHS
+            LHS = self.visit(left, param)
 
-                if not self.comparType(LHS, input_type):
-                    raise TypeMismatchInExpression(ast)
-                
-            elif isinstance(LHS, Zcode) and not isinstance(RHS, Zcode):
-                LHS.typ = RHS
-
-                if not self.comparType(RHS, input_type):
-                    raise TypeMismatchInExpression(ast)
-                
-            else:
+            if isinstance(LHS, Zcode):
                 LHS.typ = input_type
+            elif not self.comparType(LHS, input_type):
+                raise TypeMismatchInExpression(ast)
+            
+            RHS = self.visit(right, param)
+
+            if isinstance(RHS, Zcode):
                 RHS.typ = input_type
+            elif not self.comparType(RHS, input_type):
+                raise TypeMismatchInExpression(ast)
 
             return output_type
         
+        left, right = ast.left, ast.right
+
         if ast.op in type_0:
-            return checkTypeHelper(NumberType(), NumberType())
+            return checkTypeHelper(NumberType(), NumberType(), left, right, param)
         elif ast.op in type_1:
-            return checkTypeHelper(NumberType(), BoolType())
+            return checkTypeHelper(NumberType(), BoolType(), left, right, param)
         elif ast.op in type_2:
-            return checkTypeHelper(BoolType(), BoolType()) 
+            return checkTypeHelper(BoolType(), BoolType(), left, right, param) 
         elif ast.op in type_3:
-            return checkTypeHelper(StringType(), BoolType())
+            return checkTypeHelper(StringType(), BoolType(), left, right, param)
         elif ast.op in type_4:
-            return checkTypeHelper(StringType(), StringType())
+            return checkTypeHelper(StringType(), StringType(), left, right, param)
         
         return Zcode()
 
@@ -366,7 +471,7 @@ class StaticChecker(BaseVisitor, Utils):
     def visitArrayCell(self, ast, param):
         
         arr = self.visit(ast.arr, param)
-        #TODO Không thể suy diễn kiểu từ ArrayType nên cần hỏi thầy !!!!
+        
         if not isinstance(arr, ArrayType):
             raise TypeMismatchInExpression(ast)
         
@@ -427,17 +532,34 @@ class StaticChecker(BaseVisitor, Utils):
         LHS = self.visit(ast.lhs, param)
         RHS = self.visit(ast.rhs, param)
 
-        # TH1 : cả 2 đều trả về Zcode -> TypeCannotBeInferred
-        if isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
+        group_1 = [NumberType, StringType, BoolType, ArrayType]
+        group_2 = [FuncZcode, VarZcode]
+        group_3 = [ArrayZcode] # LHS will never in this group
+
+        #  TH1: cả 2 đều trả về Zcode, ArrayZcode -> TypeCannotBeInferred
+        if not (type(LHS) in group_1) and not (type(RHS) in group_1):
             raise TypeCannotBeInferred(stmt=ast)
-        # TH2, 3: nếu 1 trong 2 bên trả về Zcode bên kia xác định type thì gán type của Zcode với type đó
-        elif not isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
-            RHS.typ = LHS
-        elif isinstance(LHS, Zcode) and not isinstance(RHS, Zcode):
+        # TH2: LHS is Normal Type and RHS is ArrayZcode
+        elif type(LHS) in group_1 and type(RHS) in group_3:
+            
+            # TH2.1: LHS is not ArrayType -> TypeMissMatch
+            if not isinstance(LHS, ArrayType):
+                raise TypeMismatchInStatement(ast)
+            # TH2.2: LHS is ArrayType -> setTypeArray
+            else:
+                checkSetTypeArray = self.setTypeArray(LHS, RHS)
+                if not checkSetTypeArray:
+                    raise TypeMismatchInStatement(ast)
+
+        # TH3: LHS is Zcode and RHS is Normal
+        elif type(LHS) in group_2 and type(RHS) in group_1:
             LHS.typ = RHS
-        # TH4 : cả 2 đều có type nên kiểm tra xem 2 type có giống nhau không
+        # TH4: LHS is Normal and RHS is Zcode
+        elif type(LHS) in group_1 and type(RHS) in group_2:
+            RHS.typ = LHS
+        # TH5: LHS is Normal and RHS is Normal
         elif not self.comparType(LHS, RHS):
-            raise TypeMismatchInStatement(stmt=ast)
+            raise TypeMismatchInStatement(ast)
 
     def visitReturn(self, ast, param):
 
@@ -450,17 +572,34 @@ class StaticChecker(BaseVisitor, Utils):
 
         RHS = self.visit(ast.expr, param) if ast.expr else VoidType()
 
-        # TH1 : cả 2 đều trả về Zcode -> TypeCannotBeInferred
-        if isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
+        group_1 = [NumberType, StringType, BoolType, ArrayType, VoidType]
+        group_2 = [FuncZcode, VarZcode]
+        group_3 = [ArrayZcode] # LHS will never in this group
+
+        #  TH1: cả 2 đều trả về Zcode, ArrayZcode -> TypeCannotBeInferred
+        if not (type(LHS) in group_1) and not (type(RHS) in group_1):
             raise TypeCannotBeInferred(stmt=ast)
-        # TH2, 3: nếu 1 trong 2 bên trả về Zcode bên kia xác định type thì gán type của Zcode với type đó
-        elif not isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
-            RHS.typ = LHS
-        elif isinstance(LHS, Zcode) and not isinstance(RHS, Zcode):
+        # TH2: LHS is Normal Type and RHS is ArrayZcode
+        elif type(LHS) in group_1 and type(RHS) in group_3:
+            
+            # TH2.1: LHS is not ArrayType -> TypeMissMatch
+            if not isinstance(LHS, ArrayType):
+                raise TypeMismatchInStatement(ast)
+            # TH2.2: LHS is ArrayType -> setTypeArray
+            else:
+                checkSetTypeArray = self.setTypeArray(LHS, RHS)
+                if not checkSetTypeArray:
+                    raise TypeMismatchInStatement(ast)
+
+        # TH3: LHS is Zcode and RHS is Normal
+        elif type(LHS) in group_2 and type(RHS) in group_1:
             LHS.typ = RHS
-        # TH4 : cả 2 đều có type nên kiểm tra xem 2 type có giống nhau không
+        # TH4: LHS is Normal and RHS is Zcode
+        elif type(LHS) in group_1 and type(RHS) in group_2:
+            RHS.typ = LHS
+        # TH5: LHS is Normal and RHS is Normal
         elif not self.comparType(LHS, RHS):
-            raise TypeMismatchInStatement(stmt=ast)
+            raise TypeMismatchInStatement(ast)
 
 
 
