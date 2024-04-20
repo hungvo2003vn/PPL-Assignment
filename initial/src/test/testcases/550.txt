@@ -1,10 +1,9 @@
 
+            func fun1() return 1
+            func fun2() return
+            func fun3()
+            
             func main() begin 
-                number a
-                string b
-                dynamic c
-                a <- c
-                c <- b
-
+               return fun3()
             end
         

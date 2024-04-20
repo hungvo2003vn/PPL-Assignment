@@ -1,7 +1,10 @@
 
-            func a(number a[1,3,2])
             func main() begin 
-            end
-            func a(string a[1,3,2]) begin
+                number a
+                string b
+                dynamic c
+                a <- c
+                c <- b
+
             end
         

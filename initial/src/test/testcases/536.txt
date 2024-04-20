@@ -1,10 +1,5 @@
 
-            func fun() begin
-                number a[3]
-                return [1, 4, 3]
-                return a
-            end
             func main() begin 
-               
+                return
             end
         

@@ -1,1 +1,1 @@
-Type Mismatch In Statement: Return(NumLit(1.0))
+Type Cannot Be Inferred: VarDecl(Id(a), NumberType, None, BinaryOp(+, NumLit(1.0), ArrayLit(Id(x))))

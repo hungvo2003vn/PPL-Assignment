@@ -1,11 +1,11 @@
 
             func main()begin
                 dynamic a
-                if (a) number a
+                if (a) return
                 elif (a)  return
-                else number a
+                else return
                 
-                if(true) number a
-                elif (1) number a
+                if(true) return
+                elif (1) return
             end
         

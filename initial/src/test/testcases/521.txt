@@ -1,7 +1,8 @@
 
-            func foo() begin
-                dynamic x
-                return [x, [1,2]]                
+            dynamic x
+            number a[1,1,2,2] <- [[[x, x]]]
+            func  main()
+            begin
+                x <- [1,2]
             end
-            func main() return 
         

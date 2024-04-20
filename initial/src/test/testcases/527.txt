@@ -1,8 +1,11 @@
 
-            func foo(number a[2,2]) return
-            func main() begin
+            func foo() begin
                 dynamic x
-                foo([x, x])
-                x <- [1,2]
+                dynamic y
+                return [[1], [2]]
+                return [x, [y]]
+                x <- [1]
+                y <- x
             end
+            func main() return 
         

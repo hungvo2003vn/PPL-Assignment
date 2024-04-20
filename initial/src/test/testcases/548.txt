@@ -1,8 +1,10 @@
 
+            func fun() begin
+                string a[1,1,1,1,1]
+                return a
+                return [[[[["1"]]]]]
+            end
             func main() begin 
-                number a
-                dynamic b
-                dynamic c
-                b <- c
+               
             end
         

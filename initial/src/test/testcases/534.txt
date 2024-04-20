@@ -1,10 +1,6 @@
 
-            func fun() begin
-                return 
-                return
-                return 1
-            end
-            func main() begin 
-               
+            func main() begin
+                dynamic x
+                number a <- 1 + [x]
             end
         

@@ -1,1 +1,1 @@
-Type Mismatch In Statement: Return(StringLit(string))
+Type Mismatch In Expression: BinaryOp(+, NumLit(1.0), ArrayLit(Id(x), NumLit(1.0)))

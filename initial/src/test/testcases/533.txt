@@ -1,7 +1,6 @@
 
-            func main() begin 
-                dynamic i
-                return 1
-                return i
+            func main() begin
+                dynamic x
+                number a <- 1 + x[1,3]
             end
         

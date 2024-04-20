@@ -1,14 +1,9 @@
 
             func fun() begin
-                return [1,2]
-                return [3,4]
-            end
-            
-            func fun1() begin
+                number a[2,2]
                 return [[1,2], [3,4]]
-                return [[1,5], [3,4]]
+                return a
             end
-            
             func main() begin 
                
             end

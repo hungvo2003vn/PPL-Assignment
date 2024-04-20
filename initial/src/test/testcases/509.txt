@@ -1,6 +1,6 @@
 
             dynamic x
-            number a[3] <- [x, [x,x], 1]
+            number a[3] <- [x, x, x]
             func  main()
             begin
                 x <- 1

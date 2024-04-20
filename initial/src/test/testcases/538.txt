@@ -1,10 +1,8 @@
 
-            func fun() begin
-                number a[3,2]
-                return [[1,2], [3,4]]
-                return a
-            end
             func main() begin 
-               
+                return 1
+                begin
+                    return "string"
+                end
             end
         
