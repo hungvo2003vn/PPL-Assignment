@@ -191,7 +191,7 @@ class StaticChecker(BaseVisitor, Utils):
         typeParam = [] #! dạng mảng không cần name
         for funcParam in ast.param:
             id = funcParam.name.name
-            if listParam.get(id): raise Redeclared(Parameter(), id)
+            if listParam.get(id) and ast.body: raise Redeclared(Parameter(), id)
             # Update list param
             listParam[id] = VarZcode(funcParam.varType)
             typeParam += [funcParam.varType]
@@ -225,7 +225,7 @@ class StaticChecker(BaseVisitor, Utils):
         if ast.body:
 
             self.function = self.listFunction[0][ast.name.name]
-            self.visit(ast.body, [{}] + [listParam] + param)
+            self.visit(ast.body, [listParam] + param)
             self.function = None
 
 
@@ -322,20 +322,20 @@ class StaticChecker(BaseVisitor, Utils):
         #TODO Check type
         listLHS = [NumberType(), BoolType(), NumberType()]
         listRHS = [
-            self.visit(ast.name, param), 
-            self.visit(ast.condExpr, param),
-            self.visit(ast.updExpr, param)
+            ast.name,
+            ast.condExpr,
+            ast.updExpr
         ]
         
         for i in range(3):
 
             LHS = listLHS[i]
-            RHS = listRHS[i]
+            RHS = self.visit(listRHS[i], param)
             self.LHS_RHS_stmt(LHS, RHS, ast)
 
 
         self.BlockFor += 1
-        self.visit(ast.body, [{}] + param)
+        self.visit(ast.body, param)
         self.BlockFor -= 1
         
     def visitContinue(self, ast, param):
@@ -471,7 +471,7 @@ class StaticChecker(BaseVisitor, Utils):
         self.LHS_RHS_stmt(BoolType(), expr, ast)
         
         # visit thenStmt
-        self.visit(ast.thenStmt, [{}] + param)
+        self.visit(ast.thenStmt, param)
 
         # visit all elifStmt
         for ele in ast.elifStmt:
@@ -481,11 +481,11 @@ class StaticChecker(BaseVisitor, Utils):
             self.LHS_RHS_stmt(BoolType(), elif_expr, ast)
             
             # visit stmt of elif
-            self.visit(ele[1], [{}] + param)
+            self.visit(ele[1], param)
         
         # Visit elseStmt
         if ast.elseStmt:
-            self.visit(ast.elseStmt, [{}] + param)
+            self.visit(ast.elseStmt, param)
         
         return
 
