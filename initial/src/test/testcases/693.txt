@@ -1,0 +1,12 @@
+
+
+func foo(number a[2,2]) return  1
+        
+func main()
+begin
+    dynamic x
+    return foo([[x,x], [x,x]])
+    
+    dynamic y
+    return foo([[y,y], [y]])
+end

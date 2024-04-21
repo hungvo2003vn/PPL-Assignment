@@ -1,0 +1,13 @@
+
+            number a <- a
+            func main() begin 
+                string a <- a
+                begin
+                    dynamic b <- a
+                    string a <- b
+                    begin
+                        number a <- b
+                    end
+                end
+            end
+        

@@ -1,0 +1,6 @@
+
+            func main() begin 
+                dynamic a
+                dynamic b <- "a" - true
+            end
+        

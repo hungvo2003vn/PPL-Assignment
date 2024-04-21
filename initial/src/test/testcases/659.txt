@@ -1,0 +1,8 @@
+
+            func a() return
+            func a1(number a) return
+            func a2(number b, string c[2]) return
+            func main() begin 
+                a1()
+            end
+        

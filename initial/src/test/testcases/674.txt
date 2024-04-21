@@ -1,0 +1,7 @@
+
+            func main() begin 
+                number a[1, 2, 3, 4]
+                number b
+                var c <- a["1"]
+            end
+        

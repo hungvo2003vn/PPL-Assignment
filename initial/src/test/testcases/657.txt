@@ -1,0 +1,13 @@
+
+            func a() return
+            func a1(number a) return
+            func a2(number b, string c[2]) return
+            func main() begin 
+                a()
+                a1(1)
+                a2(1, ["1", "2"])
+                writeNumber(1)
+                writeBool(true)
+                writeString("a")
+            end
+        

@@ -20,8 +20,9 @@ class VarZcode(Zcode):
 class ArrayZcode(Type):
     #* eleType: List[Type]
     #* Type can be Zcode, ArrayZcode, String, bool, number, arraytype
-    def __init__(self, eleType):
+    def __init__(self, eleType, ast):
         self.eleType = eleType
+        self.ast = ast
 
 class CannotBeInferredZcode(Type):
     def __str__(self):
@@ -67,7 +68,7 @@ class StaticChecker(BaseVisitor, Utils):
 
         return True
     
-    def LHS_RHS_stmt(self, LHS : Type, RHS : Type, ctx):
+    def LHS_RHS_stmt(self, LHS : Type, RHS : Type, ctx, param):
         if isinstance(LHS, CannotBeInferredZcode) or isinstance(RHS, CannotBeInferredZcode):
             raise TypeCannotBeInferred(ctx)
         elif isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
@@ -75,8 +76,8 @@ class StaticChecker(BaseVisitor, Utils):
         elif isinstance(LHS, Zcode) and isinstance(RHS, ArrayZcode):
             raise TypeCannotBeInferred(ctx)
         elif isinstance(LHS, ArrayType) and isinstance(RHS, ArrayZcode):
-            if not self.setTypeArray(LHS, RHS):
-                raise TypeMismatchInStatement(ctx)
+            RHS = self.visitArrayLiteral(RHS.ast, param, LHS)
+            self.LHS_RHS_stmt(LHS, RHS, ctx, param)
         elif isinstance(RHS, ArrayZcode):
             raise TypeCannotBeInferred(ctx)
         elif isinstance(LHS, Zcode):
@@ -88,7 +89,7 @@ class StaticChecker(BaseVisitor, Utils):
         else:
             return False
     
-    def LHS_RHS_expr(self, LHS : Type, RHS : Type, ctx) -> bool:
+    def LHS_RHS_expr(self, LHS : Type, RHS : Type, ctx, param) -> bool:
         if isinstance(LHS, CannotBeInferredZcode) or isinstance(RHS, CannotBeInferredZcode):
             return True
         elif isinstance(LHS, Zcode) and isinstance(RHS, Zcode):
@@ -96,8 +97,8 @@ class StaticChecker(BaseVisitor, Utils):
         elif isinstance(LHS, Zcode) and isinstance(RHS, ArrayZcode):
             return True
         elif isinstance(LHS, ArrayType) and isinstance(RHS, ArrayZcode):
-            if not self.setTypeArray(LHS, RHS):
-                raise TypeMismatchInExpression(ctx)
+            RHS = self.visitArrayLiteral(RHS.ast, param, LHS)
+            return self.LHS_RHS_expr(LHS, RHS, ctx, param)
         elif isinstance(RHS, ArrayZcode):
             return True
         elif isinstance(LHS, Zcode):
@@ -109,48 +110,6 @@ class StaticChecker(BaseVisitor, Utils):
         else:
             return False
     
-    def setTypeArray(self, typeArray: ArrayType, typeArrayZcode: ArrayZcode):
-        #* Trường hợp size khác nhau
-        if int(typeArray.size[0]) != len(typeArrayZcode.eleType):
-            return False
-        
-        #* trường hợp bên trong array là các kiểu nguyên thủy (array 1 chiều)
-           #^ nếu typeArrayZcode.eleType[i] là Zcode : gán typeArrayZcode.eleType[i].typ = typeArray.eleType
-           #^ nếu typeArrayZcode.eleType[i] là arrayZcode : trả về False (vì 1 chiều mà bắt gán 2 chiều :) )
-        if len(typeArray.size) == 1:
-            #TODO implement
-            size_1stD = len(typeArrayZcode.eleType)
-
-            for i in range(size_1stD):
-                RHS = typeArrayZcode.eleType[i]
-
-                if isinstance(RHS, Zcode):
-                    RHS.typ = typeArray.eleType
-                elif isinstance(RHS, ArrayZcode):
-                    return False
-
-        #* trường hợp bên trong array là các arrayType (array >= 2 chiều)
-           #^ nếu typeArrayZcode.eleType[i] là Zcode : gán typeArrayZcode.eleType[i].typ = typeArray.eleType
-           #^ nếu typeArrayZcode.eleType[i] là arrayZcode : gọi đệ quy self.setTypeArray(ArrayType(typeArray.size[1:], typeArray.eleType),typeArrayZcode[i]) để vào bên trong xem có lỗi gì không       
-        else:
-            #TODO implement
-            size_1stD = len(typeArrayZcode.eleType)
-
-            for i in range(size_1stD):
-                RHS = typeArrayZcode.eleType[i]
-
-                if isinstance(RHS, Zcode):
-                    RHS.typ = ArrayType(typeArray.size[1:], typeArray.eleType)
-                elif isinstance(RHS, ArrayZcode):
-
-                    check = self.setTypeArray(
-                        ArrayType(typeArray.size[1:], typeArray.eleType),
-                        RHS
-                    )
-                    if check == False:
-                        return False
-
-        return True
     
     def visitProgram(self, ast, param):
         #! duyệt qua các biến và hàm toàn cục
@@ -178,7 +137,7 @@ class StaticChecker(BaseVisitor, Utils):
             LHS = self.visit(ast.varType, param) if ast.varType else param[0][ast.name.name]
 
             # Check
-            self.LHS_RHS_stmt(LHS, RHS, ast)
+            self.LHS_RHS_stmt(LHS, RHS, ast, param)
             
         return
 
@@ -271,7 +230,7 @@ class StaticChecker(BaseVisitor, Utils):
 
             LHS = self.visit(listLHS[i], param)
             RHS = self.visit(listRHS[i], param)
-            self.LHS_RHS_stmt(LHS, RHS, ast)
+            self.LHS_RHS_stmt(LHS, RHS, ast, param)
 
         # Check return type
         function_found = found
@@ -301,7 +260,7 @@ class StaticChecker(BaseVisitor, Utils):
             LHS = self.visit(listLHS[i], param)
             RHS = self.visit(listRHS[i], param)
 
-            if self.LHS_RHS_expr(LHS, RHS, ast): return CannotBeInferredZcode()
+            if self.LHS_RHS_expr(LHS, RHS, ast, param): return CannotBeInferredZcode()
 
         # Check return type
         function_found = found
@@ -331,7 +290,7 @@ class StaticChecker(BaseVisitor, Utils):
 
             LHS = listLHS[i]
             RHS = self.visit(listRHS[i], param)
-            self.LHS_RHS_stmt(LHS, RHS, ast)
+            self.LHS_RHS_stmt(LHS, RHS, ast, param)
 
 
         self.BlockFor += 1
@@ -352,7 +311,27 @@ class StaticChecker(BaseVisitor, Utils):
     def visitNumberLiteral(self, ast, param): return NumberType()
     def visitBooleanLiteral(self, ast, param): return BoolType()
     def visitStringLiteral(self, ast, param): return StringType()
-    def visitArrayLiteral(self, ast, param):
+    def visitArrayLiteral(self, ast, param, mainTyp=None):
+
+        if mainTyp is not None:
+            result = mainTyp
+            mainTyp = mainTyp.eleType if len(mainTyp.size) == 1 else ArrayType(mainTyp.size[1:], mainTyp.eleType) 
+            
+            
+            for item in ast.value:
+                RHS = self.visit(item, param)   
+                
+                if isinstance(RHS, CannotBeInferredZcode) or isinstance(mainTyp, CannotBeInferredZcode):
+                    return CannotBeInferredZcode()
+                if isinstance(mainTyp, ArrayType) and isinstance(RHS, ArrayZcode):
+                    mainTyp = self.visitArrayLiteral(RHS.ast, param, mainTyp)
+                elif isinstance(RHS, ArrayZcode):
+                    return CannotBeInferredZcode()
+                elif isinstance(RHS, Zcode):
+                    RHS.typ = mainTyp
+            
+            return self.visitArrayLiteral(ast, param)
+
 
         # Step 1: Check type of the ArrayLiteral, catch the first Type()!!
         typ = None
@@ -369,14 +348,14 @@ class StaticChecker(BaseVisitor, Utils):
         
         # Case 1: typ is None -> ArrayZcode
         if typ is None: 
-            return ArrayZcode(eleType=listTyp)
+            return ArrayZcode(eleType=listTyp, ast=ast)
         
         # Case 2: typ is Normal
         elif type(typ) in [StringType, BoolType, NumberType]:
             LHS = typ
             for lit in ast.value:
                 RHS = self.visit(lit, param)
-                if self.LHS_RHS_expr(LHS, RHS , ast): return CannotBeInferredZcode()
+                if self.LHS_RHS_expr(LHS, RHS , ast, param): return CannotBeInferredZcode()
                 
             return ArrayType(size=[len(ast.value)], eleType=LHS)
         
@@ -385,7 +364,7 @@ class StaticChecker(BaseVisitor, Utils):
             LHS = typ
             for lit in ast.value:
                 RHS = self.visit(lit, param)
-                if self.LHS_RHS_expr(LHS, RHS , ast): return CannotBeInferredZcode()
+                if self.LHS_RHS_expr(LHS, RHS , ast, param): return CannotBeInferredZcode()
                 
             return ArrayType(size=[len(ast.value)] + LHS.size, eleType=LHS.eleType)
 
@@ -400,10 +379,10 @@ class StaticChecker(BaseVisitor, Utils):
         def checkTypeHelper(input_type, output_type, left, right, param):
 
             LHS = self.visit(left, param)
-            if self.LHS_RHS_expr(input_type, LHS, ast): return CannotBeInferredZcode()
+            if self.LHS_RHS_expr(input_type, LHS, ast, param): return CannotBeInferredZcode()
             
             RHS = self.visit(right, param)
-            if self.LHS_RHS_expr(input_type, RHS, ast): return CannotBeInferredZcode()
+            if self.LHS_RHS_expr(input_type, RHS, ast, param): return CannotBeInferredZcode()
 
             return output_type
         
@@ -430,7 +409,7 @@ class StaticChecker(BaseVisitor, Utils):
         type_1 = ['not']
 
         def checkTypeHelper(input_type, output_type):
-            if self.LHS_RHS_expr(input_type, operand, ast): return CannotBeInferredZcode()
+            if self.LHS_RHS_expr(input_type, operand, ast, param): return CannotBeInferredZcode()
             
             return output_type
         
@@ -453,7 +432,7 @@ class StaticChecker(BaseVisitor, Utils):
         # Check idx
         for index in ast.idx:
             expr = self.visit(index, param)
-            if self.LHS_RHS_expr(NumberType(), expr, ast): return CannotBeInferredZcode()
+            if self.LHS_RHS_expr(NumberType(), expr, ast, param): return CannotBeInferredZcode()
             
         left = len(arr.size)
         right = len(ast.idx)
@@ -468,7 +447,7 @@ class StaticChecker(BaseVisitor, Utils):
         
         # Check first condition
         expr = self.visit(ast.expr, param)
-        self.LHS_RHS_stmt(BoolType(), expr, ast)
+        self.LHS_RHS_stmt(BoolType(), expr, ast, param)
         
         # visit thenStmt
         self.visit(ast.thenStmt, param)
@@ -478,7 +457,7 @@ class StaticChecker(BaseVisitor, Utils):
 
             # Check condition type
             elif_expr = self.visit(ele[0], param)
-            self.LHS_RHS_stmt(BoolType(), elif_expr, ast)
+            self.LHS_RHS_stmt(BoolType(), elif_expr, ast, param)
             
             # visit stmt of elif
             self.visit(ele[1], param)
@@ -496,7 +475,7 @@ class StaticChecker(BaseVisitor, Utils):
         RHS = self.visit(ast.rhs, param)
         LHS = self.visit(ast.lhs, param)
 
-        self.LHS_RHS_stmt(LHS, RHS, ast)
+        self.LHS_RHS_stmt(LHS, RHS, ast, param)
 
     def visitReturn(self, ast, param):
 
@@ -509,7 +488,7 @@ class StaticChecker(BaseVisitor, Utils):
             LHS = self.visit(self.function.typ, param) if not self.comparType(self.function.typ, VoidType()) else self.function.typ
         else: LHS = self.function
 
-        self.LHS_RHS_stmt(LHS, RHS, ast)
+        self.LHS_RHS_stmt(LHS, RHS, ast, param)
 
 
 

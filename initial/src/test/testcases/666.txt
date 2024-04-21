@@ -1,0 +1,11 @@
+
+            func a() return 1
+            func a1(number a) return 3 
+            func a2(number b, string c[2]) return 2
+            func main() begin 
+                var c <- a1(1) + a2(1, ["a", "b"]) + a()
+                number x <- readNumber()
+                bool y <- readBool()
+                string z <- readString()
+            end
+        
