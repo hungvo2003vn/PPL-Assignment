@@ -174,8 +174,8 @@ class StaticChecker(BaseVisitor, Utils):
 
         #TODO kiểm tra TypeCannotBeInferred và TypeMismatchInStatement xử lí ast.varInit nếu tồn tại
         if ast.varInit:
-            LHS = self.visit(ast.varType, param) if ast.varType else param[0][ast.name.name]
             RHS = self.visit(ast.varInit, param)
+            LHS = self.visit(ast.varType, param) if ast.varType else param[0][ast.name.name]
 
             # Check
             self.LHS_RHS_stmt(LHS, RHS, ast)
@@ -493,8 +493,8 @@ class StaticChecker(BaseVisitor, Utils):
 
     def visitAssign(self, ast, param):
         
-        LHS = self.visit(ast.lhs, param)
         RHS = self.visit(ast.rhs, param)
+        LHS = self.visit(ast.lhs, param)
 
         self.LHS_RHS_stmt(LHS, RHS, ast)
 
@@ -502,12 +502,12 @@ class StaticChecker(BaseVisitor, Utils):
 
         self.Return = True
         
+        RHS = self.visit(ast.expr, param) if ast.expr else VoidType()
         LHS = None
+        
         if self.function.typ:
             LHS = self.visit(self.function.typ, param) if not self.comparType(self.function.typ, VoidType()) else self.function.typ
         else: LHS = self.function
-
-        RHS = self.visit(ast.expr, param) if ast.expr else VoidType()
 
         self.LHS_RHS_stmt(LHS, RHS, ast)
 

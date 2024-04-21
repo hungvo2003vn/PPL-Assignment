@@ -1937,3 +1937,23 @@ end
         """
         expect = "Type Cannot Be Inferred: VarDecl(Id(a), NumberType, None, BinaryOp(+, NumLit(1.0), ArrayLit(ArrayLit(ArrayLit(ArrayLit(Id(x)))))))"
         self.assertTrue(TestChecker.test(input, expect, 626))  
+    
+    def test_Special_26(self):
+        input = """
+            func main()
+            begin
+                dynamic x
+                number a[1,1] <- [[x[1]]]
+            end
+        """
+        expect = "Type Cannot Be Inferred: VarDecl(Id(a), ArrayType([1.0, 1.0], NumberType), None, ArrayLit(ArrayLit(ArrayCell(Id(x), [NumLit(1.0)]))))"
+        self.assertTrue(TestChecker.test(input, expect, 627))
+
+        input = """
+            func main() begin
+                dynamic x
+                x <- (x=1) or ("abc" == "abc")
+            end
+        """
+        expect = "Type Mismatch In Statement: AssignStmt(Id(x), BinaryOp(or, BinaryOp(=, Id(x), NumLit(1.0)), BinaryOp(==, StringLit(abc), StringLit(abc))))"
+        self.assertTrue(TestChecker.test(input, expect, 628))
