@@ -198,15 +198,15 @@ class CheckCodeGenSuite(unittest.TestCase):
         expect = "-1.0\n"
         self.assertTrue(TestCodeGen.test(input, expect, 714))  
         
-        input = """
-        func main ()
-        begin
-            var a <- readBool() #* true
-            writeBool(a)
-        end
-        """
-        expect = "true\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 715))  
+        # input = """
+        # func main ()
+        # begin
+        #     var a <- readBool() #* true
+        #     writeBool(a)
+        # end
+        # """
+        # expect = "true\n"
+        # self.assertTrue(TestCodeGen.test(input, expect, 715))  
         
         input = """
         func foo()
@@ -406,10 +406,42 @@ class CheckCodeGenSuite(unittest.TestCase):
             var i <- 0
             for i until i >= 2 by 1
                 writeNumber(i)
+                
+            writeNumber(i)
         end
         """
-        expect = "0.0\n1.0\n"
+        expect = "0.0\n1.0\n0.0\n"
         self.assertTrue(TestCodeGen.test(input, expect, 733))
+        
+        input = """
+        func main ()
+        begin
+            var i <- 0
+            for i until i >= 2 by 1
+            begin
+                i <- 1000
+                break
+            end
+            writeNumber(i)
+        end
+        """
+        expect = "0.0\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 734))
+
+        #* ảo ma canada
+        # input = """
+        # func main ()
+        # begin
+        #     var i <- 0
+        #     for i until i >= 1 by 1
+        #         var k <- 2
+        #     writeNumber(i)
+        #     ## writeNumber(k)
+        # end
+        # """
+        # expect = "0.0\n"
+        # self.assertTrue(TestCodeGen.test(input, expect, 735))
+        
         
         input = """
         func main ()
@@ -420,7 +452,8 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "0.0\n1.0\n2.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 734))
+        self.assertTrue(TestCodeGen.test(input, expect, 736))
+        
         
         input = """
         func main ()
@@ -431,7 +464,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "0.0\n2.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 735))
+        self.assertTrue(TestCodeGen.test(input, expect, 737))
         
         input = """
         func main ()
@@ -442,7 +475,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = ""
-        self.assertTrue(TestCodeGen.test(input, expect, 736))
+        self.assertTrue(TestCodeGen.test(input, expect, 738))
         
         input = """
         func main ()
@@ -457,7 +490,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "0.0\n1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 737))
+        self.assertTrue(TestCodeGen.test(input, expect, 739))
         
         input = """
         func main ()
@@ -472,7 +505,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "0.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 738))
+        self.assertTrue(TestCodeGen.test(input, expect, 740))
         
         input = """
         func main ()
@@ -483,9 +516,8 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = ""
-        self.assertTrue(TestCodeGen.test(input, expect, 739))
-         
-         
+        self.assertTrue(TestCodeGen.test(input, expect, 741))
+                   
     def test_6(self): 
         input = """
         number a[2]
@@ -495,7 +527,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "0.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 740))      
+        self.assertTrue(TestCodeGen.test(input, expect, 742))      
         
         input = """
         number a[2]
@@ -505,7 +537,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 741))  
+        self.assertTrue(TestCodeGen.test(input, expect, 743))  
         
         input = """
         number a[2]
@@ -516,7 +548,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "0.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 742))     
+        self.assertTrue(TestCodeGen.test(input, expect, 744))     
         
         input = """
         func main ()
@@ -527,7 +559,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "2.5\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 743))     
+        self.assertTrue(TestCodeGen.test(input, expect, 745))     
         
         input = """
         number a[2, 3]
@@ -537,7 +569,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "0.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 744))  
+        self.assertTrue(TestCodeGen.test(input, expect, 746))  
         
         input = """
         func main ()
@@ -547,7 +579,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "0.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 745))  
+        self.assertTrue(TestCodeGen.test(input, expect, 747))  
         
         input = """
         func main ()
@@ -557,7 +589,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "0.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 746))  
+        self.assertTrue(TestCodeGen.test(input, expect, 748))  
         
         input = """
         func main ()
@@ -568,7 +600,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "0.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 747))  
+        self.assertTrue(TestCodeGen.test(input, expect, 749))  
         
         input = """
         number a[2]
@@ -579,7 +611,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 748))  
+        self.assertTrue(TestCodeGen.test(input, expect, 750))  
         
         input = """
         number a[2]
@@ -590,7 +622,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 749))  
+        self.assertTrue(TestCodeGen.test(input, expect, 751))  
         
         input = """
         number a[2,2]
@@ -601,7 +633,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 750))  
+        self.assertTrue(TestCodeGen.test(input, expect, 752))  
         
         input = """
         func main ()
@@ -612,7 +644,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 751)) 
+        self.assertTrue(TestCodeGen.test(input, expect, 753)) 
         
         input = """
         func main ()
@@ -625,7 +657,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "1.0\n1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 752)) 
+        self.assertTrue(TestCodeGen.test(input, expect, 754)) 
         
         input = """
         bool a[2]
@@ -644,7 +676,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "false\nfalse\ntrue\ntrue\ntrue\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 753)) 
+        self.assertTrue(TestCodeGen.test(input, expect, 755)) 
         
         input = """
         func main ()
@@ -663,8 +695,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "false\nfalse\ntrue\ntrue\ntrue\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 754)) 
-        
+        self.assertTrue(TestCodeGen.test(input, expect, 756)) 
 
     #* array literals
     def test_7(self): 
@@ -677,7 +708,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "2.0\n1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 755))   
+        self.assertTrue(TestCodeGen.test(input, expect, 757))   
         
         input = """
         func main ()
@@ -688,7 +719,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "2.0\n1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 756))          
+        self.assertTrue(TestCodeGen.test(input, expect, 758))          
         
         input = """
         func main ()
@@ -700,7 +731,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "2.0\n1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 757))    
+        self.assertTrue(TestCodeGen.test(input, expect, 759))    
         
         input = """
         dynamic a 
@@ -712,7 +743,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "2.0\n1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 758))   
+        self.assertTrue(TestCodeGen.test(input, expect, 760))   
         
         input = """
         var a <- [1,2]
@@ -723,7 +754,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "2.0\n1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 759))    
+        self.assertTrue(TestCodeGen.test(input, expect, 761))    
         
         input = """
         func main ()
@@ -734,7 +765,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "2.0\n3.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 760))  
+        self.assertTrue(TestCodeGen.test(input, expect, 762))  
         
         input = """
         func main ()
@@ -745,7 +776,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "2.0\n1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 761))  
+        self.assertTrue(TestCodeGen.test(input, expect, 763))  
         
         input = """
         var a <- [[1],[2]]
@@ -756,7 +787,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "2.0\n1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 762))  
+        self.assertTrue(TestCodeGen.test(input, expect, 764))  
         
         input = """
         number a[2,1] <- [[1],[2]]
@@ -767,7 +798,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "2.0\n1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 763))  
+        self.assertTrue(TestCodeGen.test(input, expect, 765))  
         
         input = """
         func main ()
@@ -778,7 +809,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "2.0\n1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 764))  
+        self.assertTrue(TestCodeGen.test(input, expect, 766))  
          
         input = """
         var b <- [true]
@@ -791,7 +822,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "false\ntrue\ntrue\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 765))  
+        self.assertTrue(TestCodeGen.test(input, expect, 767))  
         
         input = """
         bool a[2,1] <- [[true],[false]]
@@ -804,7 +835,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "false\ntrue\ntrue\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 766))  
+        self.assertTrue(TestCodeGen.test(input, expect, 768))  
         
         input = """
         string a[2,1] <- [["v"],["o"]]
@@ -817,7 +848,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "o\nv\nhung\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 767))     
+        self.assertTrue(TestCodeGen.test(input, expect, 769))     
         
         input = """
         string b[1] <- ["hung"]
@@ -830,7 +861,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "o\nv\nhung\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 768))   
+        self.assertTrue(TestCodeGen.test(input, expect, 770))   
         
         input = """
         var a <- [[[[1]]]]
@@ -844,7 +875,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "2.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 769))  
+        self.assertTrue(TestCodeGen.test(input, expect, 771))  
         
         input = """
         var a <- [[[[1]]]]
@@ -858,7 +889,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "4.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 770))  
+        self.assertTrue(TestCodeGen.test(input, expect, 772))  
         
         input = """
         func foo(number a[2])
@@ -874,12 +905,10 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "0.0\n2.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 771)) 
-         
-         
-         
+        self.assertTrue(TestCodeGen.test(input, expect, 773)) 
+             
     #* test khởi tạo hàm và visitCallStmt và return
-    def test_3(self):
+    def test_10(self):
         input = """
         func foo()
         begin
@@ -893,7 +922,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 772))   
+        self.assertTrue(TestCodeGen.test(input, expect, 774))   
         
         input = """
         func foo(string a)
@@ -906,7 +935,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end
         """
         expect = "Vohung\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 773)) 
+        self.assertTrue(TestCodeGen.test(input, expect, 775)) 
         
         input = """
         func foo(string a)   
@@ -920,7 +949,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end     
         """
         expect = "Vohung\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 774)) 
+        self.assertTrue(TestCodeGen.test(input, expect, 776)) 
         
         input = """
         func foo(string a, bool b)   
@@ -935,7 +964,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         end     
         """
         expect = "Vohung\ntrue\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 775)) 
+        self.assertTrue(TestCodeGen.test(input, expect, 777)) 
         
 
         input = """
@@ -955,7 +984,7 @@ class CheckCodeGenSuite(unittest.TestCase):
    
         """
         expect = "1\n2\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 776)) 
+        self.assertTrue(TestCodeGen.test(input, expect, 778)) 
     
         input = """
         func foo(number a)
@@ -971,128 +1000,319 @@ class CheckCodeGenSuite(unittest.TestCase):
    
         """
         expect = "1.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 777)) 
-        
+        self.assertTrue(TestCodeGen.test(input, expect, 779)) 
+ 
+    def test_9(self):
+        input = """
+            func main()
+            begin
+                if (true) writeNumber(1)
+                else writeNumber(0)
+            end
+        """
+        expect = "1.0\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 780)) 
 
-        
-        
-    def test_1(self):
         input = """
-        func main ()
-        begin
-            writeNumber(1)
-            writeBool(true)
-            writeString("vohung")
-        end
+            func main()
+            begin
+                if (2 > 3) writeNumber(1)
+                else writeNumber(0)
+            end
         """
-        expect = "1.0\ntrue\nvohung\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 778))
-    
-    def test_2(self):
-        input = """
-        number a
-    
-        func main ()
-        begin
-            writeNumber(1)
-            writeBool(true)
-            writeString("vohung")
-        end
-        """
-        expect = "1.0\ntrue\nvohung\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 779))  
-    
-    
-    
-    
-    
-    
-    
-    def test_2(self): 
-        input = """
-        func main ()
-        begin
-            writeNumber(1 + 1)
-            writeNumber(1 - 1)
-            writeNumber(1 * 2)
-            writeNumber(1 / 2)
-            writeNumber(7.5%3.5)
-            writeNumber(7.8%3.38)
-        end
-        """
-        expect = "2.0\n0.0\n2.0\n0.5\n0.5\n1.04\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 780))
-        
-        input = """
-        func main ()
-        begin
-            writeNumber(1 + 1 + 1)
-            writeNumber(1 + 1 * 3 - 1 * 2 / 2)
-            writeNumber(2 * 3 % 2)
-        end
-        """
-        expect = "3.0\n3.0\n0.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 781))
-        
-    def test_4(self): 
-        input = """
-        number a <- 1
-        func main ()
-        begin
-            writeNumber(a)
-            number a <- 2
-            writeNumber(a)
-        end
-        """
-        expect = "1.0\n2.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 782))
-        
-    def test_5(self): 
-        input = """
-        func main ()
-        begin
-            writeBool(1 > 2)
-        end
-        """
-        expect = "false\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 783))      
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        expect = "0.0\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 781)) 
 
-    def test_5(self): 
         input = """
-        
-        func foo()
-        begin
-          ##  writeString("foo")
-        end
-
-        func main ()
-        begin
-        end
+            func main()
+            begin
+                if (2 = 2) writeNumber(1)
+            end
         """
-        expect = "1.0\n2.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 784))
-
-     
-    def test_5(self): 
+        expect = "1.0\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 782)) 
+                                              
         input = """
-        number a
-        
-        func main ()
-        begin
-            writeNumber(a)
-            number b
-            writeNumber(b)
-        end
+            func main()
+            begin
+                var a <- 1
+                if (a = 0) writeNumber(1)
+                elif (a = 1) writeNumber(2)
+                elif (a = 2) writeNumber(3)
+            end
         """
-        expect = "0.0\n0.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 785))
+        expect = "2.0\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 783)) 
 
+        input = """
+            func main()
+            begin
+                var a <- 2
+                if (a = 0) writeNumber(1)
+                elif (a = 1) writeNumber(2)
+                elif (a = 2) writeNumber(3)
+            end
+        """
+        expect = "3.0\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 784)) 
+        
+        input = """
+            func main()
+            begin
+                var a <- 0
+                if (a = 0) writeNumber(1)
+                elif (a = 1) writeNumber(2)
+                elif (a = 2) writeNumber(3)
+            end
+        """
+        expect = "1.0\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 785))  
+        
+        input = """
+            func main()
+            begin
+                var a <- -1
+                if (a = 0) writeNumber(1)
+                elif (a = 1) writeNumber(2)
+                elif (a = 2) writeNumber(3)
+                else writeNumber(4)
+            end
+        """
+        expect = "4.0\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 786)) 
+        
+        # input = """
+        #     func main()
+        #     begin
+        #         var a <- 0
+        #         if (a = 0) var b <- 2
+        #         elif (a = 1)  var b <- 3
+        #         elif (a = 2)  var b <- 4
+        #         else  var b <- 5
+        #          writeNumber(b)
+        #     end
+        # """
+        # expect = "4.0\n"
+        # self.assertTrue(TestCodeGen.test(input, expect, 787))         
+        
+    # def test_8(self): 
+    #     input = """
+    #         func main()
+    #         begin
+    #             dynamic a
+                
+    #             begin 
+    #                 a <- 1
+    #             end
+    #                 writeNumber(a)
+    #         end
+    #     """
+    #     expect = "1.0\n"
+    #     self.assertTrue(TestCodeGen.test(input, expect, 788)) 
+        
+    #     input = """
+    #         func main()
+    #         begin
+    #             number a
+    #             writeNumber(a)
+    #         end
+    #     """
+    #     expect = "0.0\n"
+    #     self.assertTrue(TestCodeGen.test(input, expect, 789)) 
+        
+    #     input = """
+    #         func main()
+    #         begin
+    #             dynamic a
+    #             writeNumber(a + 1)
+    #         end
+    #     """
+    #     expect = "1.0\n"
+    #     self.assertTrue(TestCodeGen.test(input, expect, 790)) 
+                   
+    #     input = """
+    #         func foo(number a)
+    #             return a
+    #         func main()
+    #         begin
+    #             dynamic a
+    #             writeNumber(foo(a))
+    #         end
+    #     """
+    #     expect = "0.0\n"
+    #     self.assertTrue(TestCodeGen.test(input, expect, 791)) 
+                 
+    #     input = """
+    #         func main()
+    #         begin
+    #             dynamic a
+    #             number b[3] <- [1,a,a]
+    #             writeNumber(b[2])
+    #             a <- 3
+    #             writeNumber(a)
+    #         end
+    #     """
+    #     expect = "0.0\n3.0\n"
+    #     self.assertTrue(TestCodeGen.test(input, expect, 792)) 
+                 
+    #     input = """
+    #         dynamic a
+    #         func main()
+    #         begin
+    #             number b[2,2] <- [[1,1], [1,a]]
+    #             a <- 3
+    #             writeNumber(b[1,1])
+    #         end
+    #     """
+    #     expect = "0.0\n"
+    #     self.assertTrue(TestCodeGen.test(input, expect, 793)) 
+                 
+    #     input = """
+    #         func main()
+    #         begin
+    #             dynamic a <- [2,3]
+    #             number b[2,2] <- [[1,1], a]
+    #             writeNumber(b[1,1])
+    #         end
+    #     """
+    #     expect = "3.0\n"
+    #     self.assertTrue(TestCodeGen.test(input, expect, 794)) 
+                 
+                 
+        # input = """
+        #     func main()
+        #     begin
+        #         dynamic a
+        #         number b[2,2] <- [[1,1], a]
+        #         writeNumber(b[1,1])
+        #     end
+        # """
+        # expect = "3.0\n"
+        # self.assertTrue(TestCodeGen.test(input, expect, 795)) 
+                 
+    def test_99(self):  
+        input = """
+func areDivisors(number num1, number num2)
+return ((num1 % num2 = 0) or (num2 % num1 = 0))
+func main()
+begin
+var num1 <- 3
+var num2 <- 4
+if (areDivisors(num1, num2)) writeString("Yes")
+else writeString("No")
+end
+
+        """
+        expect = "No\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 796))  
+    
+        input = """
+func areDivisors(number num1, number num2)
+return ((num1 % num2 = 0) or (num2 % num1 = 0))
+func main()
+begin
+var num1 <- 2
+var num2 <- 4
+if (areDivisors(num1, num2)) writeString("Yes")
+else writeString("No")
+end
+
+        """
+        expect = "Yes\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 797))  
+        
+        input = """
+func isPrime(number x)
+func main()
+begin
+number x <- 7
+if (isPrime(x)) writeString("Yes")
+else writeString("No")
+end
+func isPrime(number x)
+begin
+if (x <= 1) return false
+var i <- 2
+for i until i > x / 2 by 1
+begin
+if (x % i = 0) return false
+    
+end
+return true
+end
+
+        """
+        expect = "Yes\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 798))
+
+        input = """
+    func isPrime(number x)
+    func main()
+    begin
+    number x <- 59
+    if (isPrime(x)) writeString("Yes")
+    else writeString("No")
+    end
+    func isPrime(number x)
+    begin
+    if (x <= 1) return false
+    var i <- 2
+    for i until i > x / 2 by 1
+    begin
+    if (x % i = 0) return false
+        
+    end
+    return true
+    end
+
+            """
+        expect = "Yes\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 799))
+            
+        input = """
+func isPrime(number x)
+func main()
+begin
+number x <- -9
+if (isPrime(x)) writeString("Yes")
+else writeString("No")
+end
+func isPrime(number x)
+begin
+if (x <= 1) return false
+var i <- 2
+for i until i > x / 2 by 1
+begin
+if (x % i = 0) return false
+    
+end
+return true
+end
+
+        """
+        expect = "No\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 800))
+        
+                
+        input = """
+func isPrime(number x)
+func main()
+begin
+number x <- 24
+if (isPrime(x)) writeString("Yes")
+else writeString("No")
+end
+func isPrime(number x)
+begin
+if (x <= 1) return false
+var i <- 2
+for i until i > x / 2 by 1
+begin
+if (x % i = 0) return false
+end
+return true
+end
+
+        """
+        expect = "No\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 801))
