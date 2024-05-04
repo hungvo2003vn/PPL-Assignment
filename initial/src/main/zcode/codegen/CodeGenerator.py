@@ -246,6 +246,7 @@ class CodeGenVisitor(BaseVisitor):
             frame=frame
         )
         self.emit.printout(code)
+        self.function.line = self.emit.printIndexNew()
 
         # Enter Scope
         frame.enterScope(True)
@@ -253,17 +254,20 @@ class CodeGenVisitor(BaseVisitor):
         
         # Emit function
         typeParam = []
-        for funcParam in ast.param:
+        forParam = VarDecl(Id("for"), NumberType())
+        for funcParam in (ast.param + [forParam]):
             index = frame.getNewIndex()
             typeParam.append(
                 VarZcode(funcParam.name.name, funcParam.varType, index, init=True) # Warning about init
             )
+            typeParam[-1].line = self.emit.printIndexNew()
+
             code = self.emit.emitVAR(
                 index, 
                 funcParam.name.name, 
                 funcParam.varType, 
                 frame.getStartLabel(), 
-                frame.getEndLabel, 
+                frame.getEndLabel(), 
                 frame
             )
             self.emit.printout(code)
@@ -277,8 +281,18 @@ class CodeGenVisitor(BaseVisitor):
         # Update frame
         frame.returnType = self.function.typ
 
+        # Update function code
+        code = self.emit.emitMETHOD(
+            lexeme=ast.name.name,
+            in_=self.function,
+            isStatic=True,
+            frame=frame
+        )
+        line = self.function.line
+        self.emit.buff[line] = code
+
         # End function
-        # self.emit.printout(self.emit.emitRETURN(self.function.typ, frame))
+        self.emit.printout(self.emit.emitRETURN(self.function.typ, frame))
         self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))
         self.emit.printout(self.emit.emitENDMETHOD(frame))
 
@@ -394,6 +408,9 @@ class CodeGenVisitor(BaseVisitor):
         2: invokestatic ZCodeClass/foo(IZ)V        
         """
         # TH3: Not io, no checkTypeLHS_RHS
+        for arg in ast.args:
+            argCode, _ = self.visit(arg, o)
+            self.emit.printout(argCode)
         return self.emit.emitINVOKESTATIC(
             f"ZCodeClass/{ast.name.name}",
             function,
@@ -562,6 +579,8 @@ class CodeGenVisitor(BaseVisitor):
         iconst_1
         freturn
         """
+        rhsCode, _ = self.visit(RHS, o)
+        self.emit.printout(rhsCode)
         self.emit.emitRETURN(RHS, frame)
 
 
@@ -631,6 +650,9 @@ class CodeGenVisitor(BaseVisitor):
             return None, function.typ if function.typ else function
         
         # TH3: Not io, no checkTypeLHS_RHS
+        for arg in ast.args:
+            argCode, _ = self.visit(arg, o)
+            self.emit.printout(argCode)
         code = self.emit.emitINVOKESTATIC(
             f"ZCodeClass/{ast.name.name}",
             function,
