@@ -15,7 +15,7 @@ class CodeGenerator:
         gc.visit(ast, None)
 
 class Access():
-    def __init__(self, frame, symbol, isLeft, checkTypeLHS_RHS = False):
+    def __init__(self, frame: Frame, symbol: list[list], isLeft: bool, checkTypeLHS_RHS = False):
         self.frame = frame #* không gian stack và local cần dùng để chạy 1 hàm
         self.symbol = symbol #* giống phần param ở BTL3 nhưng này hiện thực list<list>> (có thể dùng list<dict> như btl3)
         self.isLeft = isLeft #* hiện tại vế trên trái hay bên phải để xác định get và put cho biến
@@ -121,10 +121,12 @@ class CodeGenVisitor(BaseVisitor):
         #* khởi tạo các hàm static
         i = 0
         for item in ast.decl:
-            if type(item) is FuncDecl and item.body is not None and item.name.name != "main":
-                self.function = self.Listfunction[i]
-                self.visit(item, Symbol)
             if type(item) is FuncDecl and item.body is not None:
+
+                if item.name.name != "main":
+                    self.function = self.Listfunction[i]
+                    self.visit(item, Symbol)
+                    
                 i += 1
                 
         
@@ -145,7 +147,7 @@ class CodeGenVisitor(BaseVisitor):
         frame.exitScope()    
         self.emit.emitEPILOG()
     
-    def visitVarDecl(self, ast, o):
+    def visitVarDecl(self, ast, o: Access):
         """#TODO: Implement
         #* tạo emitVAR và o.symbol[0].append, cập nhật o.symbol[0][-1].line
         #* if ast.varInit is not None:
@@ -153,50 +155,234 @@ class CodeGenVisitor(BaseVisitor):
         #* elif type(ast.varType) is ArrayType:
             #* giống phần khai báo biến static gần giống ý tưởng
         """
+        frame: Frame = o.frame
+
+        # create new index
+        index = frame.getNewIndex()
+        # emitVAR
+        code = self.emit.emitVAR(
+            in_=index,
+            varName=ast.name.name,
+            inType=ast.varType,
+            fromLabel=frame.getStartLabel(),
+            toLabel=frame.getEndLabel(),
+            frame=frame
+        )
+        self.emit.printout(code)
+        
+        # add new var to symbol
+        newVarDecl = VarZcode(ast.name.name, ast.varType, index)
+        o.symbol[0].append(newVarDecl)
+        o.symbol[0][-1].line = self.emit.printIndexNew()
+
+        # Check varInit
+        if ast.varInit:
+            lhs = ast.name
+            rhs = ast.varInit
+            o.symbol[0][-1].init = True
+            self.visit(Assign(lhs, rhs), o)
+
+        elif type(ast.varType) is ArrayType:
+            
+            # LHS
+            arrayType: ArrayType = ast.varType
+            ## Array 1D
+            if len(arrayType.size) == 1:
+                
+                # Visit NumberLiteral
+                code = self.visit(NumberLiteral(arrayType.size[0]), Access(frame, o.symbol, True))
+                self.emit.printout(code[0])
+
+                # Take 1 int from frame for the array dimension
+                self.emit.printout(self.emit.emitF2I(frame))
+                # Get new array 1D from frame
+                self.emit.printout(self.emit.emitNEWARRAY(arrayType.eleType, frame))
+                # Place this var in static scope
+                self.emit.printout(
+                    self.emit.emitPUTSTATIC(
+                        self.className + "." + ast.name.name,
+                        arrayType,
+                        frame
+                    )
+                )
+            ## Array N-D
+            else:
+                for size in arrayType.size:
+                    
+                    # Visit NumberLiteral
+                    code = self.visit(NumberLiteral(size), Access(frame, o.symbol, True))
+                    self.emit.printout(code[0])
+
+                    # Take 1 int from frame for the array dimension
+                    self.emit.printout(self.emit.emitF2I(frame))
+
+                # Get new array N-D from frame
+                self.emit.printout(self.emit.emitMULTIANEWARRAY(arrayType, frame))
+                # Place this var in static scope
+                self.emit.printout(
+                    self.emit.emitPUTSTATIC(
+                        self.className + "." + ast.name.name,
+                        arrayType,
+                        frame
+                    )
+                )
+        
+        return
+
       
                               
-    def visitFuncDecl(self, ast, Symbol):
+    def visitFuncDecl(self, ast, Symbol: list[list]):
+
         self.Return = False
         """TODO: Implement
         #* giống hàm main, nhưng phần này có param
         """
-     
 
-    def visitId(self, ast, o):
-            frame = o.frame
-            Symbol = o.symbol
-            
-            #* cập nhật type lhs or RHS giống btl3
-            if o.checkTypeLHS_RHS:
-                for item in Symbol:
-                    for sym in item:
-                        if sym.name == ast.name:
-                            return None, sym.typ if sym.typ else sym
+        frame = Frame(ast.name.name, None)
+        code = self.emit.emitMETHOD(
+            lexeme=ast.name.name,
+            in_=self.function,
+            isStatic=True,
+            frame=frame
+        )
+        self.emit.printout(code)
+
+        # Enter Scope
+        frame.enterScope(True)
+        self.emit.printout(self.emit.emitLABEL(frame.getStartLabel(), frame))
+        
+        # Emit function
+        typeParam = []
+        for funcParam in ast.param:
+            index = frame.getNewIndex()
+            typeParam.append(
+                VarZcode(funcParam.name.name, funcParam.varType, index, init=True) # Warning about init
+            )
+            code = self.emit.emitVAR(
+                index, 
+                funcParam.name.name, 
+                funcParam.varType, 
+                frame.getStartLabel(), 
+                frame.getEndLabel, 
+                frame
+            )
+            self.emit.printout(code)
+        
+        # The body already not None, because this method only visit when body is not None
+        self.visit(ast.body, Access(frame, [typeParam] + Symbol, False))
+
+        if not self.Return:
+            if self.function.typ is None:
+                self.function.typ = VoidType()
+        # Update frame
+        frame.returnType = self.function.typ
+
+        # End function
+        # self.emit.printout(self.emit.emitRETURN(self.function.typ, frame))
+        self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))
+        self.emit.printout(self.emit.emitENDMETHOD(frame))
+
+        # Exit Scope
+        frame.exitScope()
+        self.emit.emitEPILOG()
+        self.function = None
+        
+
+    def visitId(self, ast, o: Access):
+
+        frame = o.frame
+        Symbol = o.symbol
+
+        # Update LHS, RHS
+        if o.checkTypeLHS_RHS:
+            for scope in Symbol:
+                for sym in scope:
+                    if sym.name == ast.name:
+                        return None, sym.typ if sym.typ else sym
                                         
+        """#TODO :
+        #* biến cục bộ dùng emitREADVAR, emitWRITEVAR tùy isleft
+        #* biến toàn cục (static)  dùng emitPUTSTATIC, emitGETSTATIC tùy isleft
+        """
+        # Find in all scope
+        sym = None
+        isGlobal = False
+        for i, scope in enumerate(Symbol, 1):
+            for item in scope:
+                if item.name == ast.name:
+                    sym = item
+                    isGlobal = bool(i == len(Symbol)) # Global Scope
+                    break
 
-    def visitCallExpr(self, ast, o):
-        #* phần io -> gọi qua class io.java trong phần lib
-        if ast.name.name in ["readNumber", "readBool", "readString"]:
-            if ast.name.name == "readNumber": 
-                if o.checkTypeLHS_RHS: return None, NumberType()
-                return self.emit.emitINVOKESTATIC(f"io/{ast.name.name}", FuncZcode(ast.name.name, NumberType(), []), o.frame), NumberType
-            elif ast.name.name == "readBool": 
-                if o.checkTypeLHS_RHS: return None, BoolType()
-                return self.emit.emitINVOKESTATIC(f"io/{ast.name.name}", FuncZcode(ast.name.name, BoolType(), []), o.frame), NumberType
-            elif ast.name.name == "readString": 
-                if o.checkTypeLHS_RHS: return None, StringType()
-                return self.emit.emitINVOKESTATIC(f"io/{ast.name.name}", FuncZcode(ast.name.name, StringType(), []), o.frame), NumberType
+            if sym: break
+        
+        # Check scope
+        code = None
+        if not isGlobal:
+            if o.isLeft:
+                code = self.emit.emitWRITEVAR(
+                    sym.name,
+                    sym.typ,
+                    sym.index,
+                    frame
+                )
+            else:
+                code = self.emit.emitREADVAR(
+                    sym.name,
+                    sym.typ,
+                    sym.index,
+                    frame
+                )
+        else:
+            if o.isLeft:
+                code = self.emit.emitPUTSTATIC(
+                    self.className + "/" + sym.name,
+                    sym.typ,
+                    frame
+                )
+            else:
+                code = self.emit.emitGETSTATIC(
+                    self.className + "/" + sym.name,
+                    sym.typ,
+                    frame
+                )
+        
+        return code, sym.typ if sym.typ else sym
 
-        #* tìm function trong self.Listfunction
+    def visitCallExpr(self, ast, o: Access):
+
+        # TH1: Check io -> call via class io.java in the lib
+        ioFunctions = {
+            "readNumber": NumberType(),
+            "readBool": BoolType(),
+            "readString": StringType()
+        }
+        returnType = ioFunctions.get(ast.name.name)
+        if returnType:
+            if o.checkTypeLHS_RHS: return None, returnType
+            return self.emit.emitINVOKESTATIC(
+                f"io/{ast.name.name}", 
+                FuncZcode(ast.name.name, returnType, []), 
+                o.frame
+            ), NumberType
+
+        # Check callFunction in self.Listfunction
         function = None
         for item in self.Listfunction:
             if item.name == ast.name.name:
                 function = item
                 
-        #* cập nhật type lhs or RHS giống btl3
+        # TH2: Update LHS, RHS
         if o.checkTypeLHS_RHS:
-            for i in range(len(function.param)):
-                self.LHS_RHS(function.param[i], ast.args[i], o)
+
+            listParam = function.param
+            listArg = ast.args
+
+            for i in range(len(listParam)):
+                LHS = listParam[i]
+                RHS = listArg[i]
+                self.LHS_RHS(LHS, RHS, o)
+
             return None, function.typ if function.typ else function            
             
         
@@ -207,9 +393,15 @@ class CodeGenVisitor(BaseVisitor):
         1: iconst_1
         2: invokestatic ZCodeClass/foo(IZ)V        
         """
+        # TH3: Not io, no checkTypeLHS_RHS
+        return self.emit.emitINVOKESTATIC(
+            f"ZCodeClass/{ast.name.name}",
+            function,
+            o.frame
+        ), function.typ
      
 
-    def visitBinaryOp(self, ast, o):
+    def visitBinaryOp(self, ast, o: Access):
         op = ast.op
         #* cập nhật type lhs or RHS giống btl3
         if o.checkTypeLHS_RHS:
@@ -251,7 +443,7 @@ class CodeGenVisitor(BaseVisitor):
         """
        
 
-    def visitUnaryOp(self, ast, o):
+    def visitUnaryOp(self, ast, o: Access):
         op = ast.op
         #* cập nhật type lhs or RHS giống btl3
         if o.checkTypeLHS_RHS:
@@ -265,7 +457,7 @@ class CodeGenVisitor(BaseVisitor):
         """
 
     
-    def visitArrayLiteral(self, ast, o):
+    def visitArrayLiteral(self, ast, o: Access):
         frame = o.frame
         #* cập nhật type lhs or RHS giống btl3
         if o.checkTypeLHS_RHS:
@@ -307,7 +499,7 @@ class CodeGenVisitor(BaseVisitor):
                 emitASTORE -> lưu trữ             
         """
        
-    def visitArrayCell(self, ast, o):
+    def visitArrayCell(self, ast, o: Access):
         #* cập nhật type lhs or RHS giống btl3
         if o.checkTypeLHS_RHS:
             _, arr = self.visit(ast.arr, Access(o.frame, o.symbol, False, False))
@@ -341,11 +533,11 @@ class CodeGenVisitor(BaseVisitor):
         
        
         
-    def visitNumberLiteral(self, ast, o):
+    def visitNumberLiteral(self, ast, o: Access):
         return self.emit.emitPUSHCONST(ast.value, NumberType(), o.frame) if not o.checkTypeLHS_RHS else None, NumberType()
-    def visitBooleanLiteral(self, ast, o):
+    def visitBooleanLiteral(self, ast, o: Access):
         return self.emit.emitPUSHCONST(ast.value, BoolType(), o.frame) if not o.checkTypeLHS_RHS else None, BoolType()
-    def visitStringLiteral(self, ast, o):
+    def visitStringLiteral(self, ast, o: Access):
         return self.emit.emitPUSHCONST("\"" + ast.value + "\"", StringType(), o.frame) if not o.checkTypeLHS_RHS else None, StringType()
     def visitArrayType(self, ast, param): return None, ast
     def visitNumberType(self, ast, param): return None, NumberType()
@@ -354,11 +546,13 @@ class CodeGenVisitor(BaseVisitor):
     def visitStringType(self, ast, param): return None, StringType()
     def visitFuncZcode(self, ast, param): return None, ast.typ if ast.typ else ast
     def visitVarZcode(self, ast, param): return None, ast.typ if ast.typ else ast
-    def visitReturn(self, ast, o):
+    def visitReturn(self, ast, o: Access):
         #* CHECK TYPE BTL3
-        self.LHS_RHS(self.function, ast.expr if ast.expr else VoidType(),o)
+        LHS = self.function
+        RHS = ast.expr if ast.expr else VoidType()
+        self.LHS_RHS(LHS, RHS, o)
         
-        self.Return = True #* đã có return
+        self.Return = True
         frame = o.frame
         
         """#TODO emitRETURN
@@ -368,9 +562,10 @@ class CodeGenVisitor(BaseVisitor):
         iconst_1
         freturn
         """
+        self.emit.emitRETURN(RHS, frame)
 
 
-    def visitAssign(self, ast, o):
+    def visitAssign(self, ast, o: Access):
         self.LHS_RHS(ast.lhs, ast.rhs, o)
         frame = o.frame
         rhsCode, _ = self.visit(ast.rhs, Access(frame, o.symbol, False))
@@ -386,33 +581,83 @@ class CodeGenVisitor(BaseVisitor):
         lhsCode
         rhsCode        
         """
+        self.emit.printout(rhsCode)
+        self.emit.printout(lhsCode)
+        
   
     
-    def visitCallStmt(self, ast, o):
-        #* phần io
-        if ast.name.name in ["writeNumber", "writeBool", "writeString"]:
-            if ast.name.name == "writeNumber": self.LHS_RHS(NumberType(), ast.args[0], o)
-            elif ast.name.name == "writeBool": self.LHS_RHS(BoolType(), ast.args[0], o)
-            elif ast.name.name == "writeString": self.LHS_RHS(StringType(), ast.args[0], o)
+    def visitCallStmt(self, ast, o: Access):
+
+        # TH1: Call write IO -> VoidType()
+        ioFunctions = {
+            "writeNumber": NumberType(),
+            "writeBool": BoolType(),
+            "writeString": StringType()
+        }
+        returnType = ioFunctions.get(ast.name.name)
+        if returnType:
             
+            self.LHS_RHS(returnType, ast.args[0], o)
             argsCode, argsType = self.visit(ast.args[0], o)
             self.emit.printout(argsCode)
-            self.emit.printout(self.emit.emitINVOKESTATIC(f"io/{ast.name.name}", FuncZcode(ast.name.name, VoidType(), [argsType]), o.frame))
+
+            code = self.emit.emitINVOKESTATIC(
+                f"io/{ast.name.name}", 
+                FuncZcode(ast.name.name, VoidType(), [argsType]), 
+                o.frame
+            )
+            self.emit.printout(code)
             return
 
+
         """#TODO giống call expr"""
+        # Check callFunction in self.Listfunction
+        function = None
+        for item in self.Listfunction:
+            if item.name == ast.name.name:
+                function = item
+        
+        # TH2: Update LHS, RHS
+        if o.checkTypeLHS_RHS:
+
+            listParam = function.param
+            listArg = ast.args
+
+            for i in range(len(listParam)):
+                LHS = listParam[i]
+                RHS = listArg[i]
+                self.LHS_RHS(LHS, RHS, o)
+
+            return None, function.typ if function.typ else function
+        
+        # TH3: Not io, no checkTypeLHS_RHS
+        code = self.emit.emitINVOKESTATIC(
+            f"ZCodeClass/{ast.name.name}",
+            function,
+            o.frame
+        )
+        self.emit.printout(code)
+
+        return
   
           
-    def visitBlock(self, ast, o):
-        symbolnew = [[]] + o.symbol #! tăng tầm vực
-        o.frame.enterScope(False) #* tầm vực mới
-        self.emit.printout(self.emit.emitLABEL(o.frame.getStartLabel(), o.frame)) #* đánh số tầm vực
+    def visitBlock(self, ast, o: Access):
+        symbolnew = [[]] + o.symbol # increase Scope
+        o.frame.enterScope(False) # new Scope
+
+        code = self.emit.emitLABEL(o.frame.getStartLabel(), o.frame) 
+        self.emit.printout(code)
+        
+        # Visit all statements
         for item in ast.stmt: 
-            self.visit(item,Access(o.frame, symbolnew, False))   
-        self.emit.printout(self.emit.emitLABEL(o.frame.getEndLabel(), o.frame))
-        o.frame.exitScope()  #* kết thức tầm vực
+            self.visit(item, Access(o.frame, symbolnew, False))
+        
+        code = self.emit.emitLABEL(o.frame.getEndLabel(), o.frame)
+        self.emit.printout(code)
+
+        o.frame.exitScope() # End Scope
        
-    def visitIf(self, ast, o):
+    def visitIf(self, ast, o: Access):
         #* CHECK TYPE BTL3       
         self.LHS_RHS(BoolType(), ast.expr, o)        
         for item in ast.elifStmt:
@@ -455,7 +700,7 @@ class CodeGenVisitor(BaseVisitor):
         
         
         
-    def visitFor(self, ast, o):
+    def visitFor(self, ast, o: Access):
         
         #* CHECK TYPE BTL3
         """_typID_"""        
@@ -498,9 +743,13 @@ class CodeGenVisitor(BaseVisitor):
      
         self.visit(Assign(ast.name, Id("for")), o)
 
-    def visitContinue(self, ast, o):
-        self.emit.printout(self.emit.emitGOTO(o.frame.getContinueLabel(), o.frame))
+    def visitContinue(self, ast, o: Access):
 
-    def visitBreak(self, ast, o):
-        self.emit.printout(self.emit.emitGOTO(o.frame.getBreakLabel(), o.frame))
+        code = self.emit.emitGOTO(o.frame.getContinueLabel(), o.frame)
+        self.emit.printout(code)
+
+    def visitBreak(self, ast, o: Access):
+
+        code = self.emit.emitGOTO(o.frame.getBreakLabel(), o.frame)
+        self.emit.printout(code)
         

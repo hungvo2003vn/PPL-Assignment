@@ -218,7 +218,7 @@ class Emitter():
         # frame: Frame
         # ..., value -> ...
 
-        frame.pop()
+        # frame.pop()
 
         frame.pop()
         if type(inType) is NumberType:
