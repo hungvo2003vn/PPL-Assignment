@@ -337,7 +337,7 @@ class Emitter():
         # frame: Frame
 
         typ = in_
-        list(map(lambda x: frame.pop(), typ.param))
+        # list(map(lambda x: frame.pop(), typ.param)) # WARNING fix
         frame.pop()
         if not type(typ) is VoidType:
             frame.push()
