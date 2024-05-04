@@ -458,7 +458,86 @@ class CodeGenVisitor(BaseVisitor):
             '*'
             '-'
         """
-       
+        codeReturn, returnType = None, None
+        if op in ['+', '-']:
+
+            self.emit.printout(codeLeft)
+            self.emit.printout(codeRight)
+            codeReturn = self.emit.emitADDOP(op, NumberType(), o.frame)
+            returnType = NumberType()
+            
+        elif op in ['*', '/']:
+            self.emit.printout(codeLeft)
+            self.emit.printout(codeRight)
+            codeReturn = self.emit.emitMULOP(op, NumberType(), o.frame)
+            returnType = NumberType()
+
+        elif op in ['=', '!=', '<', '>', '>=', '<=']:
+            self.emit.printout(codeLeft)
+            self.emit.printout(codeRight)
+            codeReturn = self.emit.emitREOP(op, NumberType(), o.frame)
+            returnType = BoolType()
+
+        elif op in ['and']:
+            self.emit.printout(codeLeft)
+            self.emit.printout(codeRight)
+            codeReturn = self.emit.emitANDOP(o.frame)
+            returnType = BoolType()
+
+        elif op in ['or']:
+            self.emit.printout(codeLeft)
+            self.emit.printout(codeRight)
+            codeReturn = self.emit.emitOROP(o.frame)
+            returnType = BoolType()
+        
+        elif op in ['==']:
+            self.emit.printout(codeLeft)
+            self.emit.printout(codeRight)
+            codeReturn = self.emit.emitINVOKEVIRTUAL(
+                'java/lang/String/equals', 
+                FuncZcode('java/lang/String/equals', BoolType(), [object()]), 
+                o.frame
+            )
+            returnType = BoolType()
+        
+        elif op in ['...']:
+            self.emit.printout(codeLeft)
+            self.emit.printout(codeRight)
+
+            codeReturn = self.emit.emitINVOKEVIRTUAL(
+                'java/lang/String/concat', 
+                FuncZcode('java/lang/String/concat', StringType(), [StringType()]), 
+                o.frame
+            )
+            returnType = StringType()
+        
+        elif op in ['%']:
+
+            self.emit.printout(codeLeft)
+            self.emit.printout(codeRight)
+            self.emit.printout(codeLeft)
+            self.emit.printout(codeRight)
+
+            # Chia lấy nguyên
+            codeReturn = self.emit.emitMULOP('/', NumberType(), o.frame)
+            # self.emit.printout(codeReturn)
+            # Ép thành int
+            codeReturn = self.emit.emitF2I(o.frame)
+            # self.emit.printout(codeReturn)
+            # Ép lại thành F
+            codeReturn = self.emit.emitI2F(o.frame)
+            # self.emit.printout(codeReturn)
+            # Kết quả nhân với RHS
+            codeReturn = self.emit.emitMULOP('*', NumberType(), o.frame)
+            # self.emit.printout(codeReturn)
+            # LHS - (Kết quả nhân với RHS) = Phần dư
+            codeReturn = self.emit.emitADDOP('-', NumberType(), o.frame)
+
+            returnType = NumberType()
+        
+        return codeReturn, returnType
+
+
 
     def visitUnaryOp(self, ast, o: Access):
         op = ast.op
@@ -472,7 +551,19 @@ class CodeGenVisitor(BaseVisitor):
                 return None, BoolType()
         """#TODO mitNEGOP, emitNOT
         """
+        codeOp, _ = self.visit(ast.operand, o)
+        codeReturn, returnType = None, None
 
+        if op in ['-']:
+            self.emit.printout(codeOp)
+            codeReturn = self.emit.emitNEGOP(NumberType(), o.frame)
+            returnType = NumberType()
+        elif op in ['not']:
+            self.emit.printout(codeOp)
+            codeReturn = self.emit.emitNOT(BoolType(), o.frame)
+            returnType = BoolType()
+        
+        return codeReturn, returnType
     
     def visitArrayLiteral(self, ast, o: Access):
         frame = o.frame
