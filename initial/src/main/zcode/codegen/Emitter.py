@@ -18,13 +18,14 @@ class FuncZcode(Zcode):
 
 
 class VarZcode(Zcode):
-    def __init__(self, name, typ, index):
+    def __init__(self, name, typ, index, init = False):
         self.typ = typ
         self.name = name
         self.index = index # index of variable in memory
         self.line = 0 # row inside buff
+        self.init = init
     def __str__(self):
-        return f"VarZcode(type={self.typ},name={self.name},index={self.index},line={self.line})"
+        return f"VarZcode(type={self.typ},name={self.name},index={self.index},line={self.line},init={self.init})"
 
 class Emitter():
     def __init__(self, filename):
