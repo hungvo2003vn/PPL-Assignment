@@ -514,9 +514,11 @@ class CodeGenVisitor(BaseVisitor):
 
             codeReturn += codeLeft
             codeReturn += codeRight
-            codeReturn += codeLeft
-            codeReturn += codeRight
+            codeReturn += codeLeft # Need 1 frame
+            codeReturn += codeRight # Need 1 frame
 
+            o.frame.push() # Add new frame for codeLeft
+            o.frame.push() # Add new frame for codeRight
             # Chia lấy nguyên
             codeReturn += self.emit.emitMULOP('/', NumberType(), o.frame)
             # Ép thành int
