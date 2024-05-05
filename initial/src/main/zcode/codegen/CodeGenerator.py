@@ -695,45 +695,55 @@ class CodeGenVisitor(BaseVisitor):
         o.frame.exitScope() # End Scope
        
     def visitIf(self, ast, o: Access):
-        #* CHECK TYPE BTL3       
-        self.LHS_RHS(BoolType(), ast.expr, o)        
-        for item in ast.elifStmt:
-            self.LHS_RHS(BoolType(), item[0], o)   
+
+        # Check if condition 
+        LHS = BoolType()
+        RHS = ast.expr 
+        self.LHS_RHS(LHS, RHS, o)  
+        # Check elif condition      
+        for elifStmt in ast.elifStmt:
+            RHS = elifStmt[0]
+            self.LHS_RHS(LHS, RHS, o)   
         
         frame = o.frame
-        """_enterLoop_
-            điều kiện if -> nhảy đến đặt label end if
-                |
-            visit body
-                |
-            goto exit
-                |
-            đặt label end if
-                |
-            nếu có eilf -> for
-                tạo lable mới
-                    |
-                điều kiện -> nhảy lable mới
-                    | 
-                visit
-                    |
-                goto exit
-                    |
-                đặt đến lable mới
-                    |
-            -- end for
-                |
-            nếu có else
-                |
-              visit
-                |
-            lable exit
-        """
-        label_exit = frame.getNewLabel()
-
-
-        self.emit.printout(self.emit.emitLABEL(label_exit, o.frame))  
         
+        # Step 1: Create Loop
+        frame.enterLoop()
+        # Step 2: create exitLabel, endIfLabel
+        exitLabel = frame.getNewLabel()
+        endIfLabel = frame.getNewLabel()
+        # Step 3: Check if condition to jump to endIfLabel
+        condExpCode, _ = self.visit(ast.expr, o)
+        self.emit.printout(condExpCode)
+        self.emit.printout(self.emit.emitIFFALSE(endIfLabel, frame))
+        # Step 4: visit body of thenStmt
+        self.visit(ast.thenStmt, o)
+        # Step 5: goto exit
+        self.emit.printout(self.emit.emitGOTO(exitLabel, frame))
+        # Step 6: Place endIfLabel here
+        self.emit.printout(self.emit.emitLABEL(endIfLabel, frame))
+        # Step 7: Check elifStmt
+        for elifStmt in ast.elifStmt:
+
+            # Step 7.1: Create elifLabel
+            endElifLabel = frame.getNewLabel()
+            # Step 7.2: Check elifCond to jump to endElifLabel
+            condExpCode, _ = self.visit(elifStmt[0], o)
+            self.emit.printout(condExpCode)
+            self.emit.printout(self.emit.emitIFFALSE(endElifLabel, frame))
+            # Step 7.3: visit elifStmt
+            self.visit(elifStmt[1], o)
+            # Step 7.4: goto exit
+            self.emit.printout(self.emit.emitGOTO(exitLabel, frame))
+            # Step 7.5: Place endElifLabel here
+            self.emit.printout(self.emit.emitLABEL(endElifLabel, frame))
+        
+        # Step 8: Check elseStmt
+        if ast.elseStmt: self.visit(ast.elseStmt, o)
+        # Step 9: Place exitLabel here
+        self.emit.printout(self.emit.emitLABEL(exitLabel, frame))  
+        # Step 10: End Loop
+        frame.exitLoop()
         
         
         
