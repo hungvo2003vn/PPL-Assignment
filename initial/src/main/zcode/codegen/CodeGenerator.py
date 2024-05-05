@@ -148,13 +148,7 @@ class CodeGenVisitor(BaseVisitor):
         self.emit.emitEPILOG()
     
     def visitVarDecl(self, ast, o: Access):
-        """#TODO: Implement
-        #* tạo emitVAR và o.symbol[0].append, cập nhật o.symbol[0][-1].line
-        #* if ast.varInit is not None:
-            #* self.visit(Assign(ast.name, ast.varInit), o) 
-        #* elif type(ast.varType) is ArrayType:
-            #* giống phần khai báo biến static gần giống ý tưởng
-        """
+        
         frame: Frame = o.frame
 
         # create new index
@@ -234,9 +228,6 @@ class CodeGenVisitor(BaseVisitor):
     def visitFuncDecl(self, ast, Symbol: list[list]):
 
         self.Return = False
-        """TODO: Implement
-        #* giống hàm main, nhưng phần này có param
-        """
 
         frame = Frame(ast.name.name, None)
         code = self.emit.emitMETHOD(
@@ -314,10 +305,6 @@ class CodeGenVisitor(BaseVisitor):
                     if sym.name == ast.name:
                         return None, sym.typ if sym.typ else sym
                                         
-        """#TODO :
-        #* biến cục bộ dùng emitREADVAR, emitWRITEVAR tùy isleft
-        #* biến toàn cục (static)  dùng emitPUTSTATIC, emitGETSTATIC tùy isleft
-        """
         # Find in all scope
         sym = None
         isGlobal = False
@@ -333,33 +320,11 @@ class CodeGenVisitor(BaseVisitor):
         # Check scope
         code = None
         if not isGlobal:
-            if o.isLeft:
-                code = self.emit.emitWRITEVAR(
-                    sym.name,
-                    sym.typ,
-                    sym.index,
-                    frame
-                )
-            else:
-                code = self.emit.emitREADVAR(
-                    sym.name,
-                    sym.typ,
-                    sym.index,
-                    frame
-                )
+            if o.isLeft: code = self.emit.emitWRITEVAR(sym.name, sym.typ, sym.index, frame)
+            else: code = self.emit.emitREADVAR(sym.name, sym.typ, sym.index, frame)
         else:
-            if o.isLeft:
-                code = self.emit.emitPUTSTATIC(
-                    self.className + "/" + sym.name,
-                    sym.typ,
-                    frame
-                )
-            else:
-                code = self.emit.emitGETSTATIC(
-                    self.className + "/" + sym.name,
-                    sym.typ,
-                    frame
-                )
+            if o.isLeft: code = self.emit.emitPUTSTATIC(self.className + "/" + sym.name, sym.typ, frame)
+            else: code = self.emit.emitGETSTATIC(self.className + "/" + sym.name, sym.typ, frame)
         
         return code, sym.typ if sym.typ else sym
 
@@ -399,14 +364,6 @@ class CodeGenVisitor(BaseVisitor):
 
             return None, function.typ if function.typ else function            
             
-        
-        """#TODO : gọi emitINVOKESTATIC
-        ví dụ : 
-        .line 12 -> foo(1,true)
-        0: iconst_1
-        1: iconst_1
-        2: invokestatic ZCodeClass/foo(IZ)V        
-        """
         # TH3: Not io, no checkTypeLHS_RHS
         codeReturn = ''
         for arg in ast.args:
@@ -446,53 +403,29 @@ class CodeGenVisitor(BaseVisitor):
         
         codeLeft, _ = self.visit(ast.left, o)
         codeRight, _ = self.visit(ast.right, o)
-        """#TODO emitADDOP, emitMULOP, emitREOP, emitANDOP,emitOROP, emitREOP, emitINVOKEVIRTUAL (dùng java/lang/String/concat và java/lang/String/equals)
-        #^ mọi năm có tính toán lười cho and và or năm này thấy thầy ko mô tả lạ thật :((
-        #* khó nhất chắc là % ta dùng như sau 
-            codeLeft
-            codeRight
-            codeLeft
-            codeRight
-            '/'
-            emitF2I -> ép kiểu sang int
-            emitI2F -> từ in ép kiểu ngược lại
-            '*'
-            '-'
-        """
-        codeReturn, returnType = '', None
+        codeReturn, returnType = codeLeft + codeRight, None
+
         if op in ['+', '-']:
-            codeReturn += codeLeft
-            codeReturn += codeRight
             codeReturn += self.emit.emitADDOP(op, NumberType(), o.frame)
             returnType = NumberType()
             
         elif op in ['*', '/']:
-            codeReturn += codeLeft
-            codeReturn += codeRight
             codeReturn += self.emit.emitMULOP(op, NumberType(), o.frame)
             returnType = NumberType()
 
         elif op in ['=', '!=', '<', '>', '>=', '<=']:
-            codeReturn += codeLeft
-            codeReturn += codeRight
             codeReturn += self.emit.emitREOP(op, NumberType(), o.frame)
             returnType = BoolType()
 
         elif op in ['and']:
-            codeReturn += codeLeft
-            codeReturn += codeRight
             codeReturn += self.emit.emitANDOP(o.frame)
             returnType = BoolType()
 
         elif op in ['or']:
-            codeReturn += codeLeft
-            codeReturn += codeRight
             codeReturn += self.emit.emitOROP(o.frame)
             returnType = BoolType()
         
         elif op in ['==']:
-            codeReturn += codeLeft
-            codeReturn += codeRight
             codeReturn += self.emit.emitINVOKEVIRTUAL(
                 'java/lang/String/equals', 
                 FuncZcode('java/lang/String/equals', BoolType(), [object()]), 
@@ -501,8 +434,6 @@ class CodeGenVisitor(BaseVisitor):
             returnType = BoolType()
         
         elif op in ['...']:
-            codeReturn += codeLeft
-            codeReturn += codeRight
             codeReturn += self.emit.emitINVOKEVIRTUAL(
                 'java/lang/String/concat', 
                 FuncZcode('java/lang/String/concat', StringType(), [StringType()]), 
@@ -511,9 +442,6 @@ class CodeGenVisitor(BaseVisitor):
             returnType = StringType()
         
         elif op in ['%']:
-
-            codeReturn += codeLeft
-            codeReturn += codeRight
             codeReturn += codeLeft # Need 1 frame
             codeReturn += codeRight # Need 1 frame
 
@@ -546,8 +474,7 @@ class CodeGenVisitor(BaseVisitor):
             elif op in ['not']:
                 self.LHS_RHS(ast.operand, BoolType(), o)
                 return None, BoolType()
-        """#TODO mitNEGOP, emitNOT
-        """
+        
         codeOp, _ = self.visit(ast.operand, o)
         codeReturn, returnType = '', None
 
@@ -652,7 +579,8 @@ class CodeGenVisitor(BaseVisitor):
     def visitFuncZcode(self, ast, param): return None, ast.typ if ast.typ else ast
     def visitVarZcode(self, ast, param): return None, ast.typ if ast.typ else ast
     def visitReturn(self, ast, o: Access):
-        #* CHECK TYPE BTL3
+        
+        # Check type
         LHS = self.function
         RHS = ast.expr if ast.expr else VoidType()
         self.LHS_RHS(LHS, RHS, o)
@@ -717,7 +645,6 @@ class CodeGenVisitor(BaseVisitor):
             return
 
 
-        """#TODO giống call expr"""
         # Check callFunction in self.Listfunction
         function = None
         for item in self.Listfunction:
@@ -812,45 +739,42 @@ class CodeGenVisitor(BaseVisitor):
         
     def visitFor(self, ast, o: Access):
         
-        #* CHECK TYPE BTL3
-        """_typID_"""        
-        self.LHS_RHS(NumberType(), ast.name, o)        
-        
-        """_typCondExpr_"""    
-        self.LHS_RHS(BoolType(), ast.condExpr, o) 
-
-        """_typUpdExpr_"""            
-        self.LHS_RHS(NumberType(), ast.updExpr, o) 
+        # Check LHS, RHS
+        LHS = [NumberType(), BoolType(), NumberType()]
+        RHS = [ast.name, ast.condExpr, ast.updExpr]
+        for i in range(3):
+            self.LHS_RHS(LHS[i], RHS[i], o)
 
         frame = o.frame
         self.visit(ast.name, o)
         
-        """_enterLoop_
-            gán for <- ast.name
-                |
-            tạo Loop
-                |
-            lable_new
-                |
-            kiểm tra exp để goto đến lable_Break
-                |
-            visit body
-                |
-            đặt lable continue
-                |
-            gọi phép gán Assign(ast.name, BinaryOp('+', ast.name, ast.updExpr))
-                |
-            goto đến lable_new
-                |
-            đặt lable_Break
-                |
-            end loop
-                |
-            gán for <- ast.name
-            
-        """
+        # Step 1: Assign for = ast.name
         self.visit(Assign(Id("for"), ast.name), o)
-     
+        # Step 2: Create Loop
+        frame.enterLoop()
+        # Step 3: For Label, Break Label, Continue Label
+        forLabel = frame.getNewLabel()
+        breakLabel = frame.getBreakLabel()
+        continueLabel = frame.getContinueLabel()
+        # Step 3': Place forLabel here
+        self.emit.printout(self.emit.emitLABEL(forLabel, frame))
+        # Step 4: Check exp to jump to breakLabel
+        expCode, _ = self.visit(ast.condExpr, Access(frame, o.symbol, False))
+        self.emit.printout(expCode)
+        self.emit.printout(self.emit.emitIFTRUE(breakLabel, frame)) # Yes it is =))
+        # Step 5: visit body
+        self.visit(ast.body, o)
+        # Step 6: Place continueLabel here
+        self.emit.printout(self.emit.emitLABEL(continueLabel, frame))
+        # Step 7: Update Expr
+        self.visit(Assign(ast.name, BinaryOp('+', ast.name, ast.updExpr)), o)
+        # Step 8: Go back to forLabel
+        self.emit.printout(self.emit.emitGOTO(forLabel, frame))
+        # Step 9: Place breakLabel here
+        self.emit.printout(self.emit.emitLABEL(breakLabel, frame))
+        # Step 10: End Loop
+        frame.exitLoop()
+        # Step 11: Assign ast.name = for
         self.visit(Assign(ast.name, Id("for")), o)
 
     def visitContinue(self, ast, o: Access):
