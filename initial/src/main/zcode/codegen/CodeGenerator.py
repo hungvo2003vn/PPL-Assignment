@@ -298,7 +298,7 @@ class CodeGenVisitor(BaseVisitor):
 
         # Exit Scope
         frame.exitScope()
-        self.emit.emitEPILOG()
+        # self.emit.emitEPILOG()
         self.function = None
         
 
@@ -408,10 +408,11 @@ class CodeGenVisitor(BaseVisitor):
         2: invokestatic ZCodeClass/foo(IZ)V        
         """
         # TH3: Not io, no checkTypeLHS_RHS
+        codeReturn = ''
         for arg in ast.args:
             argCode, _ = self.visit(arg, o)
-            self.emit.printout(argCode)
-        return self.emit.emitINVOKESTATIC(
+            codeReturn += argCode
+        return codeReturn + self.emit.emitINVOKESTATIC(
             f"ZCodeClass/{ast.name.name}",
             function,
             o.frame
@@ -458,42 +459,41 @@ class CodeGenVisitor(BaseVisitor):
             '*'
             '-'
         """
-        codeReturn, returnType = None, None
+        codeReturn, returnType = '', None
         if op in ['+', '-']:
-
-            self.emit.printout(codeLeft)
-            self.emit.printout(codeRight)
-            codeReturn = self.emit.emitADDOP(op, NumberType(), o.frame)
+            codeReturn += codeLeft
+            codeReturn += codeRight
+            codeReturn += self.emit.emitADDOP(op, NumberType(), o.frame)
             returnType = NumberType()
             
         elif op in ['*', '/']:
-            self.emit.printout(codeLeft)
-            self.emit.printout(codeRight)
-            codeReturn = self.emit.emitMULOP(op, NumberType(), o.frame)
+            codeReturn += codeLeft
+            codeReturn += codeRight
+            codeReturn += self.emit.emitMULOP(op, NumberType(), o.frame)
             returnType = NumberType()
 
         elif op in ['=', '!=', '<', '>', '>=', '<=']:
-            self.emit.printout(codeLeft)
-            self.emit.printout(codeRight)
-            codeReturn = self.emit.emitREOP(op, NumberType(), o.frame)
+            codeReturn += codeLeft
+            codeReturn += codeRight
+            codeReturn += self.emit.emitREOP(op, NumberType(), o.frame)
             returnType = BoolType()
 
         elif op in ['and']:
-            self.emit.printout(codeLeft)
-            self.emit.printout(codeRight)
-            codeReturn = self.emit.emitANDOP(o.frame)
+            codeReturn += codeLeft
+            codeReturn += codeRight
+            codeReturn += self.emit.emitANDOP(o.frame)
             returnType = BoolType()
 
         elif op in ['or']:
-            self.emit.printout(codeLeft)
-            self.emit.printout(codeRight)
-            codeReturn = self.emit.emitOROP(o.frame)
+            codeReturn += codeLeft
+            codeReturn += codeRight
+            codeReturn += self.emit.emitOROP(o.frame)
             returnType = BoolType()
         
         elif op in ['==']:
-            self.emit.printout(codeLeft)
-            self.emit.printout(codeRight)
-            codeReturn = self.emit.emitINVOKEVIRTUAL(
+            codeReturn += codeLeft
+            codeReturn += codeRight
+            codeReturn += self.emit.emitINVOKEVIRTUAL(
                 'java/lang/String/equals', 
                 FuncZcode('java/lang/String/equals', BoolType(), [object()]), 
                 o.frame
@@ -501,10 +501,9 @@ class CodeGenVisitor(BaseVisitor):
             returnType = BoolType()
         
         elif op in ['...']:
-            self.emit.printout(codeLeft)
-            self.emit.printout(codeRight)
-
-            codeReturn = self.emit.emitINVOKEVIRTUAL(
+            codeReturn += codeLeft
+            codeReturn += codeRight
+            codeReturn += self.emit.emitINVOKEVIRTUAL(
                 'java/lang/String/concat', 
                 FuncZcode('java/lang/String/concat', StringType(), [StringType()]), 
                 o.frame
@@ -513,25 +512,21 @@ class CodeGenVisitor(BaseVisitor):
         
         elif op in ['%']:
 
-            self.emit.printout(codeLeft)
-            self.emit.printout(codeRight)
-            self.emit.printout(codeLeft)
-            self.emit.printout(codeRight)
+            codeReturn += codeLeft
+            codeReturn += codeRight
+            codeReturn += codeLeft
+            codeReturn += codeRight
 
             # Chia lấy nguyên
-            codeReturn = self.emit.emitMULOP('/', NumberType(), o.frame)
-            # self.emit.printout(codeReturn)
+            codeReturn += self.emit.emitMULOP('/', NumberType(), o.frame)
             # Ép thành int
-            codeReturn = self.emit.emitF2I(o.frame)
-            # self.emit.printout(codeReturn)
+            codeReturn += self.emit.emitF2I(o.frame)
             # Ép lại thành F
-            codeReturn = self.emit.emitI2F(o.frame)
-            # self.emit.printout(codeReturn)
+            codeReturn += self.emit.emitI2F(o.frame)
             # Kết quả nhân với RHS
-            codeReturn = self.emit.emitMULOP('*', NumberType(), o.frame)
-            # self.emit.printout(codeReturn)
+            codeReturn += self.emit.emitMULOP('*', NumberType(), o.frame)
             # LHS - (Kết quả nhân với RHS) = Phần dư
-            codeReturn = self.emit.emitADDOP('-', NumberType(), o.frame)
+            codeReturn += self.emit.emitADDOP('-', NumberType(), o.frame)
 
             returnType = NumberType()
         
@@ -552,15 +547,15 @@ class CodeGenVisitor(BaseVisitor):
         """#TODO mitNEGOP, emitNOT
         """
         codeOp, _ = self.visit(ast.operand, o)
-        codeReturn, returnType = None, None
+        codeReturn, returnType = '', None
 
         if op in ['-']:
-            self.emit.printout(codeOp)
-            codeReturn = self.emit.emitNEGOP(NumberType(), o.frame)
+            codeReturn += codeOp
+            codeReturn += self.emit.emitNEGOP(NumberType(), o.frame)
             returnType = NumberType()
         elif op in ['not']:
-            self.emit.printout(codeOp)
-            codeReturn = self.emit.emitNOT(BoolType(), o.frame)
+            codeReturn += codeOp
+            codeReturn += self.emit.emitNOT(BoolType(), o.frame)
             returnType = BoolType()
         
         return codeReturn, returnType
