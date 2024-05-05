@@ -283,7 +283,7 @@ class CodeGenVisitor(BaseVisitor):
         self.emit.buff[line] = code
 
         # End function
-        self.emit.printout(self.emit.emitRETURN(self.function.typ, frame))
+        if not self.Return: self.emit.printout(self.emit.emitRETURN(self.function.typ, frame))
         self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))
         self.emit.printout(self.emit.emitENDMETHOD(frame))
 
@@ -595,9 +595,9 @@ class CodeGenVisitor(BaseVisitor):
         iconst_1
         freturn
         """
-        rhsCode, _ = self.visit(RHS, o)
-        self.emit.printout(rhsCode)
-        self.emit.emitRETURN(RHS, frame)
+        rhsCode, rhsType = self.visit(RHS, o)
+        if rhsCode: self.emit.printout(rhsCode)
+        self.emit.printout(self.emit.emitRETURN(rhsType, frame))
 
 
     def visitAssign(self, ast, o: Access):
