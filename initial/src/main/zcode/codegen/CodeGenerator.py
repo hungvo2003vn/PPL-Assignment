@@ -654,13 +654,6 @@ class CodeGenVisitor(BaseVisitor):
         self.Return = True
         frame = o.frame
         
-        """#TODO emitRETURN
-        #* TH1 : nếu  ast.expr is None
-        #* TH2 : Ngc lại
-        vd : return 1
-        iconst_1
-        freturn
-        """
         rhsCode, rhsType = self.visit(RHS, o)
         if rhsCode: self.emit.printout(rhsCode)
         self.emit.printout(self.emit.emitRETURN(rhsType, frame))
@@ -671,17 +664,6 @@ class CodeGenVisitor(BaseVisitor):
         frame = o.frame
         rhsCode, _ = self.visit(ast.rhs, Access(frame, o.symbol, False))
         lhsCode, _ = self.visit(ast.lhs, Access(frame, o.symbol, True))
-        
-        """TODO
-        TH1 : LHS = ArrayCell
-        lhsCode
-        rhsCode
-        self.emit.emitASTORE(self.arrayCell, frame))
-        
-        TH2 : 
-        lhsCode
-        rhsCode        
-        """
 
         if type(ast.lhs) is ArrayCell:
             code = self.emit.emitASTORE(self.arrayCell, frame)
