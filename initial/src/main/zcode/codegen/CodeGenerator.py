@@ -153,19 +153,19 @@ class CodeGenVisitor(BaseVisitor):
 
         # create new index
         index = frame.getNewIndex()
+        newVarDecl = VarZcode(ast.name.name, ast.varType, index)
         # emitVAR
         code = self.emit.emitVAR(
             in_=index,
             varName=ast.name.name,
-            inType=ast.varType,
+            inType=newVarDecl,
             fromLabel=frame.getStartLabel(),
             toLabel=frame.getEndLabel(),
             frame=frame
         )
         self.emit.printout(code)
-        
+
         # add new var to symbol
-        newVarDecl = VarZcode(ast.name.name, ast.varType, index)
         o.symbol[0].append(newVarDecl)
         o.symbol[0][-1].line = self.emit.printIndexNew()
 
@@ -191,12 +191,13 @@ class CodeGenVisitor(BaseVisitor):
                 self.emit.printout(self.emit.emitF2I(frame))
                 # Get new array 1D from frame
                 self.emit.printout(self.emit.emitNEWARRAY(arrayType.eleType, frame))
-                # Place this var in static scope
+                # Place this var in scope
                 self.emit.printout(
-                    self.emit.emitPUTSTATIC(
-                        self.className + "." + ast.name.name,
-                        arrayType,
-                        frame
+                    self.emit.emitWRITEVAR(
+                        name=ast.name.name,
+                        inType=arrayType,
+                        index=index,
+                        frame=frame
                     )
                 )
             ## Array N-D
@@ -212,14 +213,18 @@ class CodeGenVisitor(BaseVisitor):
 
                 # Get new array N-D from frame
                 self.emit.printout(self.emit.emitMULTIANEWARRAY(arrayType, frame))
-                # Place this var in static scope
+                # Place this var in scope
                 self.emit.printout(
-                    self.emit.emitPUTSTATIC(
-                        self.className + "." + ast.name.name,
-                        arrayType,
-                        frame
+                    self.emit.emitWRITEVAR(
+                        name=ast.name.name,
+                        inType=arrayType,
+                        index=index,
+                        frame=frame
                     )
                 )
+
+        # Set type for VarDecl in buff
+        self.emit.setType(o.symbol[0][-1])
         
         return
 
@@ -677,12 +682,15 @@ class CodeGenVisitor(BaseVisitor):
         lhsCode
         rhsCode        
         """
-        self.emit.printout(rhsCode)
-        self.emit.printout(lhsCode)
 
         if type(ast.lhs) is ArrayCell:
             code = self.emit.emitASTORE(self.arrayCell, frame)
+            self.emit.printout(lhsCode)
+            self.emit.printout(rhsCode)
             self.emit.printout(code)
+        else:
+            self.emit.printout(rhsCode)
+            self.emit.printout(lhsCode)
         
   
     
