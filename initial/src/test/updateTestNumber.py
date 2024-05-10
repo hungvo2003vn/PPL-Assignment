@@ -2,7 +2,7 @@ import os
 import re
 
 def update_test_numbers(file_name, start_number):
-    file_path = os.path.join(os.getcwd(), 'test', file_name)
+    file_path = os.path.join(os.getcwd(), file_name)
     with open(file_path, 'r', encoding='utf-8') as file:
         content = file.read()
 
