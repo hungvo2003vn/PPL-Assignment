@@ -490,8 +490,9 @@ class CodeGenVisitor(BaseVisitor):
         return codeReturn, returnType
     
     def visitArrayLiteral(self, ast, o: Access):
+
         frame = o.frame
-        #* cập nhật type lhs or RHS giống btl3
+        # Update LHS, RHS
         if o.checkTypeLHS_RHS:
             mainTyp = None
             for item in ast.value:
@@ -530,9 +531,41 @@ class CodeGenVisitor(BaseVisitor):
                 visit -> giá trị biến
                 emitASTORE -> lưu trữ             
         """
+        _, typeArray = self.visit(ast.value[0], o)
+        codeReturn, returnType = "", typeArray
+
+        codeReturn += self.emit.emitPUSHCONST(len(ast.value), NumberType(), frame)
+        codeReturn += self.emit.emitF2I(frame)
+
+        # If 1D-array
+        if not type(returnType) is ArrayType:
+            codeReturn += self.emit.emitNEWARRAY(returnType, frame)
+        # If ND-array
+        else:
+            codeReturn += self.emit.emitANEWARRAY(returnType, frame)
+        
+        for idx in range(len(ast.value)):
+
+            codeReturn += self.emit.emitDUP(frame)
+            codeReturn += self.emit.emitPUSHCONST(idx, NumberType(), frame)
+            codeReturn += self.emit.emitF2I(frame)
+
+            # Store value of array element
+            code, _ = self.visit(ast.value[idx], o)
+            codeReturn += code
+            # Store array
+            codeReturn += self.emit.emitASTORE(returnType, frame)
+        
+        # Return
+        if isinstance(returnType, (BoolType, StringType, NumberType)):
+                return codeReturn, ArrayType([len(ast.value)], returnType)
+        return codeReturn, ArrayType([float(len(ast.value))] + returnType.size, returnType.eleType)
+
+
        
     def visitArrayCell(self, ast, o: Access):
-        #* cập nhật type lhs or RHS giống btl3
+
+        # Update LHS, RHS
         if o.checkTypeLHS_RHS:
             _, arr = self.visit(ast.arr, Access(o.frame, o.symbol, False, False))
             for i in ast.idx:
@@ -551,7 +584,7 @@ class CodeGenVisitor(BaseVisitor):
             giá trị tại index = -1
             f2i
             float/bload/aload(string)  (nếu o.isLeft thì bỏ qua không gọi mà gán self.arrayCell = typ)  
-    
+        
         #* trường hợp tra về magnr
             visit(ast.arr) -> lấy ra get/put/read/write
             for 0 -> size - 1
@@ -562,9 +595,37 @@ class CodeGenVisitor(BaseVisitor):
             f2i
             aload -> địa chỉ   (nếu o.isLeft thì bỏ qua không gọi mà gán self.arrayCell = typ)            
         """
+        frame = o.frame
+        codeArray, typeArray = self.visit(ast.arr, Access(o.frame, o.symbol, False, False))
+        codeReturn = codeArray
+        returnType = typeArray.eleType if type(typeArray) is ArrayType else typeArray
+            
+        lenArrayCell = len(ast.idx)
+        for idx in range(lenArrayCell - 1):
+            
+            code, _ = self.visit(ast.idx[idx], o)
+            codeReturn += code # Get idx of array code
+            codeReturn += self.emit.emitF2I(frame) # Convert Float to Int
+            codeReturn += self.emit.emitALOAD(typeArray, frame) # Load array[idx] address
         
-       
-        
+        # Last index
+        code, _ = self.visit(ast.idx[-1], Access(o.frame, o.symbol, False, False))
+        codeReturn += code
+        codeReturn += self.emit.emitF2I(frame)
+
+        if o.isLeft:
+            self.arrayCell = returnType
+        else:
+            typ = None
+            if type(typeArray) is ArrayType:
+                typ = typeArray.eleType if len(ast.idx) == len(typeArray.size) else typeArray
+            else:
+                typ = typeArray
+            codeReturn += self.emit.emitALOAD(typ, frame)
+
+        return codeReturn, returnType
+
+
     def visitNumberLiteral(self, ast, o: Access):
         return self.emit.emitPUSHCONST(ast.value, NumberType(), o.frame) if not o.checkTypeLHS_RHS else None, NumberType()
     def visitBooleanLiteral(self, ast, o: Access):
@@ -618,6 +679,10 @@ class CodeGenVisitor(BaseVisitor):
         """
         self.emit.printout(rhsCode)
         self.emit.printout(lhsCode)
+
+        if type(ast.lhs) is ArrayCell:
+            code = self.emit.emitASTORE(self.arrayCell, frame)
+            self.emit.printout(code)
         
   
     
@@ -708,7 +773,6 @@ class CodeGenVisitor(BaseVisitor):
         frame = o.frame
         
         # Step 1: Create Loop
-        frame.enterLoop()
         # Step 2: create exitLabel, endIfLabel
         exitLabel = frame.getNewLabel()
         endIfLabel = frame.getNewLabel()
@@ -742,8 +806,6 @@ class CodeGenVisitor(BaseVisitor):
         if ast.elseStmt: self.visit(ast.elseStmt, o)
         # Step 9: Place exitLabel here
         self.emit.printout(self.emit.emitLABEL(exitLabel, frame))  
-        # Step 10: End Loop
-        frame.exitLoop()
         
         
         
