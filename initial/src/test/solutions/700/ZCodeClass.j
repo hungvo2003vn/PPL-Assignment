@@ -30,7 +30,7 @@ Label2:
 	invokestatic io/writeNumber(F)V
 	iconst_1
 	invokestatic io/writeBool(Z)V
-	ldc "vohung"
+	ldc "votien"
 	invokestatic io/writeString(Ljava/lang/String;)V
 Label3:
 	return

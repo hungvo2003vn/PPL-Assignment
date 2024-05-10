@@ -1,10 +1,12 @@
 
-        func foo(number a)
+        dynamic a <-1
+        func foo()
         begin
-            return true
+            a <- 3
         end
         func main ()
         begin
-            writeBool(foo(2))
+            foo()
+            writeNumber(a)
         end
         

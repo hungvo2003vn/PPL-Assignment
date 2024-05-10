@@ -27,8 +27,8 @@ Label0:
 .var 0 is args Ljava/lang/String; from Label0 to Label1
 .var 1 is for F from Label0 to Label1
 Label2:
-.var 2 is b Ljava/lang/Object; from Label2 to Label3
-	ldc "vohung"
+.var 2 is b Ljava/lang/String; from Label2 to Label3
+	ldc "votien"
 	astore_2
 Label4:
 	aload_2

@@ -1,16 +1,9 @@
 
-        func foo()
-        begin
-            writeString("1")
-        end  
-        func foo1()
-        begin
-            writeString("2")
-        end  
+        dynamic a 
         func main ()
         begin
-            foo()
-            foo1()
+            a <- [1,2]
+            writeNumber(a[1])
+            writeNumber(a[0])
         end
-   
         

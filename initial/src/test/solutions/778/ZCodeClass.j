@@ -1,6 +1,7 @@
 .source ZCodeClass.java
 .class public ZCodeClass
 .super java.lang.Object
+.field static a [F
 
 .method public <init>()V
 Label0:
@@ -21,42 +22,38 @@ Label1:
 .limit locals 0
 .end method
 
-.method public static foo()V
-Label0:
-.var 0 is for F from Label0 to Label1
-Label2:
-	ldc "1"
-	invokestatic io/writeString(Ljava/lang/String;)V
-Label3:
-	return
-Label1:
-.limit stack 1
-.limit locals 1
-.end method
-
-.method public static foo1()V
-Label0:
-.var 0 is for F from Label0 to Label1
-Label2:
-	ldc "2"
-	invokestatic io/writeString(Ljava/lang/String;)V
-Label3:
-	return
-Label1:
-.limit stack 1
-.limit locals 1
-.end method
-
 .method public static main([Ljava/lang/String;)V
 Label0:
 .var 0 is args Ljava/lang/String; from Label0 to Label1
 .var 1 is for F from Label0 to Label1
 Label2:
-	invokestatic ZCodeClass/foo()V
-	invokestatic ZCodeClass/foo1()V
+	ldc 2.0000
+	f2i
+	newarray float
+	dup
+	ldc 0.0000
+	f2i
+	ldc 1.0000
+	fastore
+	dup
+	ldc 1.0000
+	f2i
+	ldc 2.0000
+	fastore
+	putstatic ZCodeClass/a [F
+	getstatic ZCodeClass/a [F
+	ldc 1.0000
+	f2i
+	faload
+	invokestatic io/writeNumber(F)V
+	getstatic ZCodeClass/a [F
+	ldc 0.0000
+	f2i
+	faload
+	invokestatic io/writeNumber(F)V
 Label3:
 	return
 Label1:
-.limit stack 0
+.limit stack 5
 .limit locals 2
 .end method

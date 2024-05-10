@@ -1,13 +1,8 @@
 
-        func foo(number a)
-        begin
-            writeNumber(a)
-        end  
+        var a <- [1,2]
         func main ()
         begin
-            dynamic a
-            a <- 1
-            foo(a)
+            writeNumber(a[1])
+            writeNumber(a[0])
         end
-   
         

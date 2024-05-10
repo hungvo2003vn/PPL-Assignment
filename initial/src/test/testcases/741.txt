@@ -3,6 +3,8 @@
         begin
             var i <- 0
             for i until i >= 2 by 1
-                break
+                writeNumber(i)
+                
+            writeNumber(i)
         end
         

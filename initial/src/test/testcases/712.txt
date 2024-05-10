@@ -1,10 +1,16 @@
 
-        func foo(string a)
+        dynamic a <- 1
+        func foo()
         begin
-            return a
+            begin
+                number a <- 2
+            end
+            writeNumber(a)
+            a <- 3
         end
         func main ()
         begin
-            writeString(foo("vo"))
+            foo()
+            writeNumber(a)
         end
         

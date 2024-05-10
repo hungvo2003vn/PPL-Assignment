@@ -29,7 +29,7 @@ Label0:
 .var 0 is a F from Label0 to Label1
 .var 1 is for F from Label0 to Label1
 Label2:
-.var 2 is a Ljava/lang/Object; from Label2 to Label3
+.var 2 is a F from Label2 to Label3
 	ldc 3.0000
 	fstore_2
 	fload_2

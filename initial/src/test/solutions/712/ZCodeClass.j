@@ -1,6 +1,7 @@
 .source ZCodeClass.java
 .class public ZCodeClass
 .super java.lang.Object
+.field static a F
 
 .method public <init>()V
 Label0:
@@ -15,20 +16,29 @@ Label1:
 
 .method public static <clinit>()V
 Label0:
+	ldc 1.0000
+	putstatic ZCodeClass/a F
 	return
 Label1:
-.limit stack 0
+.limit stack 1
 .limit locals 0
 .end method
 
-.method public static foo(Ljava/lang/String;)Ljava/lang/String;
+.method public static foo()V
 Label0:
-.var 0 is a Ljava/lang/String; from Label0 to Label1
-.var 1 is for F from Label0 to Label1
+.var 0 is for F from Label0 to Label1
 Label2:
-	aload_0
-	areturn
+Label4:
+.var 1 is a F from Label4 to Label5
+	ldc 2.0000
+	fstore_1
+Label5:
+	getstatic ZCodeClass/a F
+	invokestatic io/writeNumber(F)V
+	ldc 3.0000
+	putstatic ZCodeClass/a F
 Label3:
+	return
 Label1:
 .limit stack 1
 .limit locals 2
@@ -39,9 +49,9 @@ Label0:
 .var 0 is args Ljava/lang/String; from Label0 to Label1
 .var 1 is for F from Label0 to Label1
 Label2:
-	ldc "vo"
-	invokestatic ZCodeClass/foo(Ljava/lang/String;)Ljava/lang/String;
-	invokestatic io/writeString(Ljava/lang/String;)V
+	invokestatic ZCodeClass/foo()V
+	getstatic ZCodeClass/a F
+	invokestatic io/writeNumber(F)V
 Label3:
 	return
 Label1:

@@ -1,11 +1,8 @@
 
-        func foo(string a)   
         func main ()
         begin
-            foo("Vohung")
+            number a[2] <- [1,2]
+            writeNumber(a[1])
+            writeNumber(a[0])
         end
-        func foo(string a)
-        begin
-            writeString(a)
-        end     
         

@@ -26,41 +26,39 @@ Label0:
 .var 0 is args Ljava/lang/String; from Label0 to Label1
 .var 1 is for F from Label0 to Label1
 Label2:
-.var 2 is i Ljava/lang/Object; from Label2 to Label3
-	ldc 0.0000
-	fstore_2
-	fload_2
-	fstore_1
-Label6:
-	fload_2
-	ldc 2.0000
-	fcmpl
-	iflt Label7
 	iconst_1
-	goto Label8
-Label7:
-	iconst_0
-Label8:
-	ifgt Label5
-Label9:
-	fload_2
-	invokestatic io/writeNumber(F)V
-	goto Label4
-	fload_2
-	invokestatic io/writeNumber(F)V
-Label10:
+	ifgt Label4
+	iconst_1
+	goto Label5
 Label4:
-	fload_2
-	ldc 1.0000
-	fadd
-	fstore_2
-	goto Label6
+	iconst_0
 Label5:
-	fload_1
-	fstore_2
+	ifgt Label6
+	iconst_1
+	goto Label7
+Label6:
+	iconst_0
+Label7:
+	invokestatic io/writeBool(Z)V
+	iconst_1
+	ifgt Label8
+	iconst_1
+	goto Label9
+Label8:
+	iconst_0
+Label9:
+	invokestatic io/writeBool(Z)V
+	iconst_0
+	ifgt Label10
+	iconst_1
+	goto Label11
+Label10:
+	iconst_0
+Label11:
+	invokestatic io/writeBool(Z)V
 Label3:
 	return
 Label1:
-.limit stack 3
-.limit locals 3
+.limit stack 5
+.limit locals 2
 .end method

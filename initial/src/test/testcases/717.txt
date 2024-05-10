@@ -1,9 +1,10 @@
 
-        func foo()
-            return "vohung"
+        func foo(string a)
+        begin
+            return a
+        end
         func main ()
         begin
-            var a <- foo() ## true
-            writeString(a)
+            writeString(foo("vo"))
         end
         

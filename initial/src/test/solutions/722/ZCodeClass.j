@@ -21,44 +21,29 @@ Label1:
 .limit locals 0
 .end method
 
+.method public static foo()Ljava/lang/String;
+Label0:
+.var 0 is for F from Label0 to Label1
+	ldc "votien"
+	areturn
+Label1:
+.limit stack 1
+.limit locals 1
+.end method
+
 .method public static main([Ljava/lang/String;)V
 Label0:
 .var 0 is args Ljava/lang/String; from Label0 to Label1
 .var 1 is for F from Label0 to Label1
 Label2:
-	ldc 1.0000
-	ldc 2.0000
-	fcmpl
-	ifge Label4
-	iconst_1
-	goto Label5
-Label4:
-	iconst_0
-Label5:
-	invokestatic io/writeBool(Z)V
-	ldc 2.0000
-	ldc 1.0000
-	fcmpl
-	ifge Label6
-	iconst_1
-	goto Label7
-Label6:
-	iconst_0
-Label7:
-	invokestatic io/writeBool(Z)V
-	ldc 1.0000
-	ldc 1.0000
-	fcmpl
-	ifge Label8
-	iconst_1
-	goto Label9
-Label8:
-	iconst_0
-Label9:
-	invokestatic io/writeBool(Z)V
+.var 2 is a Ljava/lang/String; from Label2 to Label3
+	invokestatic ZCodeClass/foo()Ljava/lang/String;
+	astore_2
+	aload_2
+	invokestatic io/writeString(Ljava/lang/String;)V
 Label3:
 	return
 Label1:
-.limit stack 2
-.limit locals 2
+.limit stack 1
+.limit locals 3
 .end method

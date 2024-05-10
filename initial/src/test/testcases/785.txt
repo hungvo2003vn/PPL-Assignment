@@ -1,9 +1,10 @@
 
-            func main()
-            begin
-                var a <- 0
-                if (a = 0) writeNumber(1)
-                elif (a = 1) writeNumber(2)
-                elif (a = 2) writeNumber(3)
-            end
+        var b <- [true]
+        func main ()
+        begin
+            bool a[2,1] <- [[true],[false]]
+            writeBool(a[1,0])
+            writeBool(a[0,0])
+            writeBool(b[0])
+        end
         

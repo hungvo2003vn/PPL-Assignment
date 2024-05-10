@@ -1,8 +1,9 @@
 
+        func foo()
+            return true
         func main ()
         begin
-            writeBool(1 >= 2)
-            writeBool(2 >= 1) 
-            writeBool(1 >= 1) 
+            var a <- foo() ## true
+            writeBool(a)
         end
         

@@ -1,9 +1,8 @@
 
-            func main()
-            begin
-                var a <- 2
-                if (a = 0) writeNumber(1)
-                elif (a = 1) writeNumber(2)
-                elif (a = 2) writeNumber(3)
-            end
+        func main ()
+        begin
+            number a[2,1] <- [[1],[2]]
+            writeNumber(a[1,0])
+            writeNumber(a[0,0])
+        end
         

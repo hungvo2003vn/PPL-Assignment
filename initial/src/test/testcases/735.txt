@@ -1,10 +1,9 @@
 
         func main ()
         begin
-            var i <- 0
-            for i until i >= 1 by 1
-                var k <- 2
-            writeNumber(i)
-            ## writeNumber(k)
+            writeBool(true or true) 
+            writeBool(true or false)
+            writeBool(false or true) 
+            writeBool(false or false)  
         end
         

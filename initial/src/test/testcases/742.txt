@@ -1,7 +1,12 @@
 
-        number a[2]
         func main ()
         begin
-            writeNumber(a[1])
+            var i <- 0
+            for i until i >= 2 by 1
+            begin
+                i <- 1000
+                break
+            end
+            writeNumber(i)
         end
         

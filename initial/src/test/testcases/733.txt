@@ -1,10 +1,8 @@
 
         func main ()
         begin
-            var i <- 0
-            for i until i >= 2 by 1
-                writeNumber(i)
-                
-            writeNumber(i)
+            writeBool(1 = 2) 
+            writeBool(2 = 1) 
+            writeBool(1 = 1) 
         end
         

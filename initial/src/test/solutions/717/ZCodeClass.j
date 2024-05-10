@@ -21,14 +21,17 @@ Label1:
 .limit locals 0
 .end method
 
-.method public static foo()Ljava/lang/String;
+.method public static foo(Ljava/lang/String;)Ljava/lang/String;
 Label0:
-.var 0 is for F from Label0 to Label1
-	ldc "vohung"
+.var 0 is a Ljava/lang/String; from Label0 to Label1
+.var 1 is for F from Label0 to Label1
+Label2:
+	aload_0
 	areturn
+Label3:
 Label1:
 .limit stack 1
-.limit locals 1
+.limit locals 2
 .end method
 
 .method public static main([Ljava/lang/String;)V
@@ -36,14 +39,12 @@ Label0:
 .var 0 is args Ljava/lang/String; from Label0 to Label1
 .var 1 is for F from Label0 to Label1
 Label2:
-.var 2 is a Ljava/lang/Object; from Label2 to Label3
-	invokestatic ZCodeClass/foo()Ljava/lang/String;
-	astore_2
-	aload_2
+	ldc "vo"
+	invokestatic ZCodeClass/foo(Ljava/lang/String;)Ljava/lang/String;
 	invokestatic io/writeString(Ljava/lang/String;)V
 Label3:
 	return
 Label1:
 .limit stack 1
-.limit locals 3
+.limit locals 2
 .end method

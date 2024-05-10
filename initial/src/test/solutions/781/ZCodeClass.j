@@ -26,26 +26,54 @@ Label0:
 .var 0 is args Ljava/lang/String; from Label0 to Label1
 .var 1 is for F from Label0 to Label1
 Label2:
+.var 2 is a [[F from Label2 to Label3
 	ldc 2.0000
-	ldc 3.0000
-	fcmpl
-	ifle Label8
-	iconst_1
-	goto Label9
-Label8:
-	iconst_0
-Label9:
-	ifle Label7
-	ldc 1.0000
-	invokestatic io/writeNumber(F)V
-	goto Label6
-Label7:
+	f2i
+	anewarray [F
+	dup
 	ldc 0.0000
+	f2i
+	ldc 1.0000
+	f2i
+	newarray float
+	dup
+	ldc 0.0000
+	f2i
+	ldc 1.0000
+	fastore
+	aastore
+	dup
+	ldc 1.0000
+	f2i
+	ldc 1.0000
+	f2i
+	newarray float
+	dup
+	ldc 0.0000
+	f2i
+	ldc 2.0000
+	fastore
+	aastore
+	astore_2
+	aload_2
+	ldc 1.0000
+	f2i
+	aaload
+	ldc 0.0000
+	f2i
+	faload
 	invokestatic io/writeNumber(F)V
-Label6:
+	aload_2
+	ldc 0.0000
+	f2i
+	aaload
+	ldc 0.0000
+	f2i
+	faload
+	invokestatic io/writeNumber(F)V
 Label3:
 	return
 Label1:
-.limit stack 2
-.limit locals 2
+.limit stack 11
+.limit locals 3
 .end method

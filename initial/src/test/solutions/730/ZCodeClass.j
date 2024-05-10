@@ -26,17 +26,39 @@ Label0:
 .var 0 is args Ljava/lang/String; from Label0 to Label1
 .var 1 is for F from Label0 to Label1
 Label2:
-	ldc "vo"
-	ldc "hung"
-	invokevirtual java/lang/String/equals(Ljava/lang/Object;)Z
+	ldc 1.0000
+	ldc 2.0000
+	fcmpl
+	ifge Label4
+	iconst_1
+	goto Label5
+Label4:
+	iconst_0
+Label5:
 	invokestatic io/writeBool(Z)V
-	ldc "hung"
-	ldc "hung"
-	invokevirtual java/lang/String/equals(Ljava/lang/Object;)Z
+	ldc 2.0000
+	ldc 1.0000
+	fcmpl
+	ifge Label6
+	iconst_1
+	goto Label7
+Label6:
+	iconst_0
+Label7:
+	invokestatic io/writeBool(Z)V
+	ldc 1.0000
+	ldc 1.0000
+	fcmpl
+	ifge Label8
+	iconst_1
+	goto Label9
+Label8:
+	iconst_0
+Label9:
 	invokestatic io/writeBool(Z)V
 Label3:
 	return
 Label1:
-.limit stack 3
+.limit stack 2
 .limit locals 2
 .end method

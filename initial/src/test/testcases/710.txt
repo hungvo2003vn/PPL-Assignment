@@ -1,10 +1,14 @@
 
+        dynamic a <-1
         func foo(number a)
         begin
-            return a
+            writeNumber(a)
+            var a <- 3
+            writeNumber(a)
         end
         func main ()
         begin
-            writeNumber(foo(2))
+            foo(2)
+            writeNumber(a)
         end
         

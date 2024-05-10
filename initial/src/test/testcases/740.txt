@@ -1,12 +1,7 @@
 
         func main ()
         begin
-            var i <- 0
-            for i until i >= 2 by 1
-            begin
-                writeNumber(i)
-                break
-                writeNumber(i)
-            end
+            writeNumber(--1) 
+            writeNumber(-1)
         end
         

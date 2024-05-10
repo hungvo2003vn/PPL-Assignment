@@ -1,9 +1,10 @@
 
-        func foo()
+        func foo(number a)
+        begin
             return true
+        end
         func main ()
         begin
-            var a <- foo() ## true
-            writeBool(a)
+            writeBool(foo(2))
         end
         

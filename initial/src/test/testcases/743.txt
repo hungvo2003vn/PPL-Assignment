@@ -1,0 +1,10 @@
+
+        func main ()
+        begin
+            var i <- 0
+            for i until i >= 1 by 1
+                var k <- 2
+            writeNumber(i)
+            ## writeNumber(k)
+        end
+        

@@ -26,10 +26,36 @@ Label0:
 .var 0 is args Ljava/lang/String; from Label0 to Label1
 .var 1 is for F from Label0 to Label1
 Label2:
-	ldc "vo"
-	ldc "hung"
-	invokevirtual java/lang/String/concat(Ljava/lang/String;)Ljava/lang/String;
-	invokestatic io/writeString(Ljava/lang/String;)V
+	ldc 1.0000
+	ldc 2.0000
+	fcmpl
+	iflt Label4
+	iconst_1
+	goto Label5
+Label4:
+	iconst_0
+Label5:
+	invokestatic io/writeBool(Z)V
+	ldc 2.0000
+	ldc 1.0000
+	fcmpl
+	iflt Label6
+	iconst_1
+	goto Label7
+Label6:
+	iconst_0
+Label7:
+	invokestatic io/writeBool(Z)V
+	ldc 1.0000
+	ldc 1.0000
+	fcmpl
+	iflt Label8
+	iconst_1
+	goto Label9
+Label8:
+	iconst_0
+Label9:
+	invokestatic io/writeBool(Z)V
 Label3:
 	return
 Label1:

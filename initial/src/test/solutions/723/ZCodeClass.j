@@ -21,44 +21,33 @@ Label1:
 .limit locals 0
 .end method
 
+.method public static foo(FF)F
+Label0:
+.var 0 is a F from Label0 to Label1
+.var 1 is c F from Label0 to Label1
+.var 2 is for F from Label0 to Label1
+	fload_0
+	freturn
+Label1:
+.limit stack 1
+.limit locals 3
+.end method
+
 .method public static main([Ljava/lang/String;)V
 Label0:
 .var 0 is args Ljava/lang/String; from Label0 to Label1
 .var 1 is for F from Label0 to Label1
 Label2:
+.var 2 is a F from Label2 to Label3
 	ldc 1.0000
 	ldc 2.0000
-	fcmpl
-	ifgt Label4
-	iconst_1
-	goto Label5
-Label4:
-	iconst_0
-Label5:
-	invokestatic io/writeBool(Z)V
-	ldc 2.0000
-	ldc 1.0000
-	fcmpl
-	ifgt Label6
-	iconst_1
-	goto Label7
-Label6:
-	iconst_0
-Label7:
-	invokestatic io/writeBool(Z)V
-	ldc 1.0000
-	ldc 1.0000
-	fcmpl
-	ifgt Label8
-	iconst_1
-	goto Label9
-Label8:
-	iconst_0
-Label9:
-	invokestatic io/writeBool(Z)V
+	invokestatic ZCodeClass/foo(FF)F
+	fstore_2
+	fload_2
+	invokestatic io/writeNumber(F)V
 Label3:
 	return
 Label1:
 .limit stack 2
-.limit locals 2
+.limit locals 3
 .end method
