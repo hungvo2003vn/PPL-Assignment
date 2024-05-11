@@ -16,10 +16,17 @@ class CodeGenerator:
 
 class Access():
     def __init__(self, frame: Frame, symbol: list[list], isLeft: bool, checkTypeLHS_RHS = False):
-        self.frame = frame #* không gian stack và local cần dùng để chạy 1 hàm
-        self.symbol = symbol #* giống phần param ở BTL3 nhưng này hiện thực list<list>> (có thể dùng list<dict> như btl3)
-        self.isLeft = isLeft #* hiện tại vế trên trái hay bên phải để xác định get và put cho biến
-        self.checkTypeLHS_RHS = checkTypeLHS_RHS  #* kiểm tra kiểu đúng không
+        self.frame = frame
+        self.symbol = symbol
+        self.isLeft = isLeft
+        self.checkTypeLHS_RHS = checkTypeLHS_RHS
+
+class Global():
+    def __init__(self, symbol: list[list] = [[]], main: FuncDecl = None, function: FuncZcode = None, frame: Frame = None):
+        self.symbol = symbol
+        self.main = main
+        self.function = function,
+        self.frame = frame
 
 class CodeGenVisitor(BaseVisitor):
     def __init__(self, astTree, path):
@@ -31,39 +38,30 @@ class CodeGenVisitor(BaseVisitor):
         self.function = None
         self.Return = False
         self.arrayCell = "" 
-    
-    def printListfunction(self):
-        print(f"self.function: {str(self.function)}" )
-        print(f"self.Return  : {str(self.Return)}" )
-        print(f"listFunction :")
-        for item in self.Listfunction:
-            print(f"         : {str(item)}" )
-    
+     
+    # Update type
+    def LHS_RHS(self, LHS, RHS, o: Access):
 
+        lhsAccess = Access(o.frame, o.symbol, True, True)
+        rhsAccess = Access(o.frame, o.symbol, False, True)
+        _, rhsType = self.visit(RHS, rhsAccess)
+        _, lhsType = self.visit(LHS, lhsAccess)
 
+        if isinstance(lhsType, Zcode) or isinstance(rhsType, Zcode):
+
+            typ = rhsType if isinstance(lhsType, Zcode) else lhsType
+            ZcodeType = rhsType if isinstance(rhsType, Zcode) else lhsType
+            # Set type for Zcode and buff
+            ZcodeType.typ = typ
+            self.emit.setType(ZcodeType)
     
-    #* CẬP NHẬT TYPE
-    def LHS_RHS(self, LHS, RHS, o):
-        #* TRUYỀN checkTypeLHS_RHS = Flase -> nghĩa là chúng ta xét type trước, trước khi lấy stack
-        _, rhsType = self.visit(RHS, Access(o.frame, o.symbol, False, True))
-        _, lhsType = self.visit(LHS, Access(o.frame, o.symbol, True, True))
-        if isinstance(lhsType, Zcode):
-            lhsType.typ = rhsType
-            self.emit.setType(lhsType) #* cập nhật lại type vì trước đó type là None
-            
-            
-        elif isinstance(rhsType, Zcode):
-           rhsType.typ = lhsType
-           self.emit.setType(rhsType) #* cập nhật lại type vì trước đó type là None
-    
-    def visitProgram(self, ast:Program, o):
-        #* khởi tạo chương trình ZCodeClass
-        self.emit.printout(self.emit.emitPROLOG(self.className, "java.lang.Object"))
-    
-        #* khởi tạo anh em biến toàn cục, hàm -> cho nó static giống java
+    def initGlobal(self, ast:Program):
+
+        # Init method, var in global
         Symbol = [[]]
         Main = None
         function = None
+
         for item in ast.decl:
             if type(item) is VarDecl:
                 index = -1
@@ -75,9 +73,12 @@ class CodeGenVisitor(BaseVisitor):
                 if item.name.name == "main":
                     function = self.Listfunction[-1]
                     Main = item
-        
-    
-        #* hàm khởi tạo trong Zcode 
+
+        return Global(Symbol, Main, function)
+
+    def initConstructor(self):
+
+        # Constructor in Zcode 
         frame = Frame("<init>", VoidType)
         self.emit.printout(self.emit.emitMETHOD(lexeme="<init>", in_=FuncZcode("init", VoidType(), []), isStatic=False, frame=frame))
         frame.enterScope(True)
@@ -89,37 +90,72 @@ class CodeGenVisitor(BaseVisitor):
         self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))
         self.emit.printout(self.emit.emitENDMETHOD(frame))
         frame.exitScope()
+    
+    def initAttribute(self, ast: Program, o: Global):
 
-
-        #* hàm khởi tạo biến static Zcode
+        # Init Attribute in ZcodeClass
+        Symbol = o.symbol
         frame = Frame("<clinit>", VoidType)
-        self.emit.printout(self.emit.emitMETHOD(lexeme="<clinit>", in_=FuncZcode("clinit", VoidType(), []), isStatic=True, frame=frame))
+
+        # Init Constructor
+        code = self.emit.emitMETHOD(
+            lexeme="<clinit>", 
+            in_=FuncZcode("clinit", VoidType(), []), 
+            isStatic=True, 
+            frame=frame
+        )
+        self.emit.printout(code)
+
+        # Enter scope, emitLABEL
         frame.enterScope(True)
         self.emit.printout(self.emit.emitLABEL(frame.getStartLabel(), frame))
+
         for var in ast.decl:
+
             if type(var) is VarDecl and var.varInit is not None:
-                self.visit(Assign(var.name, var.varInit), Access(frame, Symbol, False)) 
+
+                LHS = var.name
+                RHS = var.varInit
+                self.visit(Assign(LHS, RHS), Access(frame, Symbol, False))
+
             elif type(var) is VarDecl and type(var.varType) is ArrayType:
-                if len(var.varType.size) == 1:
-                    self.emit.printout(self.visit(NumberLiteral(var.varType.size[0]), Access(frame, Symbol, False))[0])
+                
+                arrayType: ArrayType = var.varType
+                for i in arrayType.size:
+
+                    sizeCode, _ = self.visit(
+                        NumberLiteral(i), 
+                        Access(frame, Symbol, False)
+                    )
+                    self.emit.printout(sizeCode)
                     self.emit.printout(self.emit.emitF2I(frame))
-                    self.emit.printout(self.emit.emitNEWARRAY(var.varType.eleType, frame))
-                    self.emit.printout(self.emit.emitPUTSTATIC(self.className + "." + var.name.name, var.varType, frame))
+
+                # 1-D array
+                if len(arrayType.size) == 1:
+                    self.emit.printout(self.emit.emitNEWARRAY(arrayType.eleType, frame))
+                
                 else:
-                    for i in var.varType.size:
-                        self.emit.printout(self.visit(NumberLiteral(i), Access(frame, Symbol, False))[0])
-                        self.emit.printout(self.emit.emitF2I(frame))
-                    self.emit.printout(self.emit.emitMULTIANEWARRAY(var.varType, frame))
-                    self.emit.printout(self.emit.emitPUTSTATIC(self.className + "." + var.name.name, var.varType, frame))
+                    self.emit.printout(self.emit.emitMULTIANEWARRAY(arrayType, frame))
+                # N-D array
+                self.emit.printout(
+                    self.emit.emitPUTSTATIC(
+                        self.className + "." + var.name.name, 
+                        arrayType, 
+                        frame
+                    )
+                )
+
+        # End method
         self.emit.printout(self.emit.emitRETURN(VoidType(), frame)) 
         self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))  
         self.emit.printout(self.emit.emitENDMETHOD(frame))
-        frame.exitScope()    
-    
-    
-        
-        #* khởi tạo các hàm static
+        # Exit scope
+        frame.exitScope()
+
+    def initMethod(self, ast: Program, o: Global):
+
         i = 0
+        Symbol = o.symbol
         for item in ast.decl:
             if type(item) is FuncDecl and item.body is not None:
 
@@ -128,23 +164,78 @@ class CodeGenVisitor(BaseVisitor):
                     self.visit(item, Symbol)
                     
                 i += 1
-                
-        
-        #* khởi tạo hàm main
+    
+    def initMainMethod(self, o: Global):
+
+        Main = o.main
+        Symbol = o.symbol
+        function = o.function
         frame = Frame("main", VoidType)
-        self.emit.printout(self.emit.emitMETHOD(lexeme="main", in_=FuncZcode("main", VoidType(), [ArrayType([1], StringType())]), isStatic=True, frame=frame))
+
+        code = self.emit.emitMETHOD(
+            lexeme="main", 
+            in_=FuncZcode("main", VoidType(), [ArrayType([1], StringType())]), 
+            isStatic=True, 
+            frame=frame
+        )
+        self.emit.printout(code)
+
+        # Enter Scope and emitLABEL
         frame.enterScope(True)
         self.emit.printout(self.emit.emitLABEL(frame.getStartLabel(), frame))
-        self.emit.printout(self.emit.emitVAR(frame.getNewIndex(), "args", ArrayType([], StringType()), frame.getStartLabel(), frame.getEndLabel(), frame))
+
+        # Init String[] args in java
+        code = self.emit.emitVAR(
+            frame.getNewIndex(), 
+            "args", 
+            ArrayType([], StringType()), 
+            frame.getStartLabel(), 
+            frame.getEndLabel(), 
+            frame
+        )
+        self.emit.printout(code)
+
+        # Temp param used for ForStmt
         index = frame.getNewIndex()
         typeParam = [VarZcode("for", NumberType(), index, True)]
-        self.emit.printout(self.emit.emitVAR(index, "for", NumberType(), frame.getStartLabel(), frame.getEndLabel(), frame))
+        code = self.emit.emitVAR(
+            index, 
+            "for", 
+            NumberType(), 
+            frame.getStartLabel(), 
+            frame.getEndLabel(), 
+            frame
+        )
+        self.emit.printout(code)
+
+        # Set function to check body
         self.function = function
+        # Visit body
         self.visit(Main.body, Access(frame, [typeParam] + Symbol, False))
+
+        # End main method
         self.emit.printout(self.emit.emitRETURN(VoidType(), frame))
         self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))   
         self.emit.printout(self.emit.emitENDMETHOD(frame))
+        # Exit Scope
         frame.exitScope()    
+
+    def visitProgram(self, ast: Program, o):
+
+        # Init Program ZCodeClass
+        self.emit.printout(self.emit.emitPROLOG(self.className, "java.lang.Object"))
+
+        # Init method, var in global
+        varGlobal = self.initGlobal(ast)
+        # Init constructor
+        self.initConstructor()
+        # Init Attribute of class Zcode
+        self.initAttribute(ast, varGlobal)
+        # Init method of class Zcode
+        self.initMethod(ast, varGlobal)
+        # Init Main
+        self.initMainMethod(varGlobal)
+        # Printout all the buff to .j file to run
         self.emit.emitEPILOG()
     
     def visitVarDecl(self, ast, o: Access):
