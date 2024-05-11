@@ -1,6 +1,7 @@
 
 
 import java.io.*;
+import java.io.IOException;
 
 //import bkool.codegeneration.IllegalRuntimeException;
 
@@ -10,37 +11,6 @@ public class io {
 	public static BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 	public static Writer writer = new BufferedWriter(new OutputStreamWriter(System.out));
 	
-    public static float readNumber()
-    {
-        return -1;
-    }
-
-    public static String readString()
-    {
-        return "-1";
-    }
-
-
-    public static void writeNumber(float value)
-    {
-        writeFloatLn(value);
-    }
-
-    public static void writeString(String value)
-    {
-        writeStrLn(value);
-    }
-
-    // public static void writeBool(boolean value)
-    // {
-        
-    // }
-
-
-
-
-
-
 	//public io(String name) throws IOException {
 		
 	//}
@@ -82,7 +52,7 @@ public class io {
     /** return a floating-point value read from the standard input
      *	@return float the floating-point value
      */
-    public static float readFloat()  {   
+    public static float readNumber()  {   
     	String tmp ="";
         try {
             tmp = input.readLine();
@@ -100,7 +70,7 @@ public class io {
     /** print out the value of the float f to the standard output
      *	@param f the floating-point value is printed out
      */
-    public static void writeFloat(float f)  {
+    public static void writeNumber(float f)  {
     	System.out.print(f+"");
     }
     
@@ -133,7 +103,7 @@ public class io {
      *	@param b the boolean value is printed out
      */
     public static void writeBool(boolean b)  {
-    	System.out.println(b+"");
+    	System.out.print(b+"");
     }
     
     /** same as putBoolLn except that it also prints a new line
@@ -159,7 +129,7 @@ public class io {
     /** prints the value of the string to the standard output
      *	@param a the string is printed out
      */
-     public static String readStr() {
+     public static String readString() {
     	 String tmp ="";
         try {
             tmp = input.readLine();
@@ -177,7 +147,7 @@ public class io {
     /** same as putString except that it also prints a new line
      *	@param a the string is printed out
      */
-    public static void writeStr(String a)  {
+    public static void writeString(String a)  {
     	System.out.print(a);
     }
     /** print out an empty line
@@ -193,5 +163,5 @@ public class io {
 			 e.printStackTrace();
 		}
     }
-}
 
+}
