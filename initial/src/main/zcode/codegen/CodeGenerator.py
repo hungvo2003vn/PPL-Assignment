@@ -724,7 +724,7 @@ class CodeGenVisitor(BaseVisitor):
         codeReturn += self.emit.emitF2I(frame)
 
         if o.isLeft:
-            self.arrayCell = returnType
+            self.arrayCell = typeArray.eleType if len(ast.idx) == len(typeArray.size) else typeArray
         else:
             typ = None
             if type(typeArray) is ArrayType:

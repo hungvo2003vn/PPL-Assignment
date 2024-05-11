@@ -1617,7 +1617,19 @@ end
         self.assertTrue(TestCodeGen.test(input, expect, 817))                             
                                  
     
-        
+    def test_Edgecase(self):
+
+        input = """
+            func main ()
+            begin
+                number a[4, 2]
+                number b[2] <- [6, 9]
+                a[1] <- b
+                writeNumber(a[1,1])
+            end
+        """
+        expect = "9.0\n"
+        self.assertTrue(TestCodeGen.test(input, expect, 818))
         
         
         
