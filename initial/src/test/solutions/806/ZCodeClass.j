@@ -27,15 +27,44 @@ Label0:
 .var 1 is for F from Label0 to Label1
 Label2:
 .var 2 is a Ljava/lang/Object; from Label2 to Label3
+.var 3 is b [[F from Label2 to Label3
+	ldc 2.0000
+	f2i
+	anewarray [F
+	dup
 	ldc 0.0000
-	fstore_2
-	fload_2
+	f2i
+	ldc 2.0000
+	f2i
+	newarray float
+	dup
+	ldc 0.0000
+	f2i
 	ldc 1.0000
-	fadd
+	fastore
+	dup
+	ldc 1.0000
+	f2i
+	ldc 1.0000
+	fastore
+	aastore
+	dup
+	ldc 1.0000
+	f2i
+	aload_2
+	aastore
+	astore_3
+	aload_3
+	ldc 1.0000
+	f2i
+	aaload
+	ldc 1.0000
+	f2i
+	faload
 	invokestatic io/writeNumber(F)V
 Label3:
 	return
 Label1:
-.limit stack 2
-.limit locals 3
+.limit stack 10
+.limit locals 4
 .end method

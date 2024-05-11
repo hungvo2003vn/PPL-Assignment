@@ -27,6 +27,8 @@ Label0:
 .var 1 is for F from Label0 to Label1
 Label2:
 .var 2 is a F from Label2 to Label3
+	ldc 0.0000
+	fstore_2
 	fload_2
 	invokestatic io/writeNumber(F)V
 Label3:

@@ -427,7 +427,7 @@ class CodeGenVisitor(BaseVisitor):
                         return None, sym.typ if sym.typ else sym
                                         
         # Find in all scope
-        sym = None
+        sym: VarZcode = None
         isGlobal = False
         for i, scope in enumerate(Symbol, 1):
             for item in scope:
@@ -441,13 +441,45 @@ class CodeGenVisitor(BaseVisitor):
         # Check scope
         code = None
         if not isGlobal:
-            if o.isLeft: code = self.emit.emitWRITEVAR(sym.name, sym.typ, sym.index, frame)
-            else: code = self.emit.emitREADVAR(sym.name, sym.typ, sym.index, frame)
+            if o.isLeft: 
+                code = self.emit.emitWRITEVAR(sym.name, sym.typ, sym.index, frame)
+                sym.init = True
+            else: 
+                initCode = self.initVar(sym, frame, isGlobal)
+                code = initCode + self.emit.emitREADVAR(sym.name, sym.typ, sym.index, frame)
         else:
-            if o.isLeft: code = self.emit.emitPUTSTATIC(self.className + "/" + sym.name, sym.typ, frame)
-            else: code = self.emit.emitGETSTATIC(self.className + "/" + sym.name, sym.typ, frame)
+            if o.isLeft: 
+                code = self.emit.emitPUTSTATIC(self.className + "/" + sym.name, sym.typ, frame)
+                sym.init = True
+            else: 
+                initCode = self.initVar(sym, frame, isGlobal)
+                code = initCode + self.emit.emitGETSTATIC(self.className + "/" + sym.name, sym.typ, frame)
         
         return code, sym.typ if sym.typ else sym
+    
+    def initVar(self, sym: VarZcode, frame: Frame, isGlobal: bool):
+
+        code = ''
+        if sym.init: return code
+
+        initItems = {
+            "NumberType": 0.0,
+            "StringType": "",
+            "BoolType": False
+        }
+        initValue = initItems.get(sym.typ.__str__())
+
+        if initValue is not None:
+            code += self.emit.emitPUSHCONST(initValue, sym.typ, frame)
+
+            if not isGlobal:
+                code += self.emit.emitWRITEVAR(sym.name, sym.typ, sym.index, frame)
+            else:
+                code += self.emit.emitPUTSTATIC(self.className + "/" + sym.name, sym.typ, frame)
+
+            sym.init = True
+
+        return code
 
     def visitCallExpr(self, ast, o: Access):
 

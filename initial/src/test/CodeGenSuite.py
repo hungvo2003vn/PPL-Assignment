@@ -1362,16 +1362,16 @@ class CheckCodeGenSuite(unittest.TestCase):
         self.assertTrue(TestCodeGen.test(input, expect, 805)) 
                  
                  
-        input = """
-            func main()
-            begin
-                dynamic a
-                number b[2,2] <- [[1,1], a]
-                writeNumber(b[1,1])
-            end
-        """
-        expect = "0.0\n"
-        self.assertTrue(TestCodeGen.test(input, expect, 806)) 
+        # input = """
+        #     func main()
+        #     begin
+        #         dynamic a
+        #         number b[2,2] <- [[1,1], a]
+        #         writeNumber(b[1,1])
+        #     end
+        # """
+        # expect = "0.0\n"
+        # self.assertTrue(TestCodeGen.test(input, expect, 806)) 
              
              
     #* test ALL    

@@ -21,6 +21,17 @@ Label1:
 .limit locals 0
 .end method
 
+.method public static foo(F)F
+Label0:
+.var 0 is a F from Label0 to Label1
+.var 1 is for F from Label0 to Label1
+	fload_0
+	freturn
+Label1:
+.limit stack 1
+.limit locals 2
+.end method
+
 .method public static main([Ljava/lang/String;)V
 Label0:
 .var 0 is args Ljava/lang/String; from Label0 to Label1
@@ -30,12 +41,11 @@ Label2:
 	ldc 0.0000
 	fstore_2
 	fload_2
-	ldc 1.0000
-	fadd
+	invokestatic ZCodeClass/foo(F)F
 	invokestatic io/writeNumber(F)V
 Label3:
 	return
 Label1:
-.limit stack 2
+.limit stack 1
 .limit locals 3
 .end method
