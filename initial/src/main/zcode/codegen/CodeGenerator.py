@@ -63,13 +63,31 @@ class CodeGenVisitor(BaseVisitor):
         function = None
 
         for item in ast.decl:
+
             if type(item) is VarDecl:
+
                 index = -1
-                Symbol[0].append(VarZcode(item.name.name, item.varType, -1, True if item.varInit else False))
-                self.emit.printout(self.emit.emitATTRIBUTE(item.name.name, item.varType if item.varType else Symbol[0][-1], False, self.className))
+                # Add var to current scope
+                newVar = VarZcode(item.name.name, item.varType, index, True if item.varInit else False)
+                Symbol[0].append(newVar)
+
+                code = self.emit.emitATTRIBUTE(
+                    item.name.name, 
+                    item.varType if item.varType else Symbol[0][-1], 
+                    False, 
+                    self.className
+                )
+                self.emit.printout(code)
+
+                # Record buffer's line of var
                 Symbol[0][-1].line = self.emit.printIndexNew()
+
             elif type(item) is FuncDecl and item.body is not None:
-                self.Listfunction += [FuncZcode(item.name.name, None, [i.varType for i in item.param])]
+                
+                # Add new function
+                newFunction = FuncZcode(item.name.name, None, [i.varType for i in item.param])
+                self.Listfunction.append(newFunction)
+
                 if item.name.name == "main":
                     function = self.Listfunction[-1]
                     Main = item
@@ -80,15 +98,46 @@ class CodeGenVisitor(BaseVisitor):
 
         # Constructor in Zcode 
         frame = Frame("<init>", VoidType)
-        self.emit.printout(self.emit.emitMETHOD(lexeme="<init>", in_=FuncZcode("init", VoidType(), []), isStatic=False, frame=frame))
+        # Init Method
+        code = self.emit.emitMETHOD(
+            lexeme="<init>", 
+            in_=FuncZcode("init", VoidType(), []), 
+            isStatic=False, 
+            frame=frame
+        )
+        self.emit.printout(code)
+
+        # Enter scope, emitLABEL
         frame.enterScope(True)
         self.emit.printout(self.emit.emitLABEL(frame.getStartLabel(), frame))
-        self.emit.printout(self.emit.emitVAR(frame.getNewIndex(), "this", Zcode(), frame.getStartLabel(), frame.getEndLabel(), frame))
-        self.emit.printout(self.emit.emitREADVAR("this", self.className, 0, frame))
+
+        # Declare attributes, methods
+        self.emit.printout(
+            self.emit.emitVAR(
+                frame.getNewIndex(), 
+                "this", Zcode(), 
+                frame.getStartLabel(), 
+                frame.getEndLabel(), 
+                frame)
+        )
+
+        # Read attributes, methods
+        self.emit.printout(
+            self.emit.emitREADVAR(
+                "this", 
+                self.className, 
+                0, 
+                frame
+            )
+        )
         self.emit.printout(self.emit.emitINVOKESPECIAL(frame))
+
+        # End Constructor
         self.emit.printout(self.emit.emitRETURN(VoidType(), frame))   
         self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))
         self.emit.printout(self.emit.emitENDMETHOD(frame))
+
+        # Exit scope
         frame.exitScope()
     
     def initAttribute(self, ast: Program, o: Global):
@@ -271,48 +320,31 @@ class CodeGenVisitor(BaseVisitor):
             
             # LHS
             arrayType: ArrayType = ast.varType
-            ## Array 1D
-            if len(arrayType.size) == 1:
-                
+
+            for size in arrayType.size:
+                    
                 # Visit NumberLiteral
-                code = self.visit(NumberLiteral(arrayType.size[0]), Access(frame, o.symbol, True))
-                self.emit.printout(code[0])
+                code, _ = self.visit(NumberLiteral(size), Access(frame, o.symbol, True))
+                self.emit.printout(code)
 
                 # Take 1 int from frame for the array dimension
                 self.emit.printout(self.emit.emitF2I(frame))
-                # Get new array 1D from frame
+
+            # Get new array 1D from frame
+            if len(arrayType.size) == 1:
                 self.emit.printout(self.emit.emitNEWARRAY(arrayType.eleType, frame))
-                # Place this var in scope
-                self.emit.printout(
-                    self.emit.emitWRITEVAR(
-                        name=ast.name.name,
-                        inType=arrayType,
-                        index=index,
-                        frame=frame
-                    )
-                )
-            ## Array N-D
+            # Get new array N-D from frame
             else:
-                for size in arrayType.size:
-                    
-                    # Visit NumberLiteral
-                    code = self.visit(NumberLiteral(size), Access(frame, o.symbol, True))
-                    self.emit.printout(code[0])
-
-                    # Take 1 int from frame for the array dimension
-                    self.emit.printout(self.emit.emitF2I(frame))
-
-                # Get new array N-D from frame
                 self.emit.printout(self.emit.emitMULTIANEWARRAY(arrayType, frame))
-                # Place this var in scope
-                self.emit.printout(
-                    self.emit.emitWRITEVAR(
-                        name=ast.name.name,
-                        inType=arrayType,
-                        index=index,
-                        frame=frame
-                    )
+            # Place this var in scope
+            self.emit.printout(
+                self.emit.emitWRITEVAR(
+                    name=ast.name.name,
+                    inType=arrayType,
+                    index=index,
+                    frame=frame
                 )
+            )
 
         # Set type for VarDecl in buff
         self.emit.setType(o.symbol[0][-1])
@@ -597,29 +629,7 @@ class CodeGenVisitor(BaseVisitor):
                 return None, ArrayType([len(ast.value)], mainTyp)
             return None, ArrayType([float(len(ast.value))] + mainTyp.size, mainTyp.eleType)
 
-        """#TODO:
-        #* trường hợp mảng 1 chiều
-            emitPUSHCONST -> giá trị khởi tạo của mảng
-            emitF2I -> ép kiểu sang int
-            emitNEWARRAY -> khởi tạo mảng
-            for
-                emitDUP -> nhân 2 ở đây là địa chỉ của mảng khởi tạo phía trên
-                emitPUSHCONST -> giá trị index trong mảng
-                emitF2I
-                visit -> giá trị biến
-                emitASTORE -> lưu trữ
-    
-        #* trường hợp mảng nhiều chiều
-            emitPUSHCONST -> giá trị khởi tạo của mảng
-            emitF2I -> ép kiểu sang int
-            emitANEWARRAY -> khởi tạo mảng
-            for
-                emitDUP -> nhân 2 ở đây là địa chỉ của mảng khởi tạo phía trên
-                emitPUSHCONST -> giá trị index trong mảng
-                emitF2I
-                visit -> giá trị biến
-                emitASTORE -> lưu trữ             
-        """
+        # No checkLHS_RHS
         _, typeArray = self.visit(ast.value[0], o)
         codeReturn, returnType = "", typeArray
 
@@ -662,28 +672,7 @@ class CodeGenVisitor(BaseVisitor):
             if len(arr.size) == len(ast.idx): return None, arr.eleType
             return None, ArrayType(arr.size[len(ast.idx):], arr.eleType)   
 
-
-        """#TODO:
-        #* trường trả về giá trị khác mảng
-            visit(ast.arr) -> lấy ra get/put/read/write
-            for 0 -> size - 1
-               giá trị tại index
-               f2i
-               aload
-            giá trị tại index = -1
-            f2i
-            float/bload/aload(string)  (nếu o.isLeft thì bỏ qua không gọi mà gán self.arrayCell = typ)  
-        
-        #* trường hợp tra về magnr
-            visit(ast.arr) -> lấy ra get/put/read/write
-            for 0 -> size - 1
-               giá trị tại index
-               f2i
-               aload
-            giá trị tại index = -1
-            f2i
-            aload -> địa chỉ   (nếu o.isLeft thì bỏ qua không gọi mà gán self.arrayCell = typ)            
-        """
+        # No check LHS-RHS
         frame = o.frame
         codeArray, typeArray = self.visit(ast.arr, Access(o.frame, o.symbol, False, False))
         codeReturn = codeArray
