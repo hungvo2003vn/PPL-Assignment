@@ -278,14 +278,7 @@ class CodeGenVisitor(BaseVisitor):
         frame.returnType = self.function.typ
 
         # Update function code
-        code = self.emit.emitMETHOD(
-            lexeme=ast.name.name,
-            in_=self.function,
-            isStatic=True,
-            frame=frame
-        )
-        line = self.function.line
-        self.emit.buff[line] = code
+        self.emit.setType(self.function)
 
         # End function
         if not self.Return: self.emit.printout(self.emit.emitRETURN(self.function.typ, frame))
