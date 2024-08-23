@@ -1,7 +1,7 @@
 # Principles of Programming Languages - Assignment (PPL)
 
 ## PPL Course Overview
-This is the most challenging course in the Computer Science curriculum that I've encountered during the second semester of my third year at HCMC University of Science and Technology (HCMUT). If you're currently taking this course, good luck surviving!
+This is the most challenging course in the Computer Science curriculum that I've encountered during the second semester of my third year at HCMC University of Technology (HCMUT). If you're currently taking this course, good luck surviving!
 
 ## Assignment Grades Summary
 
