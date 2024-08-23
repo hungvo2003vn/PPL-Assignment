@@ -1,0 +1,7 @@
+
+        func main ()
+        begin
+            var a <- readBool() #* true
+            writeBool(a)
+        end
+        

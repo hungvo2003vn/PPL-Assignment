@@ -1,0 +1,26 @@
+
+            func main() begin 
+                begin
+                    dynamic a
+                    var c <- a = 1
+                    a <- 3
+                end
+                begin
+                    dynamic a
+                    var c <- 1 <= a
+                    a <- 2
+                end
+                begin
+                    dynamic a
+                    var c <- 1 < a
+                    a <- 1
+                end
+                begin
+                    dynamic a
+                    dynamic b
+                    var c <- b > a
+                    a <- 1
+                    b <- 2
+                end
+            end
+        

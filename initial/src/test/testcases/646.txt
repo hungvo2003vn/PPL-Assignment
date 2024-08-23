@@ -1,0 +1,19 @@
+
+            func main() begin 
+                begin
+                    dynamic a
+                    var c <- a and false
+                    a <- true
+                end
+                begin
+                    dynamic a
+                    var c <- true or a
+                    a <- true
+                end
+                begin
+                    dynamic a
+                    var c <- a or a
+                    a <- true
+                end
+            end
+        

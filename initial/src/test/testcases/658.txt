@@ -1,0 +1,15 @@
+
+            func a() return
+            func a1(number a) return
+            func a2(number b, string c[2]) return
+            func main() begin 
+                dynamic v
+                a1(v)
+                v <- 1       
+                dynamic x   
+                dynamic y
+                 a2(x, y)
+                 x <- 1
+                 y <- ["a", "C"]
+            end
+        
